@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Pipeline Dashboard</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  #map {
+    width: 100%;
+    height: 70vh;
+  }
+  #store-list {
+    padding: 20px;
+  }
+</style>
+
+</head>
+<body>
+
+<h2 style="margin-left:20px;">📌 Sales Pipeline Dashboard</h2>
+
+<div id="map"></div>
+<div id="store-list"><b>⭐ 매장 리스트</b><br></div>
+
+<script>
+// 🚀 두영님 API URL 넣기
+const API_URL = "YOUR_API_URL_HERE?action=getPipeline";
+
+// 전역 변수
+let map;
+
+// -----------------------------
+// 1. 지도 초기화
+// -----------------------------
+function initMap() {
+  map = new Tmapv2.Map("map", {
+    center: new Tmapv2.LatLng(37.5665, 126.9780),
+    zoom: 12
+  });
+
+  // 데이터 불러오기
+  loadData();
+}
+
+// -----------------------------
+// 2. API에서 JSON 데이터 읽기
+// -----------------------------
+async function loadData() {
+  try {
+    const res = await fetch(API_URL);
+    const rows = await res.json();
+
+    if (!Array.isArray(rows)) {
+      alert("API 데이터 오류 발생!");
+      return;
+    }
+
+    renderList(rows);
+    renderMarkers(rows);
+
+  } catch (err) {
+    console.error(err);
+    alert("데이터 로딩 실패!");
+  }
+}
+
+// -----------------------------
+// 3. 매장 리스트 UI
+// -----------------------------
+function renderList(rows) {
+  const list = document.getElementById("store-list");
+  list.innerHTML = "<b>⭐ 매장 리스트</b><br><br>";
+
+  rows.forEach(r => {
+    list.innerHTML += `📍 ${r.Store || r.store_name || "매장명 없음"}<br>`;
+  });
+}
+
+// -----------------------------
+// 4. 지도에 마커 표시
+// -----------------------------
+function renderMarkers(rows) {
+  rows.forEach(r => {
+    if (!r.Lat || !r.Lng) return;
+
+    const marker = new Tmapv2.Marker({
+      position: new Tmapv2.LatLng(Number(r.Lat), Number(r.Lng)),
+      map: map
+    });
+
+    const info = new Tmapv2.InfoWindow({
+      position: new Tmapv2.LatLng(Number(r.Lat), Number(r.Lng)),
+      content: `<div style='padding:8px;'>${r.Store || "매장정보"}</div>`,
+      map: map
+    });
+  });
+}
+</script>
+
+<!-- TMap Script -->
+<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=l7xxf62f31f487904d9bb1584c5071cdb50"></script>
+
+<script>
+window.onload = initMap;
+</script>
+
+</body>
+</html>

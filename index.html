@@ -9,6 +9,7 @@
   body {
     margin: 0;
     font-family: Arial, sans-serif;
+    background: #fafafa;
   }
   #map {
     width: 100%;
@@ -25,6 +26,7 @@
     font-weight: bold;
   }
 </style>
+
 </head>
 
 <body>
@@ -35,10 +37,9 @@
 <div id="list">⭐ 매장 리스트<br><br></div>
 
 <script>
-// ⭐ 두영님 Apps Script API URL 넣기
-const API_URL = "https://script.google.com/macros/s/AKfycbysVT0VxsqMberRu6yO45Co5--UPHvJY7AuIsdG_rmc-CZ1B-FdBYt4DLdtcOYrgbc/exec";
+// ⭐ 두영님 Apps Script API URL
+const API_URL = "https://script.google.com/macros/s/AKfycbysVT0VxsqMberRu6yO45Co5--UPHvJY7AuIsdG_rmc-CZ1B-FdBYt4DLdtcOYrgbc/exec?action=getPipeline";
 
-// ⭐ 전역 변수 선언
 let map;
 
 // ------------------------
@@ -61,11 +62,13 @@ async function loadData() {
     const res = await fetch(API_URL);
     const rows = await res.json();
 
+    console.log("📌 Loaded rows:", rows);
+
     renderList(rows);
     renderMarkers(rows);
 
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error(err);
     alert("데이터 로딩 실패!");
   }
 }
@@ -78,43 +81,19 @@ function renderList(rows) {
   list.innerHTML = "⭐ 매장 리스트<br><br>";
 
   rows.forEach(r => {
-    list.innerHTML += `📍 ${r.name || r.Store || "매장명 없음"}<br>`;
+    list.innerHTML += `📍 ${r.name || "매장명 없음"}<br>`;
   });
 }
 
 // ------------------------
-// 4. 지도에 마커 표시
+// 4. 지도 마커 표시
 // ------------------------
 function renderMarkers(rows) {
-
   rows.forEach(r => {
-    const lat = Number(r.lat || r.Lat);
-    const lng = Number(r.lng || r.Lng);
+    const lat = Number(r.lat);
+    const lng = Number(r.lng);
 
     if (!lat || !lng) return;
 
     const marker = new google.maps.Marker({
-      position: { lat, lng },
-      map: map,
-      title: r.name || "매장명"
-    });
-
-    const info = new google.maps.InfoWindow({
-      content: `<div style="font-size:14px; padding:6px;">
-                  <b>${r.name || "매장명"}</b><br>
-                  ${r.sigungu || ""}
-                </div>`
-    });
-
-    marker.addListener("click", () => {
-      info.open(map, marker);
-    });
-  });
-}
-</script>
-
-<!-- ⭐ Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJMPPD7lWjk-E_LrmHJAbjnMV6ese-2bo&callback=initMap" async defer></script>
-
-</body>
-</html>
+      position: { lat,

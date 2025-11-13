@@ -1,99 +1,132 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sales Pipeline Dashboard</title>
 
 <style>
   body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #fafafa;
   }
   #map {
     width: 100%;
     height: 70vh;
   }
-  #list {
+  #store-list {
     padding: 20px;
-    font-size: 16px;
-    line-height: 1.6;
+    font-size: 15px;
   }
-  .title {
-    margin: 20px;
-    font-size: 22px;
-    font-weight: bold;
+  .store-item {
+    margin-bottom: 8px;
   }
 </style>
-
 </head>
 
 <body>
-
-<div class="title">📌 Sales Pipeline Dashboard</div>
+<h2 style="margin-left:20px;">📌 Sales Pipeline Dashboard</h2>
 
 <div id="map"></div>
-<div id="list">⭐ 매장 리스트<br><br></div>
+<div id="store-list"><b>⭐ 매장 리스트</b><br><br></div>
 
 <script>
-// ⭐ 두영님 Apps Script API URL
-const API_URL = "https://script.google.com/macros/s/AKfycbysVT0VxsqMberRu6yO45Co5--UPHvJY7AuIsdG_rmc-CZ1B-FdBYt4DLdtcOYrgbc/exec?action=getPipeline";
+// ------------------------------------------------------
+// 1) 두영님 Apps Script API URL (배포된 URL 넣기)
+// ------------------------------------------------------
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbxp7_Am-8OU9mR8YKQs8K_HfeC99AQXhJDBXBuJ56_ZqCu1V4Z1Dh4l0aYub0lcNG2k/exec?action=getPipeline";
 
+// 지도 변수
 let map;
 
-// ------------------------
-// 1. Google Map 초기화
-// ------------------------
+// ------------------------------------------------------
+// 2) 지도 초기화
+// ------------------------------------------------------
 function initMap() {
-  map = new google.maps.Map(document.getElementById("map"), {
-    center: { lat: 37.5665, lng: 126.9780 },
-    zoom: 11
+  map = new Tmapv2.Map("map", {
+    center: new Tmapv2.LatLng(37.5665, 126.9780),
+    zoom: 12,
   });
 
   loadData();
 }
 
-// ------------------------
-// 2. Apps Script JSON 불러오기
-// ------------------------
+// ------------------------------------------------------
+// 3) API → JSON 로드
+// ------------------------------------------------------
 async function loadData() {
   try {
     const res = await fetch(API_URL);
     const rows = await res.json();
 
-    console.log("📌 Loaded rows:", rows);
+    console.log("🔥 Pipeline Data:", rows);
+
+    if (!Array.isArray(rows)) {
+      alert("API 응답 오류");
+      return;
+    }
 
     renderList(rows);
     renderMarkers(rows);
 
   } catch (err) {
-    console.error(err);
+    console.error("API Error:", err);
     alert("데이터 로딩 실패!");
   }
 }
 
-// ------------------------
-// 3. 매장 리스트 렌더링
-// ------------------------
+// ------------------------------------------------------
+// 4) 매장 리스트 표시
+// ------------------------------------------------------
 function renderList(rows) {
-  const list = document.getElementById("list");
-  list.innerHTML = "⭐ 매장 리스트<br><br>";
+  const box = document.getElementById("store-list");
+  box.innerHTML = "<b>⭐ 매장 리스트</b><br><br>";
 
-  rows.forEach(r => {
-    list.innerHTML += `📍 ${r.name || "매장명 없음"}<br>`;
+  rows.forEach((r) => {
+    const name = r["Store"] || r["매장명"] || "매장명 없음";
+
+    box.innerHTML += `
+      <div class="store-item">
+        📍 ${name}
+      </div>
+    `;
   });
 }
 
-// ------------------------
-// 4. 지도 마커 표시
-// ------------------------
+// ------------------------------------------------------
+// 5) 지도에 마커 찍기
+// ------------------------------------------------------
 function renderMarkers(rows) {
-  rows.forEach(r => {
-    const lat = Number(r.lat);
-    const lng = Number(r.lng);
+  rows.forEach((r) => {
+    const lat = parseFloat(r["Lat"] || r["lat"]);
+    const lng = parseFloat(r["Lng"] || r["lng"]);
 
     if (!lat || !lng) return;
 
-    const marker = new google.maps.Marker({
-      position: { lat,
+    const marker = new Tmapv2.Marker({
+      position: new Tmapv2.LatLng(lat, lng),
+      map: map,
+    });
+
+    new Tmapv2.InfoWindow({
+      position: new Tmapv2.LatLng(lat, lng),
+      content: `<div style='padding:6px;'>${r["Store"] || "매장"}</div>`,
+      type: 2,
+      map: map,
+    });
+  });
+}
+</script>
+
+<!-- TMap JS SDK -->
+<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=l7xxf62f31f487904d9bb1584c5071cdb50"></script>
+
+<script>
+window.onload = () => initMap();
+</script>
+
+</body>
+</html>
+
+

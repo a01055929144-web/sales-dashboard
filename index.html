@@ -14,100 +14,107 @@
     width: 100%;
     height: 70vh;
   }
-  #store-list {
+  #list {
     padding: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .title {
+    margin: 20px;
+    font-size: 22px;
+    font-weight: bold;
   }
 </style>
-
 </head>
+
 <body>
 
-<h2 style="margin-left:20px;">📌 Sales Pipeline Dashboard</h2>
+<div class="title">📌 Sales Pipeline Dashboard</div>
 
 <div id="map"></div>
-<div id="store-list"><b>⭐ 매장 리스트</b><br></div>
+<div id="list">⭐ 매장 리스트<br><br></div>
 
 <script>
-// 🚀 두영님 API URL 넣기
-const API_URL = "AIzaSyDJMPPD7lWjk-E_LrmHJAbjnMV6ese-2bo?action=getPipeline";
+// ⭐ 두영님 Apps Script API URL 넣기
+const API_URL = "👉👉👉 여기에 Apps Script URL + '?action=getPipeline' 넣기";
 
-// 전역 변수
+// ⭐ 전역 변수 선언
 let map;
 
-// -----------------------------
-// 1. 지도 초기화
-// -----------------------------
+// ------------------------
+// 1. Google Map 초기화
+// ------------------------
 function initMap() {
-  map = new Tmapv2.Map("map", {
-    center: new Tmapv2.LatLng(37.5665, 126.9780),
-    zoom: 12
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: 37.5665, lng: 126.9780 },
+    zoom: 11
   });
 
-  // 데이터 불러오기
   loadData();
 }
 
-// -----------------------------
-// 2. API에서 JSON 데이터 읽기
-// -----------------------------
+// ------------------------
+// 2. Apps Script JSON 불러오기
+// ------------------------
 async function loadData() {
   try {
     const res = await fetch(API_URL);
     const rows = await res.json();
 
-    if (!Array.isArray(rows)) {
-      alert("API 데이터 오류 발생!");
-      return;
-    }
-
     renderList(rows);
     renderMarkers(rows);
 
-  } catch (err) {
-    console.error(err);
+  } catch (e) {
+    console.error(e);
     alert("데이터 로딩 실패!");
   }
 }
 
-// -----------------------------
-// 3. 매장 리스트 UI
-// -----------------------------
+// ------------------------
+// 3. 매장 리스트 렌더링
+// ------------------------
 function renderList(rows) {
-  const list = document.getElementById("store-list");
-  list.innerHTML = "<b>⭐ 매장 리스트</b><br><br>";
+  const list = document.getElementById("list");
+  list.innerHTML = "⭐ 매장 리스트<br><br>";
 
   rows.forEach(r => {
-    list.innerHTML += `📍 ${r.Store || r.store_name || "매장명 없음"}<br>`;
+    list.innerHTML += `📍 ${r.name || r.Store || "매장명 없음"}<br>`;
   });
 }
 
-// -----------------------------
+// ------------------------
 // 4. 지도에 마커 표시
-// -----------------------------
+// ------------------------
 function renderMarkers(rows) {
-  rows.forEach(r => {
-    if (!r.Lat || !r.Lng) return;
 
-    const marker = new Tmapv2.Marker({
-      position: new Tmapv2.LatLng(Number(r.Lat), Number(r.Lng)),
-      map: map
+  rows.forEach(r => {
+    const lat = Number(r.lat || r.Lat);
+    const lng = Number(r.lng || r.Lng);
+
+    if (!lat || !lng) return;
+
+    const marker = new google.maps.Marker({
+      position: { lat, lng },
+      map: map,
+      title: r.name || "매장명"
     });
 
-    const info = new Tmapv2.InfoWindow({
-      position: new Tmapv2.LatLng(Number(r.Lat), Number(r.Lng)),
-      content: `<div style='padding:8px;'>${r.Store || "매장정보"}</div>`,
-      map: map
+    const info = new google.maps.InfoWindow({
+      content: `<div style="font-size:14px; padding:6px;">
+                  <b>${r.name || "매장명"}</b><br>
+                  ${r.sigungu || ""}
+                </div>`
+    });
+
+    marker.addListener("click", () => {
+      info.open(map, marker);
     });
   });
 }
 </script>
 
-<!-- TMap Script -->
-<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=l7xxf62f31f487904d9bb1584c5071cdb50"></script>
-
-<script>
-window.onload = initMap;
-</script>
+<!-- ⭐ Google Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJMPPD7lWjk-E_LrmHJAbjnMV6ese-2bo&callback=initMap" async defer></script>
 
 </body>
 </html>

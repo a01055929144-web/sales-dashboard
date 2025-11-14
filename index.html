@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Sales Pipeline Dashboard</title>
+<title>Sales Store Map Dashboard</title>
 
 <style>
   body {
     margin: 0;
     font-family: Arial, sans-serif;
+    background: #fafafa;
   }
   #map {
     width: 100%;
@@ -17,116 +18,112 @@
   #store-list {
     padding: 20px;
     font-size: 15px;
+    line-height: 1.6;
+  }
+  h2 {
+    margin: 20px;
+    font-weight: bold;
   }
   .store-item {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 </style>
 </head>
 
 <body>
-<h2 style="margin-left:20px;">📌 Sales Pipeline Dashboard</h2>
+
+<h2>📌 Sales Store Map Dashboard</h2>
 
 <div id="map"></div>
+
 <div id="store-list"><b>⭐ 매장 리스트</b><br><br></div>
 
 <script>
-// ------------------------------------------------------
-// 1) 두영님 Apps Script API URL (배포된 URL 넣기)
-// ------------------------------------------------------
+// 🔥 두영님 WebApp URL — 반드시 /exec 사용!
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbxp7_Am-8OU9mR8YKQs8K_HfeC99AQXhJDBXBuJ56_ZqCu1V4Z1Dh4l0aYub0lcNG2k/exec?action=getPipeline";
+ "https://script.google.com/macros/s/AKfycbyLPa-oF57-XqHkz3Lkz9KZ0PzHQxhEIcQKkSXJErEPC5rm090eUvCLzr0KUDjP_QHK/exec?action=places";
 
-// 지도 변수
 let map;
 
-// ------------------------------------------------------
-// 2) 지도 초기화
-// ------------------------------------------------------
+// -----------------------------
+// 1. TMap 지도 초기화
+// -----------------------------
 function initMap() {
   map = new Tmapv2.Map("map", {
     center: new Tmapv2.LatLng(37.5665, 126.9780),
-    zoom: 12,
+    zoom: 12
   });
 
   loadData();
 }
 
-// ------------------------------------------------------
-// 3) API → JSON 로드
-// ------------------------------------------------------
+// -----------------------------
+// 2. WebApp JSON 불러오기
+// -----------------------------
 async function loadData() {
   try {
     const res = await fetch(API_URL);
     const rows = await res.json();
 
-    console.log("🔥 Pipeline Data:", rows);
-
     if (!Array.isArray(rows)) {
-      alert("API 응답 오류");
+      alert("❌ API 응답 오류");
       return;
     }
 
+    console.log("📌 Loaded:", rows);
+
     renderList(rows);
     renderMarkers(rows);
-
-  } catch (err) {
-    console.error("API Error:", err);
+  } catch (e) {
+    console.error(e);
     alert("데이터 로딩 실패!");
   }
 }
 
-// ------------------------------------------------------
-// 4) 매장 리스트 표시
-// ------------------------------------------------------
+// -----------------------------
+// 3. 매장 리스트 출력
+// -----------------------------
 function renderList(rows) {
   const box = document.getElementById("store-list");
   box.innerHTML = "<b>⭐ 매장 리스트</b><br><br>";
 
-  rows.forEach((r) => {
-    const name = r["Store"] || r["매장명"] || "매장명 없음";
-
-    box.innerHTML += `
-      <div class="store-item">
-        📍 ${name}
-      </div>
-    `;
+  rows.forEach(r => {
+    const name = r.name || "매장명 없음";
+    box.innerHTML += `<div class="store-item">📍 ${name}</div>`;
   });
 }
 
-// ------------------------------------------------------
-// 5) 지도에 마커 찍기
-// ------------------------------------------------------
+// -----------------------------
+// 4. 지도에 마커 찍기
+// -----------------------------
 function renderMarkers(rows) {
-  rows.forEach((r) => {
-    const lat = parseFloat(r["Lat"] || r["lat"]);
-    const lng = parseFloat(r["Lng"] || r["lng"]);
+  rows.forEach(r => {
+    const lat = parseFloat(r.lat);
+    const lng = parseFloat(r.lng);
 
     if (!lat || !lng) return;
 
     const marker = new Tmapv2.Marker({
       position: new Tmapv2.LatLng(lat, lng),
-      map: map,
+      map: map
     });
 
     new Tmapv2.InfoWindow({
       position: new Tmapv2.LatLng(lat, lng),
-      content: `<div style='padding:6px;'>${r["Store"] || "매장"}</div>`,
-      type: 2,
+      content: `<div style='padding:6px;'>${r.name || "매장"}</div>`,
       map: map,
+      type: 2
     });
   });
 }
 </script>
 
-<!-- TMap JS SDK -->
+<!-- TMap Script -->
 <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=l7xxf62f31f487904d9bb1584c5071cdb50"></script>
 
 <script>
-window.onload = () => initMap();
+window.onload = initMap;
 </script>
 
 </body>
 </html>
-
-

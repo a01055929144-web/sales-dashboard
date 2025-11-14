@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sales Store Map Dashboard</title>
 
 <style>
@@ -32,60 +32,66 @@
 <body>
 
 <h2>📌 Sales Store Map Dashboard</h2>
+
 <div id="map"></div>
+
 <div id="store-list">
   <b>⭐ 매장 리스트</b><br><br>
 </div>
 
 <script>
 // ⭐ Apps Script API URL
-const API_URL = "https://script.google.com/macros/s/AKfycbyLPa-oF57-XqHkz3Lkz9KZ0PzHQxhEIcQKkSXJErEPC5rm090eUvCLzr0KUDjP_QHK/exec?action=places";
+// (두영님 배포된 getPlaces 엔드포인트)
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbyLPa-oF57-XqHkz3Lkz9KZ0PzHQxhEIcQKkSXJErEPC5rm090eUvCLzr0KUDjP_QHK/exec?action=places";
 
-// 지도 객체
 let map;
 
 // --------------------------------------------------
 // 1) 지도 초기화
 // --------------------------------------------------
 function initMap() {
+  console.log("📌 initMap() 실행됨 — Tmapv2 여부 확인:", typeof Tmapv2);
+
   map = new Tmapv2.Map("map", {
     center: new Tmapv2.LatLng(37.5665, 126.9780),
-    zoom: 12
+    zoom: 12,
   });
 
   loadData();
 }
 
 // --------------------------------------------------
-// 2) Apps Script에서 JSON 데이터 로드
+// 2) Apps Script JSON 로드
 // --------------------------------------------------
 async function loadData() {
   try {
     const res = await fetch(API_URL);
     const rows = await res.json();
 
+    console.log("📌 API 응답:", rows);
+
     if (!Array.isArray(rows)) {
-      alert("API 응답 오류!");
+      alert("API 응답이 배열 형태가 아닙니다.");
       return;
     }
 
     renderList(rows);
     renderMarkers(rows);
-
   } catch (err) {
-    console.error(err);
+    console.error("🔥 API 로드 오류:", err);
     alert("데이터 로딩 실패!");
   }
 }
 
 // --------------------------------------------------
-// 3) 매장 리스트 출력
+// 3) 매장 리스트 UI 출력
 // --------------------------------------------------
 function renderList(rows) {
   const box = document.getElementById("store-list");
   box.innerHTML = "<b>⭐ 매장 리스트</b><br><br>";
 
-  rows.forEach(r => {
+  rows.forEach((r) => {
     const name = r.name || "매장명 없음";
     box.innerHTML += `<div class="store-item">📍 ${name}</div>`;
   });
@@ -95,7 +101,7 @@ function renderList(rows) {
 // 4) 지도에 마커 표시
 // --------------------------------------------------
 function renderMarkers(rows) {
-  rows.forEach(r => {
+  rows.forEach((r) => {
     const lat = parseFloat(r.lat);
     const lng = parseFloat(r.lng);
 
@@ -103,20 +109,20 @@ function renderMarkers(rows) {
 
     new Tmapv2.Marker({
       position: new Tmapv2.LatLng(lat, lng),
-      map: map
+      map: map,
     });
 
     new Tmapv2.InfoWindow({
       position: new Tmapv2.LatLng(lat, lng),
       content: `<div style="padding:6px;">${r.name || "매장"}</div>`,
       type: 2,
-      map: map
+      map: map,
     });
   });
 }
 </script>
 
-<!-- ⭐ 반드시 포함! → TMap SDK -->
+<!-- ⭐ 반드시 포함해야 하는 TMAP SDK (v2) — 핵심! -->
 <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=l7xxf62f31f487904d9bb1584c5071cdb50"></script>
 
 <script>

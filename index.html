@@ -71,14 +71,14 @@ function renderList(rows) {
 }
 
 // -----------------------------------------------------
-// 4) 지도 마커 표시 (lat/lng null 완전 방지)
+// 4) 지도 마커 표시 — lat/lng null 완전 방지
 // -----------------------------------------------------
 function renderMarkers(rows) {
   rows.forEach(r => {
     const lat = Number(r.lat);
     const lng = Number(r.lng);
 
-    // ⚠️ 숫자로 변환해도 NaN이면 스킵
+    // ⚠️ lat/lng가 숫자로 변환되지 않으면 스킵
     if (isNaN(lat) || isNaN(lng)) {
       console.warn("❗ 위경도 없음 → 스킵:", r);
       return;

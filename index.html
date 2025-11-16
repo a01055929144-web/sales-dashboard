@@ -71,22 +71,21 @@ function renderList(rows) {
 }
 
 // -----------------------------------------------------
-// 4) 지도 마커 표시
+// 4) 지도 마커 표시 (lat/lng null 완전 방지)
 // -----------------------------------------------------
 function renderMarkers(rows) {
   rows.forEach(r => {
-    const lat = parseFloat(r.lat);
-    const lng = parseFloat(r.lng);
+    const lat = Number(r.lat);
+    const lng = Number(r.lng);
 
+    // ⚠️ 숫자로 변환해도 NaN이면 스킵
     if (isNaN(lat) || isNaN(lng)) {
       console.warn("❗ 위경도 없음 → 스킵:", r);
       return;
     }
 
-    const position = new naver.maps.LatLng(lat, lng);
-
     const marker = new naver.maps.Marker({
-      position: position,
+      position: new naver.maps.LatLng(lat, lng),
       map: map
     });
 

@@ -1,53 +1,37 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sales Store Map Dashboard</title>
 
 <style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #fafafa;
-  }
-  #map {
-    width: 100%;
-    height: 70vh;
-  }
-  #store-list {
-    padding: 20px;
-    font-size: 15px;
-    line-height: 1.6;
-  }
-  .store-item {
-    margin-bottom: 6px;
-  }
-  h2 {
-    margin: 20px;
-  }
+  body { margin: 0; font-family: Arial, sans-serif; background: #fafafa; }
+  #map { width: 100%; height: 70vh; }
+  #store-list { padding: 20px; font-size: 15px; line-height: 1.6; }
+  .store-item { margin-bottom: 6px; }
+  h2 { margin: 20px; }
 </style>
 </head>
 
 <body>
-
 <h2>📌 Sales Store Map Dashboard</h2>
 <div id="map"></div>
 <div id="store-list"><b>⭐ 매장 리스트</b><br><br></div>
 
 <script>
-// ⭐ Apps Script API URL (두영님 것 그대로 사용)
+// ⭐ 두영님 Google Apps Script API URL
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbyLPa-oF57-XqHkz3Lkz9KZ0PzHQxhEIcQKkSXJErEPC5rm090eUvCLzr0KUDjP_QHK/exec?action=places";
+ "https://script.google.com/macros/s/AKfycbyLPa-oF57-XqHkz3Lkz9KZ0PzHQxhEIcQKkSXJErEPC5rm090eUvCLzr0KUDjP_QHK/exec?action=places";
 
 // 지도 객체
 let map;
 
-// --------------------------------------------------
+// --------------------------------------------------------------------
 // 1) 네이버 지도 초기화
-// --------------------------------------------------
+// --------------------------------------------------------------------
 function initMap() {
-  map = new naver.maps.Map("map", {
+  map = new naver.maps.Map('map', {
     center: new naver.maps.LatLng(37.5665, 126.9780),
     zoom: 12
   });
@@ -55,33 +39,28 @@ function initMap() {
   loadData();
 }
 
-// --------------------------------------------------
-// 2) Apps Script JSON 데이터 불러오기
-// --------------------------------------------------
+// --------------------------------------------------------------------
+// 2) Apps Script 데이터 로드
+// --------------------------------------------------------------------
 async function loadData() {
   try {
     const res = await fetch(API_URL);
     const rows = await res.json();
-
-    if (!Array.isArray(rows)) {
-      alert("API 응답 오류!");
-      return;
-    }
 
     console.log("📌 불러온 데이터:", rows);
 
     renderList(rows);
     renderMarkers(rows);
 
-  } catch (err) {
-    console.error("API 에러:", err);
+  } catch (error) {
+    console.error("API 오류:", error);
     alert("데이터 로딩 실패!");
   }
 }
 
-// --------------------------------------------------
-// 3) 매장 리스트 표시
-// --------------------------------------------------
+// --------------------------------------------------------------------
+// 3) 리스트 출력
+// --------------------------------------------------------------------
 function renderList(rows) {
   const box = document.getElementById("store-list");
   box.innerHTML = "<b>⭐ 매장 리스트</b><br><br>";
@@ -92,41 +71,40 @@ function renderList(rows) {
   });
 }
 
-// --------------------------------------------------
-// 4) 지도에 마커 표시 (lat/lng null 완전 방지 버전)
-// --------------------------------------------------
+// --------------------------------------------------------------------
+// 4) 지도에 마커 표시
+// --------------------------------------------------------------------
 function renderMarkers(rows) {
   rows.forEach(r => {
-    const lat = Number(r.lat);
-    const lng = Number(r.lng);
+    const lat = parseFloat(r.lat);
+    const lng = parseFloat(r.lng);
 
-    // lat/lng가 null, NaN, 빈값이면 스킵
-    if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
-      console.warn("좌표 없음 → 스킵:", r.name, r.lat, r.lng);
-      return;
-    }
+    if (!lat || !lng) return;
 
     const position = new naver.maps.LatLng(lat, lng);
 
-    // 마커
-    new naver.maps.Marker({
+    const marker = new naver.maps.Marker({
       position: position,
       map: map
     });
 
-    // 인포윈도우
-    new naver.maps.InfoWindow({
+    const infoWindow = new naver.maps.InfoWindow({
       content: `<div style="padding:6px;">${r.name || "매장"}</div>`
+    });
+
+    naver.maps.Event.addListener(marker, "click", function () {
+      infoWindow.open(map, marker);
     });
   });
 }
 </script>
 
-<!-- ⭐ 네이버 지도 JS API (두영님 Client ID 적용) -->
-<script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=oci3g40aau"></script>
+<!-- ⭐ 반드시 포함해야 함 → 네이버 지도 v3 SDK -->
+<script
+  src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=oci3g40aau">
+</script>
 
 <script>
-// 페이지 로드 → 지도 실행
 window.onload = initMap;
 </script>
 

@@ -1,97 +1,373 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Sales Store Map Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sales Store Map Dashboard</title>
 
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet 기본 CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 
-<style>
-    body { margin: 0; font-family: Arial, sans-serif; }
-    #map { width: 100%; height: 70vh; }
-    #store-list { padding: 20px; }
-    .store-item { margin-bottom: 6px; }
-    h2 { margin: 20px; }
-</style>
+  <!-- MarkerCluster CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+  />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+    }
+
+    h2 {
+      margin: 16px 20px 8px;
+    }
+
+    /* 상단 검색/필터 바 */
+    #controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0 20px 12px;
+      box-sizing: border-box;
+    }
+
+    #controls input,
+    #controls select {
+      padding: 6px 10px;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    #controls input {
+      flex: 1 1 220px;
+    }
+
+    #controls select {
+      flex: 0 0 160px;
+    }
+
+    #map {
+      width: 100%;
+      height: 65vh;
+    }
+
+    #store-list {
+      padding: 16px 20px 40px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .store-item {
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+
+    .store-item:hover {
+      text-decoration: underline;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 1px 6px;
+      font-size: 11px;
+      border-radius: 999px;
+      background: #eee;
+      margin-left: 4px;
+    }
+
+    .badge-status {
+      background: #ffd5d5;
+    }
+
+    .badge-category {
+      background: #d5e7ff;
+    }
+  </style>
 </head>
 
 <body>
-<h2>📌 Sales Store Map Dashboard</h2>
-<div id="map"></div>
-<div id="store-list"><b>⭐ 매장 리스트</b><br><br></div>
+  <h2>📌 Sales Store Map Dashboard</h2>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- 🔍 검색 & 필터 영역 -->
+  <div id="controls">
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="매장명 / 키워드 / 지역 검색"
+    />
+    <select id="categoryFilter">
+      <option value="">전체 카테고리</option>
+    </select>
+    <select id="statusFilter">
+      <option value="">전체 상태</option>
+    </select>
+  </div>
 
-<script>
-// ⭐ Apps Script API URL
-const API_URL =
- "https://script.google.com/macros/s/AKfycbyLPa-oF57-XqHkz3Lkz9KZ0PzHQxhEIcQKkSXJErEPC5rm090eUvCLzr0KUDjP_QHK/exec?action=places";
+  <div id="map"></div>
+  <div id="store-list"><b>⭐ 매장 리스트</b><br /><br /></div>
 
-// 지도 초기화 (서울 중심)
-const map = L.map('map').setView([37.5665, 126.9780], 12);
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-// OpenStreetMap 타일 (무료)
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '© OpenStreetMap'
-}).addTo(map);
+  <!-- MarkerCluster JS -->
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
-// -----------------------------------------------------
-// 데이터 로드
-// -----------------------------------------------------
-async function loadData() {
-    try {
+  <script>
+    // ⭐ Apps Script API URL (두영님 것 그대로 사용)
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycbyLPa-oF57-XqHkz3Lkz9KZ0PzHQxhEIcQKkSXJErEPC5rm090eUvCLzr0KUDjP_QHK/exec?action=places";
+
+    // 전역 변수
+    let map;
+    let allRows = [];
+    let markersLayer; // 클러스터 그룹
+
+    // -----------------------------------------------------
+    // 1) 지도 초기화
+    // -----------------------------------------------------
+    map = L.map("map").setView([37.5665, 126.978], 11); // 서울 중심
+
+    // 무료 OSM 타일
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "© OpenStreetMap",
+    }).addTo(map);
+
+    // 마커 클러스터 그룹 초기화
+    markersLayer = L.markerClusterGroup();
+    map.addLayer(markersLayer);
+
+    // -----------------------------------------------------
+    // 2) 데이터 로드
+    // -----------------------------------------------------
+    async function loadData() {
+      try {
         const res = await fetch(API_URL);
         const rows = await res.json();
 
         console.log("📌 불러온 데이터:", rows);
 
-        renderList(rows);
-        renderMarkers(rows);
+        // 내부에서 사용할 원본 저장
+        allRows = rows.map((r, idx) => ({
+          ...r,
+          _id: idx, // 내부용 ID
+        }));
 
-    } catch (err) {
+        buildFilters(allRows);
+        applyFilters(); // 초기 렌더링
+      } catch (err) {
         console.error("API 오류:", err);
         alert("데이터 로딩 실패!");
+      }
     }
-}
 
-// -----------------------------------------------------
-// 매장 리스트 출력
-// -----------------------------------------------------
-function renderList(rows) {
-    const box = document.getElementById("store-list");
-    box.innerHTML = "<b>⭐ 매장 리스트</b><br><br>";
+    // -----------------------------------------------------
+    // 3) 필터 옵션(카테고리/상태) 구성
+    // -----------------------------------------------------
+    function buildFilters(rows) {
+      const categorySet = new Set();
+      const statusSet = new Set();
 
-    rows.forEach(r => {
-        box.innerHTML += `<div class="store-item">📍 ${r.name || "이름 없음"}</div>`;
-    });
-}
+      rows.forEach((r) => {
+        const category =
+          r.category ||
+          r.keyword ||
+          r.keywordorAddress ||
+          r.keywordOrAddress ||
+          r.sigungu ||
+          "";
+        const status = r.Status || r.status || "";
 
-// -----------------------------------------------------
-// 지도 마커 표시
-// -----------------------------------------------------
-function renderMarkers(rows) {
-    rows.forEach(r => {
+        if (category) categorySet.add(category);
+        if (status) statusSet.add(status);
+      });
+
+      const categoryFilter = document.getElementById("categoryFilter");
+      const statusFilter = document.getElementById("statusFilter");
+
+      // 카테고리 옵션 채우기
+      [...categorySet]
+        .sort()
+        .forEach((c) => {
+          const opt = document.createElement("option");
+          opt.value = c;
+          opt.textContent = c;
+          categoryFilter.appendChild(opt);
+        });
+
+      // 상태 옵션 채우기
+      [...statusSet]
+        .sort()
+        .forEach((s) => {
+          const opt = document.createElement("option");
+          opt.value = s;
+          opt.textContent = s;
+          statusFilter.appendChild(opt);
+        });
+
+      // 필터 변경 이벤트
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", applyFilters);
+      categoryFilter.addEventListener("change", applyFilters);
+      statusFilter.addEventListener("change", applyFilters);
+    }
+
+    // -----------------------------------------------------
+    // 4) 검색 + 필터 적용 후 리스트/마커 렌더링
+    // -----------------------------------------------------
+    function applyFilters() {
+      const searchText = document
+        .getElementById("searchInput")
+        .value.toLowerCase()
+        .trim();
+      const categoryValue = document.getElementById("categoryFilter").value;
+      const statusValue = document.getElementById("statusFilter").value;
+
+      const filtered = allRows.filter((r) => {
+        const name = (r.name || "").toLowerCase();
+        const sigungu = (r.sigungu || "").toLowerCase();
+        const vendor = (r.Vender || r.vendor || "").toLowerCase();
+        const category =
+          (
+            r.category ||
+            r.keyword ||
+            r.keywordorAddress ||
+            r.keywordOrAddress ||
+            r.sigungu ||
+            ""
+          ).toLowerCase();
+        const status = (r.Status || r.status || "").toLowerCase();
+
+        // 검색어 필터
+        if (searchText) {
+          const combined = `${name} ${sigungu} ${category} ${vendor}`;
+          if (!combined.includes(searchText)) return false;
+        }
+
+        // 카테고리 필터
+        if (categoryValue) {
+          const catRaw =
+            r.category ||
+            r.keyword ||
+            r.keywordorAddress ||
+            r.keywordOrAddress ||
+            r.sigungu ||
+            "";
+          if (catRaw !== categoryValue) return false;
+        }
+
+        // 상태 필터
+        if (statusValue) {
+          const statusRaw = r.Status || r.status || "";
+          if (statusRaw !== statusValue) return false;
+        }
+
+        return true;
+      });
+
+      renderList(filtered);
+      renderMarkers(filtered);
+    }
+
+    // -----------------------------------------------------
+    // 5) 매장 리스트 렌더링
+    // -----------------------------------------------------
+    function renderList(rows) {
+      const box = document.getElementById("store-list");
+      box.innerHTML =
+        "<b>⭐ 매장 리스트</b><br><span style='font-size:12px;color:#888;'>(" +
+        rows.length +
+        "개 매장)</span><br><br>";
+
+      rows.forEach((r) => {
+        const name = r.name || "매장명 없음";
+        const category =
+          r.category || r.keyword || r.keywordorAddress || r.keywordOrAddress;
+        const status = r.Status || r.status;
+
+        const div = document.createElement("div");
+        div.className = "store-item";
+        div.textContent = "📍 " + name;
+        div.dataset.id = r._id;
+
+        if (category) {
+          const spanCat = document.createElement("span");
+          spanCat.className = "badge badge-category";
+          spanCat.textContent = category;
+          div.appendChild(spanCat);
+        }
+        if (status) {
+          const spanStatus = document.createElement("span");
+          spanStatus.className = "badge badge-status";
+          spanStatus.textContent = status;
+          div.appendChild(spanStatus);
+        }
+
+        div.addEventListener("click", () => {
+          const marker = r._marker;
+          if (marker) {
+            map.setView(marker.getLatLng(), 16);
+            marker.openPopup();
+          }
+        });
+
+        box.appendChild(div);
+      });
+    }
+
+    // -----------------------------------------------------
+    // 6) 지도 마커(클러스터) 렌더링
+    // -----------------------------------------------------
+    function renderMarkers(rows) {
+      markersLayer.clearLayers();
+
+      rows.forEach((r) => {
         const lat = Number(r.lat);
         const lng = Number(r.lng);
 
-        // 위도/경도 없으면 건너뛰기
         if (isNaN(lat) || isNaN(lng)) {
-            console.warn("❗ 위경도 없음 → 스킵:", r);
-            return;
+          console.warn("❗ 위경도 없음 → 스킵:", r);
+          return;
         }
 
-        const marker = L.marker([lat, lng]).addTo(map);
-        marker.bindPopup(`<b>${r.name || "매장"}</b>`);
-    });
-}
+        const name = r.name || "매장";
+        const category =
+          r.category || r.keyword || r.keywordorAddress || r.keywordOrAddress;
+        const status = r.Status || r.status;
+        const sigungu = r.sigungu || "";
 
-// 최초 실행
-loadData();
-</script>
+        const marker = L.marker([lat, lng]);
+        const popupHtml = `
+          <div style="font-size:13px;">
+            <b>${name}</b><br/>
+            ${sigungu ? sigungu + "<br/>" : ""}
+            ${category ? "카테고리: " + category + "<br/>" : ""}
+            ${status ? "상태: " + status + "<br/>" : ""}
+          </div>
+        `;
+        marker.bindPopup(popupHtml);
 
+        // 나중에 리스트 클릭 시 사용
+        r._marker = marker;
+
+        markersLayer.addLayer(marker);
+      });
+    }
+
+    // 최초 실행
+    loadData();
+  </script>
 </body>
 </html>

@@ -1,482 +1,280 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sales Store Map Dashboard</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sales Store Map Dashboard</title>
 
-  <!-- Leaflet 기본 -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <!-- MarkerCluster -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+<!-- Marker Cluster -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 
-  <style>
-    * { box-sizing: border-box; }
+<style>
+  body { margin: 0; background: #f5f6fa; font-family: "Pretendard", sans-serif; }
+  #map { height: 60vh; width: 100%; border-radius: 10px; }
 
-    body {
-      margin: 0;
-      font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f3f4f7;
-      color: #222;
-    }
+  .container { width: 95%; margin: auto; padding-top: 15px; }
+  .filters { display: flex; gap: 10px; margin-bottom: 10px; }
+  input, select { padding: 10px; border-radius: 6px; border: 1px solid #ccc; width: 100%; }
 
-    header {
-      padding: 14px 20px;
-      font-size: 20px;
-      font-weight: 700;
-      background: #ffffff;
-      border-bottom: 1px solid #e3e4ea;
-    }
+  /* 카드 */
+  .dash-container { display: flex; gap: 10px; margin-top: 15px; }
+  .card {
+    flex: 1;
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
 
-    .container {
-      padding: 16px 16px 30px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
+  .store-list { max-height: 55vh; overflow-y: auto; }
+  .store-item { padding: 10px 0; border-bottom: 1px solid #eee; }
 
-    /* 필터 영역 */
-    #filters {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
+  .status-badge {
+    display: inline-block;
+    padding: 3px 7px;
+    border-radius: 5px;
+    color: white;
+    font-size: 12px;
+  }
 
-    #filters input,
-    #filters select {
-      flex: 1;
-      padding: 9px 11px;
-      border-radius: 8px;
-      border: 1px solid #d0d2dc;
-      font-size: 14px;
-      background: #fff;
-    }
+  .green { background:#2ecc71; }
+  .blue { background:#3498db; }
+  .orange { background:#e67e22; }
+  .gray { background:#7f8c8d; }
+  .red { background:#e74c3c; }
 
-    #filters input {
-      flex: 2.2;
-    }
-
-    #map {
-      width: 100%;
-      height: 60vh;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid #d0d2dc;
-    }
-
-    /* 아래 영역: 대시보드 / 리스트 */
-    #bottom-row {
-      display: flex;
-      gap: 14px;
-      margin-top: 16px;
-    }
-
-    #dashboard {
-      flex: 0.9;
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 14px 14px 10px;
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
-      min-width: 260px;
-    }
-
-    #store-panel {
-      flex: 2.1;
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 14px 14px 6px;
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
-      max-height: 32vh;
-      overflow-y: auto;
-    }
-
-    h2 {
-      margin: 0 0 12px;
-      font-size: 19px;
-    }
-
-    h3 {
-      margin: 0 0 10px;
-      font-size: 16px;
-    }
-
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .kpi-card {
-      background: #f7f8fc;
-      border-radius: 10px;
-      padding: 9px 10px;
-      font-size: 13px;
-    }
-
-    .kpi-label {
-      color: #6b7280;
-      margin-bottom: 3px;
-    }
-
-    .kpi-value {
-      font-size: 17px;
-      font-weight: 700;
-    }
-
-    /* 매장 리스트 */
-    #store-panel-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    #store-count {
-      font-size: 13px;
-      color: #6b7280;
-    }
-
-    .store-item {
-      padding: 6px 0;
-      border-bottom: 1px solid #f0f1f6;
-      font-size: 13px;
-    }
-
-    .store-item:last-child {
-      border-bottom: none;
-      margin-bottom: 6px;
-    }
-
-    .store-name-row {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-bottom: 2px;
-    }
-
-    .store-name {
-      font-weight: 600;
-      font-size: 13px;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 2px 7px;
-      border-radius: 999px;
-      font-size: 11px;
-      color: #ffffff;
-      white-space: nowrap;
-    }
-
-    .category-text {
-      font-size: 11px;
-      color: #6b7280;
-      margin-bottom: 1px;
-    }
-
-    .address-text {
-      font-size: 11px;
-      color: #6b7280;
-    }
-
-    .store-link {
-      font-size: 11px;
-      color: #2563eb;
-      text-decoration: none;
-    }
-
-    .store-link:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 960px) {
-      #bottom-row {
-        flex-direction: column;
-      }
-      #store-panel {
-        max-height: none;
-      }
-    }
-  </style>
+</style>
 </head>
 
 <body>
-<header>📍 Sales Store Map Dashboard</header>
-
 <div class="container">
+  <!-- 필터 -->
 
-  <!-- 필터 영역 -->
-  <div id="filters">
-    <input id="searchInput" placeholder="매장명 / 시군구 / 도로명주소 / 키워드 검색" />
+  <div class="filters">
+    <input id="searchInput" placeholder="매장명 / 지번 / 키워드 검색" />
 
     <select id="categoryFilter">
-      <option value="">전체 카테고리</option>
+      <option value="전체">전체 카테고리</option>
     </select>
 
     <select id="statusFilter">
-      <option value="">전체 상태</option>
-      <option value="거래 성사">거래 성사</option>
-      <option value="미팅 완료">미팅 완료</option>
-      <option value="미팅 요청">미팅 요청</option>
-      <option value="부재중/미응답">부재중/미응답</option>
-      <option value="거절">거절</option>
+      <option value="전체">전체 상태</option>
     </select>
   </div>
 
   <!-- 지도 -->
   <div id="map"></div>
 
-  <!-- 아래 대시보드 + 리스트 -->
-  <div id="bottom-row">
-    <section id="dashboard">
+  <!-- 아래 레이아웃 -->
+  <div class="dash-container">
+    <!-- 대시보드 -->
+    <div class="card" id="dashboardCard">
       <h3>📊 대시보드</h3>
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <div class="kpi-label">총 매장 수</div>
-          <div class="kpi-value" id="kpi-total">0</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">거래 성사</div>
-          <div class="kpi-value" id="kpi-deal">0</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">미팅 완료</div>
-          <div class="kpi-value" id="kpi-done">0</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">미팅 요청</div>
-          <div class="kpi-value" id="kpi-request">0</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">부재중/미응답</div>
-          <div class="kpi-value" id="kpi-noanswer">0</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">거절</div>
-          <div class="kpi-value" id="kpi-deny">0</div>
-        </div>
-      </div>
-    </section>
+      <p>총 매장 수: <b id="totalCount">0</b></p>
+      <p>거래 성사: <b id="doneCount">0</b></p>
+      <p>미팅 완료: <b id="meetingDoneCount">0</b></p>
+      <p>미팅 요청: <b id="meetingReqCount">0</b></p>
+      <p>부재중/미응답: <b id="noRespCount">0</b></p>
+      <p>거절: <b id="rejectCount">0</b></p>
+    </div>
 
-    <section id="store-panel">
-      <div id="store-panel-title">
-        <h3>⭐ 매장 리스트</h3>
-        <div id="store-count"></div>
-      </div>
-      <div id="store-list"></div>
-    </section>
+    <!-- 매장 리스트 -->
+    <div class="card store-list" id="storeListCard">
+      <h3>⭐ 매장 리스트</h3>
+      <div id="storeList"></div>
+    </div>
   </div>
-
 </div>
 
 <script>
-  // ⭐ Apps Script JSON API
-  const API_URL =
-    "https://script.google.com/macros/s/AKfycbyLPa-oF57-XqHkz3Lkz9KZ0PzHQxhEIcQKkSXJErEPC5rm090eUvCLzr0KUDjP_QHK/exec?action=places";
+/* -----------------------------------------------
+    1) API URL
+------------------------------------------------*/
+const API_URL =
+ "https://script.google.com/macros/s/AKfycbyLPa-oF57-XqHkz3Lkz9KZ0PzHQxhEIcQKkSXJErEPC5rm090eUvCLzr0KUDjP_QHK/exec?action=places";
 
-  // 상태별 색상
-  const STATUS_COLOR = {
-    "미팅 요청": "#f1c40f",      // 노랑
-    "부재중/미응답": "#7f8c8d",  // 회색
-    "거절": "#e74c3c",          // 빨강
-    "미팅 완료": "#3498db",    // 파랑
-    "거래 성사": "#2ecc71"     // 초록
+/* -----------------------------------------------
+    2) 상태값 → 색상 매핑
+------------------------------------------------*/
+const statusColor = {
+  "거래 성사": "green",
+  "미팅 완료": "blue",
+  "미팅 요청": "orange",
+  "부재중/미응답": "gray",
+  "거절": "red",
+};
+
+/* -----------------------------------------------
+    3) 전역
+------------------------------------------------*/
+let map;
+let markers = L.markerClusterGroup();
+let rawData = [];
+
+/* -----------------------------------------------
+    4) 지도 초기화
+------------------------------------------------*/
+function initMap() {
+  map = L.map('map').setView([37.55, 126.97], 11);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19
+  }).addTo(map);
+
+  map.addLayer(markers);
+
+  loadData();
+}
+
+/* -----------------------------------------------
+    5) 데이터 불러오기
+------------------------------------------------*/
+async function loadData() {
+  const res = await fetch(API_URL);
+  rawData = await res.json();
+
+  buildFilters();     // 카테고리/상태 필터 생성
+  renderAll(rawData); // 지도 + 리스트 + 대시보드
+}
+
+/* -----------------------------------------------
+    6) 필터 UI 구성
+------------------------------------------------*/
+function buildFilters() {
+  const categories = [...new Set(rawData.map(r => r.category))].sort();
+  const statuses = [...new Set(rawData.map(r => r.status))];
+
+  const catSel = document.getElementById("categoryFilter");
+  const stSel = document.getElementById("statusFilter");
+
+  categories.forEach(c => {
+    catSel.innerHTML += `<option value="${c}">${c}</option>`;
+  });
+
+  statuses.forEach(s => {
+    stSel.innerHTML += `<option value="${s}">${s}</option>`;
+  });
+
+  catSel.onchange = applyFilter;
+  stSel.onchange = applyFilter;
+  document.getElementById("searchInput").oninput = applyFilter;
+}
+
+/* -----------------------------------------------
+    7) 필터 적용
+------------------------------------------------*/
+function applyFilter() {
+  let keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+  let cat = document.getElementById("categoryFilter").value;
+  let st = document.getElementById("statusFilter").value;
+
+  const filtered = rawData.filter(r => {
+    if (cat !== "전체" && r.category !== cat) return false;
+    if (st !== "전체" && r.status !== st) return false;
+
+    if (keyword) {
+      const t = (r.name + r.keyword + r.roadAddress).toLowerCase();
+      if (!t.includes(keyword)) return false;
+    }
+    return true;
+  });
+
+  renderAll(filtered);
+}
+
+/* -----------------------------------------------
+    8) 전체 렌더링 (지도 + 리스트 + 대시보드)
+------------------------------------------------*/
+function renderAll(data) {
+  renderMarkers(data);
+  renderList(data);
+  renderDashboard(data);
+}
+
+/* -----------------------------------------------
+    9) 지도 마커
+------------------------------------------------*/
+function renderMarkers(data) {
+  markers.clearLayers();
+
+  data.forEach(r => {
+    if (!r.lat || !r.lng) return;
+
+    const color = statusColor[r.status] || "gray";
+
+    const icon = L.divIcon({
+      className: "",
+      html: `<div style="
+        width:18px;
+        height:18px;
+        background:${color};
+        border-radius:50%;
+        border:2px solid white;
+      "></div>`
+    });
+
+    const marker = L.marker([r.lat, r.lng], { icon });
+
+    marker.bindPopup(`
+      <b>${r.name}</b><br>
+      ${r.roadAddress}<br>
+      <a href="${r.url}" target="_blank">URL 이동</a><br>
+      상태: ${r.status}
+    `);
+
+    markers.addLayer(marker);
+  });
+}
+
+/* -----------------------------------------------
+    10) 리스트 UI
+------------------------------------------------*/
+function renderList(data) {
+  const box = document.getElementById("storeList");
+
+  box.innerHTML = data.map(r => `
+    <div class="store-item">
+      <div><b>${r.name}</b></div>
+      <div>${r.roadAddress}</div>
+      <div>
+        <span class="status-badge ${statusColor[r.status]}">${r.status}</span>
+        · <a href="${r.url}" target="_blank">바로가기</a>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* -----------------------------------------------
+    11) 대시보드 UI
+------------------------------------------------*/
+function renderDashboard(data) {
+  const count = {
+    total: data.length,
+    deal: data.filter(r => r.status === "거래 성사").length,
+    done: data.filter(r => r.status === "미팅 완료").length,
+    req: data.filter(r => r.status === "미팅 요청").length,
+    noresp: data.filter(r => r.status === "부재중/미응답").length,
+    reject: data.filter(r => r.status === "거절").length
   };
 
-  let map;
-  let markerCluster;
-  let rawData = [];
-  let normalizedData = [];
+  document.getElementById("totalCount").innerText = count.total;
+  document.getElementById("doneCount").innerText = count.deal;
+  document.getElementById("meetingDoneCount").innerText = count.done;
+  document.getElementById("meetingReqCount").innerText = count.req;
+  document.getElementById("noRespCount").innerText = count.noresp;
+  document.getElementById("rejectCount").innerText = count.reject;
+}
 
-  function initMap() {
-    map = L.map("map").setView([37.5665, 126.9780], 11);
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19
-    }).addTo(map);
-
-    markerCluster = L.markerClusterGroup();
-    map.addLayer(markerCluster);
-
-    loadData();
-  }
-
-  // 시트 → 프론트에서 사용할 형태로 정규화
-  function normalizeRow(r) {
-    const lat = Number(r.lat || r.Lat || r.latitude || r.LAT);
-    const lng = Number(r.lng || r.Lng || r.longitude || r.LNG);
-
-    const categoryFull = (r.category || r.Category || "").toString();
-    const bigCategory = categoryFull.split(">")[0].trim();
-
-    return {
-      name: r.name || r.Name || "",
-      sigungu: r.sigungu || r.시군구 || "",
-      blog_count: r.blog_count || r.blogCount || "",
-      keyword: r.keyword || "",
-      address: r.address || r.roadAddress || r.주소 || "",
-      url: r.url || r.URL || "",
-      manager: r.manager || r["Manager(Call)"] || "",
-      status: r.status || r.Status || "",
-      lat,
-      lng,
-      categoryFull,
-      bigCategory
-    };
-  }
-
-  async function loadData() {
-    try {
-      const res = await fetch(API_URL);
-      rawData = await res.json();
-
-      normalizedData = rawData.map(normalizeRow);
-
-      buildCategoryFilter(normalizedData);
-      applyFilters(); // 첫 렌더링
-    } catch (err) {
-      console.error("데이터 로딩 오류:", err);
-      alert("데이터를 불러오는 중 오류가 발생했습니다.");
-    }
-  }
-
-  function buildCategoryFilter(rows) {
-    const select = document.getElementById("categoryFilter");
-    select.innerHTML = `<option value="">전체 카테고리</option>`;
-
-    const cats = [...new Set(rows.map(r => r.bigCategory).filter(Boolean))].sort();
-    cats.forEach(cat => {
-      const opt = document.createElement("option");
-      opt.value = cat;
-      opt.textContent = cat;
-      select.appendChild(opt);
-    });
-  }
-
-  function applyFilters() {
-    const kw = document.getElementById("searchInput").value.trim();
-    const cat = document.getElementById("categoryFilter").value;
-    const st = document.getElementById("statusFilter").value;
-
-    const filtered = normalizedData.filter(r => {
-      if (kw) {
-        const inText =
-          (r.name && r.name.includes(kw)) ||
-          (r.sigungu && r.sigungu.includes(kw)) ||
-          (r.address && r.address.includes(kw)) ||
-          (r.keyword && r.keyword.includes(kw));
-        if (!inText) return false;
-      }
-
-      if (cat && r.bigCategory !== cat) return false;
-
-      if (st && r.status !== st) return false;
-
-      return true;
-    });
-
-    renderMarkers(filtered);
-    renderDashboard(filtered);
-    renderStoreList(filtered);
-  }
-
-  function renderMarkers(rows) {
-    markerCluster.clearLayers();
-
-    rows.forEach(r => {
-      if (isNaN(r.lat) || isNaN(r.lng)) return;
-
-      const color = STATUS_COLOR[r.status] || "#6b7280";
-
-      const marker = L.circleMarker([r.lat, r.lng], {
-        radius: 8,
-        color: color,
-        fillColor: color,
-        fillOpacity: 0.9
-      });
-
-      const popupHtml = `
-        <div style="font-size:12px;">
-          <b>${r.name}</b><br/>
-          <span>${r.address}</span><br/>
-          <span>${r.status || ""}</span><br/>
-          ${r.url ? `<a href="${r.url}" target="_blank">링크 열기</a>` : ""}
-        </div>
-      `;
-
-      marker.bindPopup(popupHtml);
-      markerCluster.addLayer(marker);
-    });
-  }
-
-  function renderDashboard(rows) {
-    const total = rows.length;
-    let deal = 0, done = 0, request = 0, noanswer = 0, deny = 0;
-
-    rows.forEach(r => {
-      const s = r.status;
-      if (s === "거래 성사") deal++;
-      else if (s === "미팅 완료") done++;
-      else if (s === "미팅 요청") request++;
-      else if (s === "부재중/미응답") noanswer++;
-      else if (s === "거절") deny++;
-    });
-
-    document.getElementById("kpi-total").textContent = total;
-    document.getElementById("kpi-deal").textContent = deal;
-    document.getElementById("kpi-done").textContent = done;
-    document.getElementById("kpi-request").textContent = request;
-    document.getElementById("kpi-noanswer").textContent = noanswer;
-    document.getElementById("kpi-deny").textContent = deny;
-  }
-
-  function renderStoreList(rows) {
-    const box = document.getElementById("store-list");
-    const countBox = document.getElementById("store-count");
-
-    countBox.textContent = `${rows.length}개 매장`;
-
-    box.innerHTML = "";
-
-    rows.forEach(r => {
-      const color = STATUS_COLOR[r.status] || "#6b7280";
-
-      const div = document.createElement("div");
-      div.className = "store-item";
-      div.innerHTML = `
-        <div class="store-name-row">
-          <span class="store-name">${r.name}</span>
-          ${
-            r.status
-              ? `<span class="badge" style="background:${color};">${r.status}</span>`
-              : ""
-          }
-        </div>
-        ${
-          r.categoryFull
-            ? `<div class="category-text">카테고리: ${r.categoryFull}</div>`
-            : ""
-        }
-        <div class="address-text">${r.address || ""}</div>
-        ${
-          r.url
-            ? `<a class="store-link" href="${r.url}" target="_blank">URL 열기</a>`
-            : ""
-        }
-      `;
-      box.appendChild(div);
-    });
-  }
-
-  document.getElementById("searchInput").addEventListener("input", applyFilters);
-  document.getElementById("categoryFilter").addEventListener("change", applyFilters);
-  document.getElementById("statusFilter").addEventListener("change", applyFilters);
-
-  window.onload = initMap;
+/* -----------------------------------------------
+    시작
+------------------------------------------------*/
+initMap();
 </script>
-
 </body>
 </html>

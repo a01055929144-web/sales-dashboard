@@ -1238,7 +1238,11 @@ function saveMemo() {
 
   textarea.value = "";
 
-  fetch(`${BASE_URL}?action=addMemo&name=${encodeURIComponent(selectedStoreName)}&memo=${encodeURIComponent(text)}`)
+  const url = `${BASE_URL}?action=addMemo&name=${encodeURIComponent(
+    selectedStoreName
+  )}&memo=${encodeURIComponent(text)}`;
+
+  fetch(url)
     .then(() => loadHistory(selectedStoreName))
     .catch(e => console.error("메모 저장 오류:", e));
 }

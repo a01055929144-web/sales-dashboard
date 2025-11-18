@@ -41,6 +41,13 @@
   transform: none !important;
   opacity: 0.7;
 }
+<head>
+  <style>
+    /* 기존 스타일들... */
+
+    /* 🔥 여기에 추가해도 되고 */
+  </style>
+</head>
 
 
     /* 상단 바 */
@@ -643,8 +650,11 @@
       </div>
     </div>
 <!-- 담당자 입력 -->
-<div class="detail-card">
-  <div class="detail-title">담당자*필수*</div>
+<div class="detail-title">
+  담당자 <span class="required-text">*필수*</span>
+</div>
+
+<div class="input-wrapper">
   <select id="managerInput" class="select-input full-width">
     <option value="">담당자 선택</option>
     <option value="Zero">Zero</option>
@@ -653,7 +663,9 @@
     <option value="Aimee">Aimee</option>
     <option value="Merry">Merry</option>
   </select>
+  <span class="error-icon">❗</span>
 </div>
+
 
     <!-- 상태 변경 -->
     <div class="status-change">

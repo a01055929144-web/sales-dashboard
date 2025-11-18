@@ -625,6 +625,16 @@
         매장을 선택하면 상세정보가 여기에 표시됩니다.
       </div>
     </div>
+<!-- 담당자 입력 -->
+<div class="detail-card">
+  <div class="detail-title">담당자</div>
+  <input
+    id="managerInput"
+    class="search-input"
+    style="width:100%; margin-top:4px;"
+    placeholder="담당자 이름을 입력하세요"
+  />
+</div>
 
     <!-- 상태 변경 -->
     <div class="status-change">
@@ -1236,17 +1246,32 @@ function saveMemo() {
     return;
   }
 
+  // 🔹 새로 추가된 담당자 입력란
+  const manager = document.getElementById("managerInput").value.trim() || "미기입";
+
+  // 화면 즉시 반영
+  const now = new Date();
+  const ts = now.toLocaleString("ko-KR");
+
+  const listEl = document.getElementById("historyList");
+  const newItem = `
+    <div class="history-item">
+      <div class="history-meta">${ts} · ${manager}</div>
+      <div class="history-text">${text}</div>
+    </div>
+  `;
+  listEl.insertAdjacentHTML("afterbegin", newItem);
   textarea.value = "";
 
-  const url = `${BASE_URL}?action=addMemo&name=${encodeURIComponent(
-    selectedStoreName
-  )}&memo=${encodeURIComponent(text)}`;
+  // 🚀 GAS 전송
+  const url =
+    `${BASE_URL}?action=addMemo` +
+    `&name=${encodeURIComponent(selectedStoreName)}` +
+    `&memo=${encodeURIComponent(text)}` +
+    `&manager=${encodeURIComponent(manager)}`;
 
-  fetch(url)
-    .then(() => loadHistory(selectedStoreName))
-    .catch(e => console.error("메모 저장 오류:", e));
+  fetch(url).catch(e => console.error("메모 저장 오류:", e));
 }
-
 
   /**************** 통계 + 차트 ****************/
   function renderStats() {

@@ -1,269 +1,357 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<title>Sales Store Map Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <title>Sales Store Map Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<!-- Leaflet & MarkerCluster -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <!-- Leaflet & MarkerCluster -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+  />
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-    background: #f3f4f6;
-    color: #111827;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        system-ui, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-  header {
-    padding: 10px 16px;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-  header h1 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-  .header-controls {
-    display: flex;
-    gap: 8px;
-    flex: 1;
-    align-items: center;
-    position: relative;
-  }
-  .search-input,
-  .select-input {
-    border-radius: 999px;
-    border: 1px solid #e5e7eb;
-    padding: 6px 12px;
-    font-size: 13px;
-    outline: none;
-    background: #f9fafb;
-  }
-  .search-input { flex: 1; }
+    /* 상단 바 */
+    header {
+      padding: 10px 16px;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .header-controls {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+      align-items: center;
+      position: relative;
+    }
+    .search-input,
+    .select-input {
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      padding: 6px 12px;
+      font-size: 13px;
+      outline: none;
+      background: #f9fafb;
+    }
+    .search-input { flex: 1; }
 
-  .layout {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 320px minmax(0, 1fr) 320px;
-    height: calc(100vh - 52px);
-    overflow: hidden;
-  }
+    /* 레이아웃 */
+    .layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr) 300px;
+      height: calc(100vh - 52px);
+      overflow: hidden;
+    }
 
-  /* 좌측 패널 */
-  .store-panel {
-    background: #ffffff;
-    border-right: 1px solid #e5e7eb;
-    padding: 12px;
-    overflow-y: auto;
-  }
-  .store-panel h2 {
-    font-size: 14px;
-    margin: 0 0 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .store-count { font-size: 11px; color: #6b7280; }
-  .store-list { list-style: none; margin: 0; padding: 0; }
-  .store-item {
-    padding: 10px 8px;
-    border-radius: 10px;
-    border: 1px solid #f3f4f6;
-    margin-bottom: 6px;
-    background: #fff;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-  .store-item:hover {
-    background: #eef2ff;
-    border-color: #dbe4ff;
-    transform: translateY(-1px);
-  }
-  .store-name {
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-  .store-meta {
-    font-size: 11px;
-    color: #6b7280;
-  }
-  .status-badge {
-    display: inline-block;
-    padding: 2px 6px;
-    font-size: 10px;
-    border-radius: 999px;
-    color: #ffffff;
-    margin-right: 4px;
-  }
+    /* 좌측 매장 리스트 */
+    .store-panel {
+      background: #ffffff;
+      border-right: 1px solid #e5e7eb;
+      padding: 12px;
+      overflow-y: auto;
+    }
+    .store-panel h2 {
+      font-size: 14px;
+      margin: 0 0 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .store-count {
+      font-size: 11px;
+      color: #6b7280;
+    }
+    .store-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .store-item {
+      padding: 8px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-bottom: 6px;
+      border: 1px solid transparent;
+      background: #ffffff;
+      transition: background 0.12s ease, border-color 0.12s ease,
+        box-shadow 0.12s ease, transform 0.12s ease;
+    }
+    .store-item:hover {
+      background: #f3f4ff;
+      border-color: #e0e7ff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+      transform: translateY(-1px);
+    }
+    .store-name {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .store-meta {
+      font-size: 11px;
+      color: #6b7280;
+      margin-bottom: 2px;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #ffffff;
+    }
 
-  #map { width: 100%; height: 100%; }
+    /* 지도 */
+    #map {
+      width: 100%;
+      height: 100%;
+    }
 
-  /* 우측 대시보드 */
-  .dashboard-panel {
-    background: #ffffff;
-    border-left: 1px solid #e5e7eb;
-    padding: 12px;
-    overflow-y: auto;
-  }
-  .dashboard-title {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
+    /* 우측 대시보드 */
+    .dashboard-panel {
+      background: #ffffff;
+      border-left: 1px solid #e5e7eb;
+      padding: 12px;
+      overflow-y: auto;
+    }
+    .dashboard-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-  .number-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-  .number-card {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 8px;
-    text-align: center;
-  }
-  .number-title {
-    font-size: 11px;
-    color: #6b7280;
-    margin-bottom: 4px;
-  }
-  .number-value {
-    font-size: 16px;
-    font-weight: 700;
-  }
+    .chart-wrapper {
+      background: #f9fafb;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      padding: 8px;
+      margin-bottom: 8px;
+    }
 
-  .autocomplete {
-    position: absolute;
-    background: white;
-    border: 1px solid #e5e7eb;
-    width: 260px;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 50;
-    border-radius: 8px;
-    display: none;
-    top: 34px;
-    right: 0;
-  }
-  .autocomplete-item {
-    padding: 6px 10px;
-    cursor: pointer;
-    font-size: 13px;
-  }
-  .autocomplete-item:hover { background: #f3f4f6; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .stat-card {
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      padding: 6px 8px;
+    }
+    .stat-label {
+      font-size: 10px;
+      color: #6b7280;
+      margin-bottom: 2px;
+    }
+    .stat-value {
+      font-size: 13px;
+      font-weight: 700;
+    }
 
-  .marker-dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 999px;
-    border: 2px solid #ffffff;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
-    animation: pop 0.3s ease-out;
-  }
-  @keyframes pop {
-    0% { transform: scale(0.2); }
-    80% { transform: scale(1.2); }
-    100% { transform: scale(1); }
-  }
+    .section-card {
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      padding: 8px 10px;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-  .store-detail {
-    margin-top: 15px;
-    padding: 10px;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    font-size: 13px;
-  }
-  .store-detail h3 { margin: 0 0 8px; font-size: 15px; }
+    .store-detail-line {
+      margin-bottom: 3px;
+    }
+    .store-detail-line span {
+      font-weight: 600;
+      margin-right: 4px;
+    }
 
-  .photo-carousel {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    margin-top: 8px;
-  }
-  .photo-carousel img {
-    width: 120px;
-    height: 90px;
-    border-radius: 8px;
-    object-fit: cover;
-    cursor: pointer;
-  }
+    .status-select {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      padding: 6px 10px;
+      font-size: 12px;
+      background: #ffffff;
+    }
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 6px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+    }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
 
-  .history-log {
-    margin-top: 10px;
-    background: #ffffff;
-    border-radius: 10px;
-    border: 1px solid #e5e7eb;
-    padding: 10px;
-    max-height: 180px;
-    overflow-y: auto;
-    font-size: 12px;
-  }
-  .history-item {
-    padding: 6px 4px;
-    border-bottom: 1px solid #f1f5f9;
-  }
-  .history-item:last-child { border-bottom: none; }
-  .history-date { font-weight: 600; color: #374151; }
-  .history-user { color: #6b7280; font-size: 11px; }
-  .history-text { margin-top: 2px; }
+    .history-list {
+      max-height: 130px;
+      overflow-y: auto;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      padding: 6px 8px;
+      font-size: 11px;
+    }
+    .history-item {
+      padding: 4px 0;
+      border-bottom: 1px dashed #e5e7eb;
+    }
+    .history-item:last-child {
+      border-bottom: none;
+    }
+    .history-meta {
+      color: #6b7280;
+      font-size: 10px;
+      margin-bottom: 2px;
+    }
 
-  .status-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 10px;
-  }
-  .status-buttons button {
-    border: none;
-    border-radius: 999px;
-    padding: 4px 8px;
-    font-size: 11px;
-    cursor: pointer;
-    background: #e5e7eb;
-    color: #111827;
-  }
+    .memo-textarea {
+      width: 100%;
+      min-height: 60px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      padding: 6px 8px;
+      font-size: 12px;
+      resize: vertical;
+    }
 
-  .toggle-btn {
-    margin-top: 10px;
-    padding: 6px 10px;
-    background: #e5e7eb;
-    border-radius: 8px;
-    cursor: pointer;
-    border: none;
-    font-size: 12px;
-  }
-</style>
+    .autocomplete {
+      position: absolute;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      width: 260px;
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 50;
+      border-radius: 8px;
+      display: none;
+      top: 34px;
+      right: 0;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    .autocomplete-item {
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .autocomplete-item:hover {
+      background: #f3f4f6;
+    }
+
+    /* 마커 */
+    .marker-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    }
+    .marker-dot.selected {
+      width: 26px;
+      height: 26px;
+      border-width: 3px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.35);
+      animation: pop 0.18s ease-out;
+    }
+    @keyframes pop {
+      0% { transform: scale(0.2); }
+      80% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    .store-panel::-webkit-scrollbar,
+    .dashboard-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    .store-panel::-webkit-scrollbar-thumb,
+    .dashboard-panel::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 999px;
+    }
+
+    @media (max-width: 1024px) {
+      .layout {
+        grid-template-columns: 0 minmax(0, 1fr) 0;
+      }
+      .store-panel { display: none; }
+      .dashboard-panel {
+        position: absolute;
+        right: 0;
+        top: 52px;
+        bottom: 0;
+        width: 280px;
+        z-index: 20;
+        box-shadow: -4px 0 12px rgba(0,0,0,0.08);
+      }
+    }
+  </style>
 </head>
 <body>
-
 <header>
   <h1>📍 Sales Store Map Dashboard</h1>
   <div class="header-controls">
-
+    <!-- 상단: 상태 → 카테고리 → 검색 -->
     <select id="statusSelect" class="select-input">
       <option value="ALL">전체 상태</option>
     </select>
@@ -278,47 +366,119 @@
       type="text"
       placeholder="매장명 / 지역 / 도로명주소 / 키워드 검색"
     />
-
     <div id="autocomplete" class="autocomplete"></div>
   </div>
 </header>
 
 <div class="layout">
+  <!-- 좌측 매장 리스트 -->
   <aside class="store-panel">
-    <h2>⭐ 매장 리스트 <span class="store-count" id="storeCountLabel"></span></h2>
+    <h2>
+      ⭐ 매장 리스트
+      <span class="store-count" id="storeCountLabel"></span>
+    </h2>
     <ul id="storeList" class="store-list"></ul>
   </aside>
 
-  <main><div id="map"></div></main>
+  <!-- 지도 -->
+  <main>
+    <div id="map"></div>
+  </main>
 
+  <!-- 우측 대시보드 -->
   <aside class="dashboard-panel">
-    <div class="dashboard-title">📊 대시보드</div>
+    <div class="dashboard-title">
+      <span>📊 대시보드</span>
+      <span id="currentStoreLabel" style="font-size:11px;color:#6b7280;"></span>
+    </div>
 
-    <!-- 숫자 요약 카드 -->
-    <div id="numberStats" class="number-stats"></div>
+    <!-- 1) 도넛 차트 -->
+    <div class="chart-wrapper">
+      <canvas id="statusChart" style="width:100%;height:170px;"></canvas>
 
-    <!-- 상태 도넛 차트 -->
-    <canvas id="statusChart" style="width:100%; height:180px;"></canvas>
+      <!-- 2) 숫자 카운트 -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">총 매장 수</div>
+          <div class="stat-value" id="statTotal">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">거래 성사</div>
+          <div class="stat-value" id="statDeal">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">미팅 완료</div>
+          <div class="stat-value" id="statMeetingDone">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">미팅 요청</div>
+          <div class="stat-value" id="statRequest">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">부재중/미응답</div>
+          <div class="stat-value" id="statNoAnswer">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">거절</div>
+          <div class="stat-value" id="statReject">0</div>
+        </div>
+      </div>
+    </div>
 
-    <!-- 동선 토글 버튼 -->
-    <button id="routeToggle" class="toggle-btn">동선 보기 토글</button>
+    <!-- 3) 매장 상세정보 -->
+    <div class="section-card" id="storeDetailCard">
+      <div class="section-title">📌 매장 상세정보</div>
+      <div id="storeDetailBody" style="font-size:12px;color:#4b5563;">
+        매장을 선택하면 상세정보가 표시됩니다.
+      </div>
+    </div>
 
-    <!-- 상세 정보 -->
-    <div id="storeDetail" class="store-detail"></div>
+    <!-- 4) 상태 변경 드롭다운 -->
+    <div class="section-card">
+      <div class="section-title">
+        <span>✅ 상태 변경</span>
+      </div>
+      <select id="statusChangeSelect" class="status-select" disabled>
+        <option value="">매장 선택 필요</option>
+        <option value="거래 성사">거래 성사</option>
+        <option value="미팅 완료">미팅 완료</option>
+        <option value="미팅 요청">미팅 요청</option>
+        <option value="부재중/미응답">부재중/미응답</option>
+        <option value="거절">거절</option>
+      </select>
+      <div style="margin-top:6px;text-align:right;">
+        <button id="statusChangeBtn" class="btn btn-primary" disabled>
+          상태 변경 저장
+        </button>
+      </div>
+    </div>
 
-    <!-- 사진 캐러셀 -->
-    <div id="storePhotos" class="photo-carousel"></div>
+    <!-- 5) 히스토리 로그 -->
+    <div class="section-card">
+      <div class="section-title">
+        <span>📝 히스토리 로그</span>
+      </div>
+      <div id="historyList" class="history-list">
+        히스토리를 불러오려면 매장을 선택하세요.
+      </div>
+    </div>
 
-    <!-- 히스토리 로그 -->
-    <div id="historyLog" class="history-log"></div>
-
-    <!-- 상태 변경 버튼 -->
-    <div class="status-buttons">
-      <button class="status-button" data-status="거래 성사">거래 성사</button>
-      <button class="status-button" data-status="미팅 완료">미팅 완료</button>
-      <button class="status-button" data-status="미팅 요청">미팅 요청</button>
-      <button class="status-button" data-status="부재중/미응답">부재중/미응답</button>
-      <button class="status-button" data-status="거절">거절</button>
+    <!-- 6) 메모 입력 -->
+    <div class="section-card">
+      <div class="section-title">
+        <span>✏️ 메모 추가</span>
+      </div>
+      <textarea
+        id="memoInput"
+        class="memo-textarea"
+        placeholder="히스토리에 남길 메모를 입력하세요."
+        disabled
+      ></textarea>
+      <div style="margin-top:6px;text-align:right;">
+        <button id="memoSaveBtn" class="btn btn-primary" disabled>
+          메모 저장
+        </button>
+      </div>
     </div>
   </aside>
 </div>
@@ -328,19 +488,19 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 <script>
-/* ⭐ WebApp BASE URL (action 없음) */
-const BASE_URL =
+// ⭐ 두영님 Apps Script WebApp 기본 URL (마지막 /exec 까지)
+// 예시: const API_BASE = "https://script.google.com/macros/s/AKfycbz3V3zX-.../exec";
+const API_BASE =
   "https://script.google.com/macros/s/AKfycbz3V3zX-zdYbwajKaZjktsClGesOFEoTHqDsHHFrWdr6BdbYmgDPaXiNbYH5gNNtTVv/exec";
-
-const PLACES_URL  = BASE_URL + "?action=places";
 
 let rawRows = [];
 let filteredRows = [];
 let map, markerCluster, chartInstance;
+let allMarkers = [];         // row별 마커
+let selectedMarker = null;
 let currentStore = null;
-let routeLayer = null;
 
-/* 상태 색상 */
+// 상태별 색상
 const STATUS_COLOR = {
   "거래 성사": "#2ecc71",
   "미팅 완료": "#3498db",
@@ -349,7 +509,7 @@ const STATUS_COLOR = {
   "거절": "#e74c3c"
 };
 
-/* 초기 로드 */
+// 초기화
 window.addEventListener("load", async () => {
   initMap();
   initEvents();
@@ -357,7 +517,7 @@ window.addEventListener("load", async () => {
   await loadData();
 });
 
-/* 지도 */
+// 지도 생성
 function initMap() {
   map = L.map("map", {
     center: [37.5665, 126.9780],
@@ -377,6 +537,7 @@ function initMap() {
   map.addLayer(markerCluster);
 }
 
+// 이벤트
 function initEvents() {
   document.getElementById("searchInput").addEventListener("input", () => {
     applyFilters();
@@ -384,252 +545,249 @@ function initEvents() {
     showAutocomplete();
   });
   document.getElementById("categorySelect").addEventListener("change", () => {
-    applyFilters(); saveFilters();
+    applyFilters();
+    saveFilters();
   });
   document.getElementById("statusSelect").addEventListener("change", () => {
-    applyFilters(); saveFilters();
+    applyFilters();
+    saveFilters();
   });
 
-  document.getElementById("routeToggle").addEventListener("click", toggleRoute);
-
-  document.querySelectorAll(".status-button").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
-      const newStatus = e.target.dataset.status;
-      await onChangeStatus(newStatus);
-    });
-  });
+  // 상태 변경 저장
+  document.getElementById("statusChangeBtn").addEventListener("click", onClickStatusChange);
+  // 메모 저장
+  document.getElementById("memoSaveBtn").addEventListener("click", onClickMemoSave);
 }
 
-/* 데이터 불러오기 */
+// 데이터 로드
 async function loadData() {
-  const res = await fetch(PLACES_URL);
-  const json = await res.json();
+  try {
+    const res = await fetch(`${API_BASE}?action=places`);
+    const json = await res.json();
 
-  rawRows = json.filter(r => r.lat && r.lng);
-  buildFilters(rawRows);
-  applyFilters();
+    rawRows = json.filter(r => r.lat && r.lng);
+    buildFilters(rawRows);
+    applyFilters();
+  } catch (e) {
+    console.error("데이터 로딩 오류:", e);
+    alert("데이터를 불러오지 못했습니다.");
+  }
 }
 
-/* 필터 목록 생성 */
+// 필터 옵션 구성
 function buildFilters(rows) {
-  const statusSet = new Set();
+  const categorySelect = document.getElementById("categorySelect");
+  const statusSelect = document.getElementById("statusSelect");
+
   const categorySet = new Set();
+  const statusSet = new Set();
 
   rows.forEach(r => {
-    if (r.Status) statusSet.add(r.Status);
-    if (r.category) categorySet.add(r.category.split(">")[0].trim());
+    if (r.category) {
+      const major = r.category.split(">")[0].trim();
+      categorySet.add(major);
+    }
+    if (r.Status) {
+      statusSet.add(r.Status);
+    }
   });
 
-  const statusSelect = document.getElementById("statusSelect");
-  const categorySelect = document.getElementById("categorySelect");
-
-  // 기존 옵션 유지(ALL 제외 제거 후 재생성)할 수도 있지만, 간단히 한 번만 생성하는 전제
-  if (statusSelect.options.length === 1) {
-    [...statusSet].sort().forEach(s => {
-      const opt = document.createElement("option");
-      opt.value = s;
-      opt.textContent = s;
-      statusSelect.appendChild(opt);
-    });
-  }
-
-  if (categorySelect.options.length === 1) {
-    [...categorySet].sort().forEach(c => {
-      const opt = document.createElement("option");
-      opt.value = c;
-      opt.textContent = c;
-      categorySelect.appendChild(opt);
-    });
-  }
-}
-
-/* 자동완성 */
-function showAutocomplete() {
-  const ac = document.getElementById("autocomplete");
-  const q = document.getElementById("searchInput").value.trim().toLowerCase();
-  if (!q) { ac.style.display = "none"; return; }
-
-  const matched = rawRows.filter(r =>
-    (r.name || "").toLowerCase().includes(q) ||
-    (r.roadAddress || "").toLowerCase().includes(q) ||
-    (r.keyword || "").toLowerCase().includes(q)
-  ).slice(0, 10);
-
-  ac.innerHTML = matched.map(r =>
-    `<div class="autocomplete-item">${r.name}</div>`
-  ).join("");
-
-  ac.style.display = matched.length ? "block" : "none";
-
-  document.querySelectorAll(".autocomplete-item").forEach((el, i) => {
-    el.addEventListener("click", () => {
-      const store = matched[i];
-      document.getElementById("searchInput").value = store.name;
-      ac.style.display = "none";
-      map.setView([store.lat, store.lng], 17);
-      showStoreDetail(store);
-      applyFilters();
-    });
+  // 카테고리 옵션
+  const savedCat = categorySelect.value;
+  categorySelect.innerHTML = '<option value="ALL">전체 카테고리</option>';
+  Array.from(categorySet).sort().forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    categorySelect.appendChild(opt);
   });
+  if (savedCat) categorySelect.value = savedCat;
+
+  // 상태 옵션
+  const savedSt = statusSelect.value;
+  statusSelect.innerHTML = '<option value="ALL">전체 상태</option>';
+  Array.from(statusSet).forEach(st => {
+    const opt = document.createElement("option");
+    opt.value = st;
+    opt.textContent = st;
+    statusSelect.appendChild(opt);
+  });
+  if (savedSt) statusSelect.value = savedSt;
 }
 
-/* 필터 적용 */
+// 필터 적용
 function applyFilters() {
   const q = document.getElementById("searchInput").value.trim().toLowerCase();
   const cat = document.getElementById("categorySelect").value;
   const st = document.getElementById("statusSelect").value;
 
   filteredRows = rawRows.filter(r => {
-    const text = `${r.name} ${r.sigungu} ${r.roadAddress} ${r.keyword}`.toLowerCase();
+    const text = [
+      r.name || "",
+      r.sigungu || "",
+      r.roadAddress || "",
+      r.keyword || ""
+    ].join(" ").toLowerCase();
     const matchSearch = !q || text.includes(q);
 
-    const major = (r.category || "").split(">")[0].trim();
+    const major = r.category ? r.category.split(">")[0].trim() : "기타";
     const matchCat = cat === "ALL" || major === cat;
-    const matchStatus = st === "ALL" || r.Status === st;
+    const matchStatus = st === "ALL" || (r.Status || "") === st;
 
     return matchSearch && matchCat && matchStatus;
   });
 
   renderAll();
+  updateCurrentStoreLabel();
 }
 
-/* 전체 렌더링 */
 function renderAll() {
   renderMarkers();
   renderStoreList();
-  renderStats(filteredRows);
-
-  // 동선 다시 그림
-  if (routeLayer) {
-    map.removeLayer(routeLayer);
-    drawRouteLine();
-  }
+  renderStats();
 }
 
-/* 마커 */
-function createMarkerIcon(status) {
+/* 마커 관련 */
+function createMarkerIcon(status, selected = false) {
+  const color = STATUS_COLOR[status] || "#7f8c8d";
+  const cls = selected ? "marker-dot selected" : "marker-dot";
   return L.divIcon({
-    className: "custom-marker",
-    html: `<div class="marker-dot" style="background:${STATUS_COLOR[status] || "#7f8c8d"}"></div>`,
-    iconSize: [18, 18], iconAnchor: [9, 9]
+    className: "",
+    html: `<div class="${cls}" style="background:${color};"></div>`,
+    iconSize: selected ? [26, 26] : [18, 18],
+    iconAnchor: selected ? [13, 13] : [9, 9]
   });
 }
 
 function renderMarkers() {
   markerCluster.clearLayers();
+  allMarkers = [];
+  selectedMarker = null;
+
   filteredRows.forEach(r => {
-    const marker = L.marker([r.lat, r.lng], {
-      icon: createMarkerIcon(r.Status)
+    const lat = Number(r.lat);
+    const lng = Number(r.lng);
+    if (isNaN(lat) || isNaN(lng)) return;
+
+    const marker = L.marker([lat, lng], {
+      icon: createMarkerIcon(r.Status, false)
     });
+
+    marker._store = r;
+
+    marker.on("click", () => {
+      onSelectStore(r, marker);
+    });
+
     markerCluster.addLayer(marker);
+    allMarkers.push(marker);
   });
+
+  if (filteredRows.length > 0) {
+    const group = L.featureGroup(allMarkers);
+    map.fitBounds(group.getBounds().pad(0.1));
+  }
 }
 
 /* 좌측 리스트 */
 function renderStoreList() {
-  const list = document.getElementById("storeList");
-  list.innerHTML = "";
-  document.getElementById("storeCountLabel").textContent =
-    `${filteredRows.length}개`;
+  const listEl = document.getElementById("storeList");
+  const countLabel = document.getElementById("storeCountLabel");
+  listEl.innerHTML = "";
 
-  filteredRows.slice(0, 500).forEach(r => {
+  countLabel.textContent = `${filteredRows.length.toLocaleString()}개 매장`;
+
+  filteredRows.slice(0, 300).forEach(r => {
     const li = document.createElement("li");
     li.className = "store-item";
 
-    const major = (r.category || "").split(">")[0];
+    const statusColor = STATUS_COLOR[r.Status] || "#6b7280";
 
     li.innerHTML = `
-      <div class="store-name">${r.name || "매장명 없음"}</div>
+      <div class="store-name">
+        <span>${r.name || "매장명 없음"}</span>
+        ${r.Status ? `<span class="status-badge" style="background:${statusColor};">${r.Status}</span>` : ""}
+      </div>
       <div class="store-meta">
-        <span class="status-badge" style="background:${STATUS_COLOR[r.Status] || "#9ca3af"}">${r.Status || "상태 없음"}</span>
-        ${major || "기타"} · ${r.sigungu || ""}
+        ${(r.sigungu || "")} · ${(r.category || "").split(">")[0] || ""} 
       </div>
       <div class="store-meta">${r.roadAddress || ""}</div>
     `;
 
     li.addEventListener("click", () => {
-      map.setView([r.lat, r.lng], 17);
-      showStoreDetail(r);
+      // 해당 매장 마커 찾기
+      const marker = allMarkers.find(m => m._store && m._store.name === r.name);
+      onSelectStore(r, marker);
     });
 
-    list.appendChild(li);
+    listEl.appendChild(li);
   });
 }
 
-/* 상세 정보 + 히스토리 + 사진 */
-async function showStoreDetail(r) {
-  currentStore = r;
+/* 매장 선택 공통 처리 */
+function onSelectStore(store, marker) {
+  currentStore = store;
+  updateCurrentStoreLabel();
+  highlightMarker(marker, store.Status);
+  showStoreDetail(store);
+  enableStoreControls(true);
+  loadHistory(store.name);
 
-  const box = document.getElementById("storeDetail");
-  const photosBox = document.getElementById("storePhotos");
-  const historyBox = document.getElementById("historyLog");
+  if (marker) {
+    const latlng = marker.getLatLng();
+    map.setView(latlng, 17, { animate: true });
+  }
+}
 
-  box.innerHTML = `
-    <h3>${r.name || "매장명 없음"}</h3>
-    <div><strong>주소:</strong> ${r.roadAddress || ""}</div>
-    <div><strong>상태:</strong> ${r.Status || ""}</div>
-    <div><strong>카테고리:</strong> ${(r.category || "").split(">")[0]}</div>
-    <div><strong>시군구:</strong> ${r.sigungu || ""}</div>
-    <div><strong>블로그 수:</strong> ${r.blog_count || "-"}</div>
-    <div><strong>키워드:</strong> ${r.keyword || ""}</div>
-    ${r.URL ? `<div><a href="${r.URL}" target="_blank">네이버 플레이스 열기</a></div>` : ""}
+function highlightMarker(marker, status) {
+  // 다른 마커는 모두 기본 아이콘으로
+  allMarkers.forEach(m => {
+    const st = (m._store && m._store.Status) || status;
+    m.setIcon(createMarkerIcon(st, false));
+  });
+
+  // 선택 마커만 강조
+  if (marker) {
+    marker.setIcon(createMarkerIcon(status, true));
+    selectedMarker = marker;
+  }
+}
+
+/* 상세정보 표시 */
+function showStoreDetail(r) {
+  const el = document.getElementById("storeDetailBody");
+
+  if (!r) {
+    el.innerHTML = "매장을 선택하면 상세정보가 표시됩니다.";
+    return;
+  }
+
+  const majorCat = (r.category || "").split(">")[0] || "";
+  const urlHtml = r.URL
+    ? `<a href="${r.URL}" target="_blank" style="color:#2563eb;">네이버 플레이스 열기</a>`
+    : "없음";
+
+  el.innerHTML = `
+    <div class="store-detail-line"><span>매장명</span>${r.name || ""}</div>
+    <div class="store-detail-line"><span>주소</span>${r.roadAddress || ""}</div>
+    <div class="store-detail-line"><span>지역</span>${r.sigungu || ""}</div>
+    <div class="store-detail-line"><span>카테고리</span>${majorCat}</div>
+    <div class="store-detail-line"><span>상태</span>${r.Status || "-"}</div>
+    <div class="store-detail-line"><span>블로그 수</span>${r.blog_count || "-"}</div>
+    <div class="store-detail-line"><span>키워드</span>${r.keyword || "-"}</div>
+    <div class="store-detail-line"><span>링크</span>${urlHtml}</div>
   `;
 
-  photosBox.innerHTML = "";
-  historyBox.innerHTML = "히스토리를 불러오는 중...";
-
-  // 히스토리 로드
-  try {
-    const storeId = r.store_id || (r.name + "|" + r.roadAddress);
-    const resH = await fetch(`${BASE_URL}?action=history&storeId=${encodeURIComponent(storeId)}`);
-    const logs = await resH.json();
-    if (logs.length === 0) {
-      historyBox.innerHTML = "<div class='history-item'>히스토리가 없습니다.</div>";
-    } else {
-      historyBox.innerHTML = logs.map(log => `
-        <div class="history-item">
-          <div class="history-date">${formatDate(log.date)}</div>
-          <div class="history-user">${log.user || ""}</div>
-          <div class="history-text">${log.memo || ""}</div>
-        </div>
-      `).join("");
-    }
-  } catch (e) {
-    historyBox.innerHTML = "<div class='history-item'>히스토리를 불러오지 못했습니다.</div>";
-  }
-
-  // 사진 로드 (og:image 1개)
-  if (r.URL) {
-    try {
-      const resP = await fetch(`${BASE_URL}?action=photos&url=${encodeURIComponent(r.URL)}`);
-      const imgs = await resP.json();
-      if (imgs.length > 0) {
-        photosBox.innerHTML = imgs.slice(0, 5).map(src =>
-          `<img src="${src}" onclick="window.open('${src}')" />`
-        ).join("");
-      } else {
-        photosBox.innerHTML = "";
-      }
-    } catch (e) {
-      photosBox.innerHTML = "";
-    }
-  }
+  // 상태 변경 드롭다운 값 세팅
+  const statusSelect = document.getElementById("statusChangeSelect");
+  statusSelect.disabled = false;
+  statusSelect.value = r.Status || "";
 }
 
-function formatDate(d) {
-  if (!d) return "";
-  const dt = new Date(d);
-  if (isNaN(dt)) return d;
-  const y = dt.getFullYear();
-  const m = String(dt.getMonth() + 1).padStart(2, "0");
-  const day = String(dt.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-/* 숫자 + 차트 */
-function renderStats(rows) {
+/* 대시보드 통계 (차트 + 숫자) */
+function renderStats() {
   const stats = {
-    total: rows.length,
+    total: filteredRows.length,
     deal: 0,
     meetingDone: 0,
     request: 0,
@@ -637,140 +795,271 @@ function renderStats(rows) {
     reject: 0
   };
 
-  rows.forEach(r => {
-    if (r.Status === "거래 성사") stats.deal++;
-    else if (r.Status === "미팅 완료") stats.meetingDone++;
-    else if (r.Status === "미팅 요청") stats.request++;
-    else if (r.Status === "부재중/미응답") stats.noAnswer++;
-    else if (r.Status === "거절") stats.reject++;
+  filteredRows.forEach(r => {
+    switch (r.Status) {
+      case "거래 성사":
+        stats.deal++; break;
+      case "미팅 완료":
+        stats.meetingDone++; break;
+      case "미팅 요청":
+        stats.request++; break;
+      case "부재중/미응답":
+        stats.noAnswer++; break;
+      case "거절":
+        stats.reject++; break;
+    }
   });
 
-  renderNumberStats(stats);
-  renderStatusChart(stats);
-}
+  // 숫자 카운트
+  document.getElementById("statTotal").textContent = stats.total.toLocaleString();
+  document.getElementById("statDeal").textContent = stats.deal.toLocaleString();
+  document.getElementById("statMeetingDone").textContent = stats.meetingDone.toLocaleString();
+  document.getElementById("statRequest").textContent = stats.request.toLocaleString();
+  document.getElementById("statNoAnswer").textContent = stats.noAnswer.toLocaleString();
+  document.getElementById("statReject").textContent = stats.reject.toLocaleString();
 
-function renderNumberStats(stats) {
-  const progress = stats.total > 0
-    ? ((stats.deal + stats.meetingDone) / stats.total * 100).toFixed(1)
-    : 0;
-
-  document.getElementById("numberStats").innerHTML = `
-    <div class="number-card">
-      <div class="number-title">총 매장 수</div>
-      <div class="number-value">${stats.total}</div>
-    </div>
-    <div class="number-card">
-      <div class="number-title">거래 성사</div>
-      <div class="number-value">${stats.deal}</div>
-    </div>
-    <div class="number-card">
-      <div class="number-title">미팅 완료</div>
-      <div class="number-value">${stats.meetingDone}</div>
-    </div>
-    <div class="number-card">
-      <div class="number-title">진행률</div>
-      <div class="number-value">${progress}%</div>
-    </div>
-    <div class="number-card">
-      <div class="number-title">미팅 요청</div>
-      <div class="number-value">${stats.request}</div>
-    </div>
-    <div class="number-card">
-      <div class="number-title">부재중/미응답</div>
-      <div class="number-value">${stats.noAnswer}</div>
-    </div>
-  `;
-}
-
-function renderStatusChart(stats) {
-  const ctx = document.getElementById("statusChart");
-
-  const labels = ["거래 성사", "미팅 완료", "미팅 요청", "부재중/미응답", "거절"];
-  const values = [
-    stats.deal,
-    stats.meetingDone,
-    stats.request,
-    stats.noAnswer,
-    stats.reject
-  ];
-
+  // 도넛 차트
   if (chartInstance) chartInstance.destroy();
+  const ctx = document.getElementById("statusChart");
 
   chartInstance = new Chart(ctx, {
     type: "doughnut",
     data: {
-      labels,
+      labels: ["거래 성사", "미팅 완료", "미팅 요청", "부재중/미응답", "거절"],
       datasets: [{
-        data: values,
-        backgroundColor: ["#2ecc71","#3498db","#f1c40f","#95a5a6","#e74c3c"]
+        data: [
+          stats.deal,
+          stats.meetingDone,
+          stats.request,
+          stats.noAnswer,
+          stats.reject
+        ],
+        backgroundColor: [
+          STATUS_COLOR["거래 성사"],
+          STATUS_COLOR["미팅 완료"],
+          STATUS_COLOR["미팅 요청"],
+          STATUS_COLOR["부재중/미응답"],
+          STATUS_COLOR["거절"]
+        ]
       }]
     },
     options: {
       cutout: "60%",
       responsive: true,
-      plugins: { legend: { position: "bottom" } }
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: { boxWidth: 10, font: { size: 10 } }
+        }
+      }
     }
   });
 }
 
-/* 동선 (Polyline) */
-function toggleRoute() {
-  if (routeLayer) {
-    map.removeLayer(routeLayer);
-    routeLayer = null;
-  } else {
-    drawRouteLine();
-  }
-}
-
-function drawRouteLine() {
-  if (filteredRows.length < 2) return;
-  const points = filteredRows.map(r => [r.lat, r.lng]);
-  routeLayer = L.polyline(points, {
-    color: "#3498db",
-    weight: 3,
-    dashArray: "4, 6"
-  }).addTo(map);
-}
-
-/* 상태 변경 */
-async function onChangeStatus(newStatus) {
-  if (!currentStore) {
-    alert("먼저 매장을 선택해주세요.");
+/* 자동완성 */
+function showAutocomplete() {
+  const ac = document.getElementById("autocomplete");
+  const q = document.getElementById("searchInput").value.trim().toLowerCase();
+  if (!q) {
+    ac.style.display = "none";
     return;
   }
-  if (!confirm(`상태를 "${newStatus}"(으)로 변경할까요?`)) return;
 
-  const rowId = currentStore._row;
-  const storeId = currentStore.store_id || (currentStore.name + "|" + currentStore.roadAddress);
+  const matched = rawRows.filter(r => {
+    const text = [
+      r.name || "",
+      r.roadAddress || "",
+      r.keyword || ""
+    ].join(" ").toLowerCase();
+    return text.includes(q);
+  }).slice(0, 12);
 
-  const url =
-    `${BASE_URL}?action=updateStatus&id=${encodeURIComponent(rowId)}&status=${encodeURIComponent(newStatus)}&storeId=${encodeURIComponent(storeId)}`;
+  if (!matched.length) {
+    ac.style.display = "none";
+    return;
+  }
 
-  await fetch(url);
-  await loadData();
-  applyFilters();
+  ac.innerHTML = matched.map(r =>
+    `<div class="autocomplete-item">${r.name}</div>`
+  ).join("");
 
-  // 변경된 매장 다시 찾아서 상세정보 갱신
-  const updated = rawRows.find(r => r._row === rowId);
-  if (updated) showStoreDetail(updated);
+  ac.style.display = "block";
+
+  const items = ac.querySelectorAll(".autocomplete-item");
+  items.forEach((el, i) => {
+    el.addEventListener("click", () => {
+      const store = matched[i];
+      document.getElementById("searchInput").value = store.name;
+      ac.style.display = "none";
+      // 해당 매장 선택 처리
+      const marker = allMarkers.find(m => m._store && m._store.name === store.name);
+      onSelectStore(store, marker);
+      applyFilters(); // 검색 필터 적용
+    });
+  });
+}
+
+/* 히스토리 로드 */
+async function loadHistory(storeName) {
+  const box = document.getElementById("historyList");
+  if (!storeName) {
+    box.innerHTML = "히스토리를 불러오려면 매장을 선택하세요.";
+    return;
+  }
+
+  box.innerHTML = "불러오는 중...";
+
+  try {
+    const res = await fetch(`${API_BASE}?action=history&store_id=${encodeURIComponent(storeName)}`);
+    const logs = await res.json();
+
+    if (!logs.length) {
+      box.innerHTML = "등록된 히스토리가 없습니다.";
+      return;
+    }
+
+    box.innerHTML = logs.map(log => `
+      <div class="history-item">
+        <div class="history-meta">
+          ${log.timestamp} · ${log.manager || ""}
+        </div>
+        <div>${log.memo || ""}</div>
+      </div>
+    `).join("");
+
+  } catch (e) {
+    console.error(e);
+    box.innerHTML = "히스토리를 불러오지 못했습니다.";
+  }
+}
+
+/* 상태 변경 저장 */
+async function onClickStatusChange() {
+  if (!currentStore) return;
+
+  const select = document.getElementById("statusChangeSelect");
+  const btn = document.getElementById("statusChangeBtn");
+  const newStatus = select.value;
+
+  if (!newStatus || newStatus === currentStore.Status) {
+    alert("변경할 상태를 선택해주세요.");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "저장 중...";
+
+  try {
+    const body = new URLSearchParams({
+      action: "updateStatus",
+      store_id: currentStore.name,
+      status: newStatus
+    });
+
+    const res = await fetch(API_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body
+    });
+
+    const json = await res.json();
+    if (json && json.result === "ok") {
+      // 프론트 데이터 갱신
+      currentStore.Status = newStatus;
+      rawRows.forEach(r => {
+        if (r.name === currentStore.name) r.Status = newStatus;
+      });
+      applyFilters();
+      showStoreDetail(currentStore);
+      loadHistory(currentStore.name); // 상태 변경 히스토리도 함께 기록됨
+      alert("상태가 변경되었습니다.");
+    } else {
+      alert("상태 변경에 실패했습니다.");
+    }
+  } catch (e) {
+    console.error(e);
+    alert("상태 변경 중 오류가 발생했습니다.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "상태 변경 저장";
+  }
+}
+
+/* 메모 저장 */
+async function onClickMemoSave() {
+  if (!currentStore) return;
+  const textarea = document.getElementById("memoInput");
+  const btn = document.getElementById("memoSaveBtn");
+  const memo = textarea.value.trim();
+  if (!memo) {
+    alert("메모 내용을 입력해주세요.");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "저장 중...";
+
+  try {
+    const body = new URLSearchParams({
+      action: "addHistory",
+      store_id: currentStore.name,
+      memo: memo
+    });
+
+    const res = await fetch(API_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body
+    });
+
+    const json = await res.json();
+    if (json && json.result === "ok") {
+      textarea.value = "";
+      loadHistory(currentStore.name);
+      alert("메모가 저장되었습니다.");
+    } else {
+      alert("메모 저장에 실패했습니다.");
+    }
+  } catch (e) {
+    console.error(e);
+    alert("메모 저장 중 오류가 발생했습니다.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "메모 저장";
+  }
 }
 
 /* 필터 저장/불러오기 */
 function saveFilters() {
-  localStorage.setItem("filterStatus", document.getElementById("statusSelect").value);
-  localStorage.setItem("filterCategory", document.getElementById("categorySelect").value);
-  localStorage.setItem("filterSearch", document.getElementById("searchInput").value);
+  localStorage.setItem("kb_statusFilter", document.getElementById("statusSelect").value);
+  localStorage.setItem("kb_categoryFilter", document.getElementById("categorySelect").value);
+  localStorage.setItem("kb_search", document.getElementById("searchInput").value);
 }
-
 function loadFilters() {
-  const st = localStorage.getItem("filterStatus");
-  const cat = localStorage.getItem("filterCategory");
-  const q = localStorage.getItem("filterSearch");
-
+  const st = localStorage.getItem("kb_statusFilter");
+  const cat = localStorage.getItem("kb_categoryFilter");
+  const q = localStorage.getItem("kb_search");
   if (st) document.getElementById("statusSelect").value = st;
   if (cat) document.getElementById("categorySelect").value = cat;
   if (q) document.getElementById("searchInput").value = q;
+}
+
+/* 현재 선택 매장 라벨 */
+function updateCurrentStoreLabel() {
+  const label = document.getElementById("currentStoreLabel");
+  if (currentStore && currentStore.name) {
+    label.textContent = currentStore.name;
+  } else {
+    label.textContent = "";
+  }
+}
+
+/* 매장 선택/비선택 시 버튼 활성/비활성 */
+function enableStoreControls(enabled) {
+  document.getElementById("statusChangeSelect").disabled = !enabled;
+  document.getElementById("statusChangeBtn").disabled = !enabled;
+  document.getElementById("memoInput").disabled = !enabled;
+  document.getElementById("memoSaveBtn").disabled = !enabled;
 }
 </script>
 </body>

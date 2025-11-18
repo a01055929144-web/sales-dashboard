@@ -26,8 +26,7 @@
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-        system-ui, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
       background: #f3f4f6;
       color: #111827;
       height: 100vh;
@@ -58,7 +57,6 @@
       gap: 8px;
       flex: 1;
       align-items: center;
-      position: relative;
     }
     .search-input,
     .select-input {
@@ -70,12 +68,14 @@
       background: #f9fafb;
     }
     .search-input { flex: 1; }
+    .select-input { min-width: 140px; }
+    .select-input.full-width { width: 100%; }
 
-    /* 레이아웃 */
+    /* 메인 레이아웃 */
     .layout {
       flex: 1;
       display: grid;
-      grid-template-columns: 280px minmax(0, 1fr) 300px;
+      grid-template-columns: 280px minmax(0, 1fr) 320px;
       height: calc(100vh - 52px);
       overflow: hidden;
     }
@@ -87,66 +87,102 @@
       padding: 12px;
       overflow-y: auto;
     }
-    .store-panel h2 {
-      font-size: 14px;
-      margin: 0 0 8px;
+    .store-header-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 6px;
+    }
+    .store-header-row h2 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
     }
     .store-count {
       font-size: 11px;
       color: #6b7280;
     }
+    .store-sort-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 11px;
+      color: #6b7280;
+    }
+    .store-sort-row select {
+      flex: 1;
+      min-width: 0;
+    }
+
     .store-list {
       list-style: none;
-      margin: 0;
       padding: 0;
+      margin: 0;
     }
     .store-item {
-      padding: 8px 10px;
+      padding: 8px 8px;
       border-radius: 10px;
       cursor: pointer;
-      margin-bottom: 6px;
       border: 1px solid transparent;
-      background: #ffffff;
-      transition: background 0.12s ease, border-color 0.12s ease,
-        box-shadow 0.12s ease, transform 0.12s ease;
+      margin-bottom: 6px;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
     }
     .store-item:hover {
       background: #f3f4ff;
       border-color: #e0e7ff;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
-      transform: translateY(-1px);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+    }
+    .store-header {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 2px;
     }
     .store-name {
       font-size: 13px;
       font-weight: 600;
-      margin-bottom: 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      color: #111827;
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
-    .store-meta {
-      font-size: 11px;
-      color: #6b7280;
+    .fav-icon {
+      font-size: 14px;
+      color: #fbbf24;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .store-meta-line {
+      display: flex;
+      align-items: center;
+      gap: 4px;
       margin-bottom: 2px;
     }
     .status-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
+      font-size: 11px;
+      padding: 2px 6px;
       border-radius: 999px;
-      font-size: 10px;
-      font-weight: 600;
-      color: #ffffff;
+      background: #e5e7eb;
+      color: #374151;
+      flex-shrink: 0;
+    }
+    .meta-text {
+      font-size: 11px;
+      color: #6b7280;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .store-meta-address {
+      font-size: 11px;
+      color: #6b7280;
     }
 
     /* 지도 */
-    #map {
-      width: 100%;
-      height: 100%;
-    }
+    #map { width: 100%; height: 100%; }
 
     /* 우측 대시보드 */
     .dashboard-panel {
@@ -157,193 +193,216 @@
     }
     .dashboard-title {
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 6px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 6px;
     }
-
     .chart-wrapper {
-      background: #f9fafb;
       border-radius: 12px;
+      padding: 10px;
       border: 1px solid #e5e7eb;
-      padding: 8px;
+      background: #f9fafb;
       margin-bottom: 8px;
+    }
+    #statusChart {
+      width: 100%;
+      max-height: 200px;
+    }
+    .chart-stats {
+      font-size: 11px;
+      color: #374151;
+      margin-top: 6px;
+      line-height: 1.4;
     }
 
     .stat-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 6px;
-      margin-top: 6px;
+      margin-bottom: 10px;
     }
     .stat-card {
-      background: #ffffff;
-      border-radius: 10px;
-      border: 1px solid #e5e7eb;
       padding: 6px 8px;
+      border-radius: 10px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
     }
     .stat-label {
-      font-size: 10px;
+      font-size: 11px;
       color: #6b7280;
       margin-bottom: 2px;
     }
     .stat-value {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
     }
+    .stat-sub {
+      font-size: 11px;
+      color: #6b7280;
+    }
 
-    .section-card {
+    .detail-card {
       border-radius: 12px;
       border: 1px solid #e5e7eb;
+      padding: 10px;
       background: #f9fafb;
-      padding: 8px 10px;
-      margin-top: 8px;
-      font-size: 12px;
+      margin-bottom: 8px;
     }
-    .section-title {
+    .detail-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .detail-body {
+      font-size: 12px;
+      color: #374151;
+    }
+    .info-item {
+      margin: 6px 0;
+      font-size: 12px;
+      color: #374151;
+    }
+    .info-item span {
+      display: inline-block;
+      width: 70px;
+      font-weight: 600;
+    }
+
+    .status-change {
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      padding: 10px;
+      background: #fafafa;
+      margin-bottom: 8px;
+    }
+    .status-change-header {
       font-size: 12px;
       font-weight: 600;
       margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
-    .store-detail-line {
-      margin-bottom: 3px;
-    }
-    .store-detail-line span {
-      font-weight: 600;
-      margin-right: 4px;
-    }
-
-    .status-select {
-      width: 100%;
-      border-radius: 999px;
-      border: 1px solid #d1d5db;
-      padding: 6px 10px;
-      font-size: 12px;
-      background: #ffffff;
-    }
-    .btn {
+    .primary-btn,
+    .secondary-btn {
       border-radius: 999px;
       border: none;
       padding: 6px 10px;
       font-size: 12px;
       cursor: pointer;
-      font-weight: 600;
+      margin-top: 6px;
     }
-    .btn-primary {
+    .primary-btn {
       background: #2563eb;
       color: #ffffff;
     }
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: default;
+    .primary-btn:hover { background: #1d4ed8; }
+    .secondary-btn {
+      background: #e5e7eb;
+      color: #111827;
     }
+    .secondary-btn:hover { background: #d1d5db; }
 
+    .history-section {
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      padding: 10px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 180px;
+    }
+    .history-header {
+      font-size: 12px;
+      font-weight: 600;
+    }
     .history-list {
       max-height: 130px;
       overflow-y: auto;
       border-radius: 8px;
-      background: #ffffff;
       border: 1px solid #e5e7eb;
-      padding: 6px 8px;
+      padding: 6px;
       font-size: 11px;
+      background: #f9fafb;
     }
     .history-item {
-      padding: 4px 0;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
       border-bottom: 1px dashed #e5e7eb;
     }
     .history-item:last-child {
       border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
     }
     .history-meta {
       color: #6b7280;
-      font-size: 10px;
       margin-bottom: 2px;
     }
+    .history-text {
+      color: #111827;
+      white-space: pre-wrap;
+    }
+    .history-empty {
+      color: #9ca3af;
+    }
 
-    .memo-textarea {
+    .memo-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .memo-box textarea {
       width: 100%;
-      min-height: 60px;
       border-radius: 8px;
       border: 1px solid #d1d5db;
       padding: 6px 8px;
       font-size: 12px;
       resize: vertical;
+      min-height: 48px;
     }
 
-    .autocomplete {
-      position: absolute;
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      width: 260px;
-      max-height: 220px;
-      overflow-y: auto;
-      z-index: 50;
-      border-radius: 8px;
-      display: none;
-      top: 34px;
-      right: 0;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    /* 커스텀 마커 */
+    .custom-marker {
+      border-radius: 999px;
+      background: transparent;
     }
-    .autocomplete-item {
-      padding: 6px 10px;
-      cursor: pointer;
-      font-size: 13px;
-    }
-    .autocomplete-item:hover {
-      background: #f3f4f6;
-    }
-
-    /* 마커 */
     .marker-dot {
-      width: 14px;
-      height: 14px;
       border-radius: 999px;
       border: 2px solid #ffffff;
       box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+      animation: pop 0.25s ease-out;
     }
-    .marker-dot.selected {
-      width: 26px;
-      height: 26px;
-      border-width: 3px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.35);
-      animation: pop 0.18s ease-out;
+    .marker-selected {
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.9);
     }
+
     @keyframes pop {
-      0% { transform: scale(0.2); }
-      80% { transform: scale(1.15); }
+      0% { transform: scale(0.2); opacity: 0; }
+      80% { transform: scale(1.15); opacity: 1; }
       100% { transform: scale(1); }
     }
 
+    /* 스크롤바 */
     .store-panel::-webkit-scrollbar,
-    .dashboard-panel::-webkit-scrollbar {
+    .dashboard-panel::-webkit-scrollbar,
+    .history-list::-webkit-scrollbar {
       width: 6px;
     }
     .store-panel::-webkit-scrollbar-thumb,
-    .dashboard-panel::-webkit-scrollbar-thumb {
+    .dashboard-panel::-webkit-scrollbar-thumb,
+    .history-list::-webkit-scrollbar-thumb {
       background: #d1d5db;
       border-radius: 999px;
     }
 
-    @media (max-width: 1024px) {
+    @media (max-width: 1200px) {
       .layout {
-        grid-template-columns: 0 minmax(0, 1fr) 0;
+        grid-template-columns: 0 minmax(0, 1fr) 320px;
       }
       .store-panel { display: none; }
-      .dashboard-panel {
-        position: absolute;
-        right: 0;
-        top: 52px;
-        bottom: 0;
-        width: 280px;
-        z-index: 20;
-        box-shadow: -4px 0 12px rgba(0,0,0,0.08);
-      }
     }
   </style>
 </head>
@@ -351,133 +410,127 @@
 <header>
   <h1>📍 Sales Store Map Dashboard</h1>
   <div class="header-controls">
-    <!-- 상단: 상태 → 카테고리 → 검색 -->
-    <select id="statusSelect" class="select-input">
+    <!-- 상태 필터 -->
+    <select id="statusFilterSelect" class="select-input">
       <option value="ALL">전체 상태</option>
     </select>
 
+    <!-- 카테고리 필터 -->
     <select id="categorySelect" class="select-input">
       <option value="ALL">전체 카테고리</option>
     </select>
 
+    <!-- 검색 -->
     <input
       id="searchInput"
       class="search-input"
       type="text"
       placeholder="매장명 / 지역 / 도로명주소 / 키워드 검색"
     />
-    <div id="autocomplete" class="autocomplete"></div>
   </div>
 </header>
 
 <div class="layout">
-  <!-- 좌측 매장 리스트 -->
+  <!-- 좌측: 매장 리스트 -->
   <aside class="store-panel">
-    <h2>
-      ⭐ 매장 리스트
+    <div class="store-header-row">
+      <h2>⭐ 매장 리스트</h2>
       <span class="store-count" id="storeCountLabel"></span>
-    </h2>
+    </div>
+    <div class="store-sort-row">
+      <span>정렬</span>
+      <select id="sortSelect" class="select-input">
+        <option value="default">즐겨찾기 ▷ 상태 ▷ 이름</option>
+        <option value="name">이름순 (가나다)</option>
+        <option value="blog">블로그 수 많은순</option>
+      </select>
+    </div>
     <ul id="storeList" class="store-list"></ul>
   </aside>
 
-  <!-- 지도 -->
+  <!-- 가운데: 지도 -->
   <main>
     <div id="map"></div>
   </main>
 
-  <!-- 우측 대시보드 -->
+  <!-- 오른쪽: 대시보드 -->
   <aside class="dashboard-panel">
-    <div class="dashboard-title">
-      <span>📊 대시보드</span>
-      <span id="currentStoreLabel" style="font-size:11px;color:#6b7280;"></span>
-    </div>
+    <div class="dashboard-title">📊 대시보드</div>
 
-    <!-- 1) 도넛 차트 -->
+    <!-- 도넛 차트 + 상태 비율 -->
     <div class="chart-wrapper">
-      <canvas id="statusChart" style="width:100%;height:170px;"></canvas>
+      <canvas id="statusChart"></canvas>
+      <div id="chartStats" class="chart-stats"></div>
+    </div>
 
-      <!-- 2) 숫자 카운트 -->
-      <div class="stat-grid">
-        <div class="stat-card">
-          <div class="stat-label">총 매장 수</div>
-          <div class="stat-value" id="statTotal">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">거래 성사</div>
-          <div class="stat-value" id="statDeal">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">미팅 완료</div>
-          <div class="stat-value" id="statMeetingDone">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">미팅 요청</div>
-          <div class="stat-value" id="statRequest">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">부재중/미응답</div>
-          <div class="stat-value" id="statNoAnswer">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">거절</div>
-          <div class="stat-value" id="statReject">0</div>
-        </div>
+    <!-- 숫자 카운트 -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">총 매장 수</div>
+        <div class="stat-value" id="statTotal">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">거래 성사</div>
+        <div class="stat-value" id="statDeal">0</div>
+        <div class="stat-sub" id="statDealPct"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">미팅 완료</div>
+        <div class="stat-value" id="statMeetingDone">0</div>
+        <div class="stat-sub" id="statMeetingDonePct"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">미팅 요청</div>
+        <div class="stat-value" id="statRequest">0</div>
+        <div class="stat-sub" id="statRequestPct"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">부재중/미응답</div>
+        <div class="stat-value" id="statNoAnswer">0</div>
+        <div class="stat-sub" id="statNoAnswerPct"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">거절</div>
+        <div class="stat-value" id="statReject">0</div>
+        <div class="stat-sub" id="statRejectPct"></div>
       </div>
     </div>
 
-    <!-- 3) 매장 상세정보 -->
-    <div class="section-card" id="storeDetailCard">
-      <div class="section-title">📌 매장 상세정보</div>
-      <div id="storeDetailBody" style="font-size:12px;color:#4b5563;">
-        매장을 선택하면 상세정보가 표시됩니다.
+    <!-- 매장 상세정보 -->
+    <div class="detail-card">
+      <div class="detail-title">🏪 매장 상세정보</div>
+      <div id="storeDetailBody" class="detail-body">
+        매장을 선택하면 상세정보가 여기에 표시됩니다.
       </div>
     </div>
 
-    <!-- 4) 상태 변경 드롭다운 -->
-    <div class="section-card">
-      <div class="section-title">
-        <span>✅ 상태 변경</span>
-      </div>
-      <select id="statusChangeSelect" class="status-select" disabled>
-        <option value="">매장 선택 필요</option>
+    <!-- 상태 변경 -->
+    <div class="status-change">
+      <div class="status-change-header">상태 변경</div>
+      <select id="statusChangeSelect" class="select-input full-width">
+        <option value="">상태 선택</option>
         <option value="거래 성사">거래 성사</option>
         <option value="미팅 완료">미팅 완료</option>
         <option value="미팅 요청">미팅 요청</option>
         <option value="부재중/미응답">부재중/미응답</option>
         <option value="거절">거절</option>
       </select>
-      <div style="margin-top:6px;text-align:right;">
-        <button id="statusChangeBtn" class="btn btn-primary" disabled>
-          상태 변경 저장
-        </button>
-      </div>
+      <button id="statusSaveBtn" class="primary-btn">상태 변경 저장</button>
     </div>
 
-    <!-- 5) 히스토리 로그 -->
-    <div class="section-card">
-      <div class="section-title">
-        <span>📝 히스토리 로그</span>
-      </div>
+    <!-- 히스토리 + 메모 -->
+    <div class="history-section">
+      <div class="history-header">🕒 히스토리</div>
       <div id="historyList" class="history-list">
-        히스토리를 불러오려면 매장을 선택하세요.
+        매장을 선택하면 히스토리가 여기에 표시됩니다.
       </div>
-    </div>
-
-    <!-- 6) 메모 입력 -->
-    <div class="section-card">
-      <div class="section-title">
-        <span>✏️ 메모 추가</span>
-      </div>
-      <textarea
-        id="memoInput"
-        class="memo-textarea"
-        placeholder="히스토리에 남길 메모를 입력하세요."
-        disabled
-      ></textarea>
-      <div style="margin-top:6px;text-align:right;">
-        <button id="memoSaveBtn" class="btn btn-primary" disabled>
-          메모 저장
-        </button>
+      <div class="memo-box">
+        <textarea
+          id="memoInput"
+          rows="3"
+          placeholder="메모를 입력하면 저장 시 일시가 자동 기록됩니다."
+        ></textarea>
+        <button id="memoSaveBtn" class="secondary-btn">메모 저장</button>
       </div>
     </div>
   </aside>
@@ -488,579 +541,611 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 <script>
-// ⭐ 두영님 Apps Script WebApp 기본 URL (마지막 /exec 까지)
-// 예시: const API_BASE = "https://script.google.com/macros/s/AKfycbz3V3zX-.../exec";
-const API_BASE =
-  "https://script.google.com/macros/s/AKfycbw6CX8h-SpxKYyakhYkjGqo9iz4PSN-LzZz2pkSD2UtxrDeYbGstDoi8D5gOnScgy61/exec";
+  /*************************************************
+   * 🔑 두영님 Apps Script WebApp 기본 URL
+   *  예시: https://script.google.com/macros/s/XXXXX/exec
+   *  뒤에 ?action=... 은 JS에서 붙입니다.
+   *************************************************/
+  const BASE_URL =
+"https://script.google.com/macros/s/AKfycbw6CX8h-SpxKYyakhYkjGqo9iz4PSN-LzZz2pkSD2UtxrDeYbGstDoi8D5gOnScgy61/exec";
+  let rawRows = [];
+  let rawByName = {};
+  let filteredRows = [];
+  let map, markerCluster, chartInstance;
+  let markersByName = {};
+  let selectedStoreName = null;
 
-let rawRows = [];
-let filteredRows = [];
-let map, markerCluster, chartInstance;
-let allMarkers = [];         // row별 마커
-let selectedMarker = null;
-let currentStore = null;
-
-// 상태별 색상
-const STATUS_COLOR = {
-  "거래 성사": "#2ecc71",
-  "미팅 완료": "#3498db",
-  "미팅 요청": "#f1c40f",
-  "부재중/미응답": "#95a5a6",
-  "거절": "#e74c3c"
-};
-
-// 초기화
-window.addEventListener("load", async () => {
-  initMap();
-  initEvents();
-  loadFilters();
-  await loadData();
-});
-
-// 지도 생성
-function initMap() {
-  map = L.map("map", {
-    center: [37.5665, 126.9780],
-    zoom: 11,
-    zoomControl: true
-  });
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: "&copy; OpenStreetMap"
-  }).addTo(map);
-
-  markerCluster = L.markerClusterGroup({
-    showCoverageOnHover: false,
-    maxClusterRadius: 40
-  });
-  map.addLayer(markerCluster);
-}
-
-// 이벤트
-function initEvents() {
-  document.getElementById("searchInput").addEventListener("input", () => {
-    applyFilters();
-    saveFilters();
-    showAutocomplete();
-  });
-  document.getElementById("categorySelect").addEventListener("change", () => {
-    applyFilters();
-    saveFilters();
-  });
-  document.getElementById("statusSelect").addEventListener("change", () => {
-    applyFilters();
-    saveFilters();
-  });
-
-  // 상태 변경 저장
-  document.getElementById("statusChangeBtn").addEventListener("click", onClickStatusChange);
-  // 메모 저장
-  document.getElementById("memoSaveBtn").addEventListener("click", onClickMemoSave);
-}
-
-// 데이터 로드
-async function loadData() {
-  try {
-    const res = await fetch(`${API_BASE}?action=places`);
-    const json = await res.json();
-
-    rawRows = json.filter(r => r.lat && r.lng);
-    buildFilters(rawRows);
-    applyFilters();
-  } catch (e) {
-    console.error("데이터 로딩 오류:", e);
-    alert("데이터를 불러오지 못했습니다.");
-  }
-}
-
-// 필터 옵션 구성
-function buildFilters(rows) {
-  const categorySelect = document.getElementById("categorySelect");
-  const statusSelect = document.getElementById("statusSelect");
-
-  const categorySet = new Set();
-  const statusSet = new Set();
-
-  rows.forEach(r => {
-    if (r.category) {
-      const major = r.category.split(">")[0].trim();
-      categorySet.add(major);
-    }
-    if (r.Status) {
-      statusSet.add(r.Status);
-    }
-  });
-
-  // 카테고리 옵션
-  const savedCat = categorySelect.value;
-  categorySelect.innerHTML = '<option value="ALL">전체 카테고리</option>';
-  Array.from(categorySet).sort().forEach(cat => {
-    const opt = document.createElement("option");
-    opt.value = cat;
-    opt.textContent = cat;
-    categorySelect.appendChild(opt);
-  });
-  if (savedCat) categorySelect.value = savedCat;
-
-  // 상태 옵션
-  const savedSt = statusSelect.value;
-  statusSelect.innerHTML = '<option value="ALL">전체 상태</option>';
-  Array.from(statusSet).forEach(st => {
-    const opt = document.createElement("option");
-    opt.value = st;
-    opt.textContent = st;
-    statusSelect.appendChild(opt);
-  });
-  if (savedSt) statusSelect.value = savedSt;
-}
-
-// 필터 적용
-function applyFilters() {
-  const q = document.getElementById("searchInput").value.trim().toLowerCase();
-  const cat = document.getElementById("categorySelect").value;
-  const st = document.getElementById("statusSelect").value;
-
-  filteredRows = rawRows.filter(r => {
-    const text = [
-      r.name || "",
-      r.sigungu || "",
-      r.roadAddress || "",
-      r.keyword || ""
-    ].join(" ").toLowerCase();
-    const matchSearch = !q || text.includes(q);
-
-    const major = r.category ? r.category.split(">")[0].trim() : "기타";
-    const matchCat = cat === "ALL" || major === cat;
-    const matchStatus = st === "ALL" || (r.Status || "") === st;
-
-    return matchSearch && matchCat && matchStatus;
-  });
-
-  renderAll();
-  updateCurrentStoreLabel();
-}
-
-function renderAll() {
-  renderMarkers();
-  renderStoreList();
-  renderStats();
-}
-
-/* 마커 관련 */
-function createMarkerIcon(status, selected = false) {
-  const color = STATUS_COLOR[status] || "#7f8c8d";
-  const cls = selected ? "marker-dot selected" : "marker-dot";
-  return L.divIcon({
-    className: "",
-    html: `<div class="${cls}" style="background:${color};"></div>`,
-    iconSize: selected ? [26, 26] : [18, 18],
-    iconAnchor: selected ? [13, 13] : [9, 9]
-  });
-}
-
-function renderMarkers() {
-  markerCluster.clearLayers();
-  allMarkers = [];
-  selectedMarker = null;
-
-  filteredRows.forEach(r => {
-    const lat = Number(r.lat);
-    const lng = Number(r.lng);
-    if (isNaN(lat) || isNaN(lng)) return;
-
-    const marker = L.marker([lat, lng], {
-      icon: createMarkerIcon(r.Status, false)
-    });
-
-    marker._store = r;
-
-    marker.on("click", () => {
-      onSelectStore(r, marker);
-    });
-
-    markerCluster.addLayer(marker);
-    allMarkers.push(marker);
-  });
-
-  if (filteredRows.length > 0) {
-    const group = L.featureGroup(allMarkers);
-    map.fitBounds(group.getBounds().pad(0.1));
-  }
-}
-
-/* 좌측 리스트 */
-function renderStoreList() {
-  const listEl = document.getElementById("storeList");
-  const countLabel = document.getElementById("storeCountLabel");
-  listEl.innerHTML = "";
-
-  countLabel.textContent = `${filteredRows.length.toLocaleString()}개 매장`;
-
-  filteredRows.slice(0, 300).forEach(r => {
-    const li = document.createElement("li");
-    li.className = "store-item";
-
-    const statusColor = STATUS_COLOR[r.Status] || "#6b7280";
-
-    li.innerHTML = `
-      <div class="store-name">
-        <span>${r.name || "매장명 없음"}</span>
-        ${r.Status ? `<span class="status-badge" style="background:${statusColor};">${r.Status}</span>` : ""}
-      </div>
-      <div class="store-meta">
-        ${(r.sigungu || "")} · ${(r.category || "").split(">")[0] || ""} 
-      </div>
-      <div class="store-meta">${r.roadAddress || ""}</div>
-    `;
-
-    li.addEventListener("click", () => {
-      // 해당 매장 마커 찾기
-      const marker = allMarkers.find(m => m._store && m._store.name === r.name);
-      onSelectStore(r, marker);
-    });
-
-    listEl.appendChild(li);
-  });
-}
-
-/* 매장 선택 공통 처리 */
-function onSelectStore(store, marker) {
-  currentStore = store;
-  updateCurrentStoreLabel();
-  highlightMarker(marker, store.Status);
-  showStoreDetail(store);
-  enableStoreControls(true);
-  loadHistory(store.name);
-
-  if (marker) {
-    const latlng = marker.getLatLng();
-    map.setView(latlng, 17, { animate: true });
-  }
-}
-
-function highlightMarker(marker, status) {
-  // 다른 마커는 모두 기본 아이콘으로
-  allMarkers.forEach(m => {
-    const st = (m._store && m._store.Status) || status;
-    m.setIcon(createMarkerIcon(st, false));
-  });
-
-  // 선택 마커만 강조
-  if (marker) {
-    marker.setIcon(createMarkerIcon(status, true));
-    selectedMarker = marker;
-  }
-}
-
-/* 상세정보 표시 */
-function showStoreDetail(r) {
-  const el = document.getElementById("storeDetailBody");
-
-  if (!r) {
-    el.innerHTML = "매장을 선택하면 상세정보가 표시됩니다.";
-    return;
-  }
-
-  const majorCat = (r.category || "").split(">")[0] || "";
-  const urlHtml = r.URL
-    ? `<a href="${r.URL}" target="_blank" style="color:#2563eb;">네이버 플레이스 열기</a>`
-    : "없음";
-
-  el.innerHTML = `
-    <div class="store-detail-line"><span>매장명</span>${r.name || ""}</div>
-    <div class="store-detail-line"><span>주소</span>${r.roadAddress || ""}</div>
-    <div class="store-detail-line"><span>지역</span>${r.sigungu || ""}</div>
-    <div class="store-detail-line"><span>카테고리</span>${majorCat}</div>
-    <div class="store-detail-line"><span>상태</span>${r.Status || "-"}</div>
-    <div class="store-detail-line"><span>블로그 수</span>${r.blog_count || "-"}</div>
-    <div class="store-detail-line"><span>키워드</span>${r.keyword || "-"}</div>
-    <div class="store-detail-line"><span>링크</span>${urlHtml}</div>
-  `;
-
-  // 상태 변경 드롭다운 값 세팅
-  const statusSelect = document.getElementById("statusChangeSelect");
-  statusSelect.disabled = false;
-  statusSelect.value = r.Status || "";
-}
-
-/* 대시보드 통계 (차트 + 숫자) */
-function renderStats() {
-  const stats = {
-    total: filteredRows.length,
-    deal: 0,
-    meetingDone: 0,
-    request: 0,
-    noAnswer: 0,
-    reject: 0
+  const STATUS_COLOR = {
+    "거래 성사": "#2ecc71",
+    "미팅 완료": "#3498db",
+    "미팅 요청": "#f1c40f",
+    "부재중/미응답": "#95a5a6",
+    "거절": "#e74c3c"
   };
 
-  filteredRows.forEach(r => {
-    switch (r.Status) {
-      case "거래 성사":
-        stats.deal++; break;
-      case "미팅 완료":
-        stats.meetingDone++; break;
-      case "미팅 요청":
-        stats.request++; break;
-      case "부재중/미응답":
-        stats.noAnswer++; break;
-      case "거절":
-        stats.reject++; break;
-    }
+  const STATUS_ORDER = {
+    "거래 성사": 0,
+    "미팅 완료": 1,
+    "미팅 요청": 2,
+    "부재중/미응답": 3,
+    "거절": 4
+  };
+
+  window.addEventListener("load", () => {
+    initMap();
+    initEvents();
+    loadData();
   });
 
-  // 숫자 카운트
-  document.getElementById("statTotal").textContent = stats.total.toLocaleString();
-  document.getElementById("statDeal").textContent = stats.deal.toLocaleString();
-  document.getElementById("statMeetingDone").textContent = stats.meetingDone.toLocaleString();
-  document.getElementById("statRequest").textContent = stats.request.toLocaleString();
-  document.getElementById("statNoAnswer").textContent = stats.noAnswer.toLocaleString();
-  document.getElementById("statReject").textContent = stats.reject.toLocaleString();
-
-  // 도넛 차트
-  if (chartInstance) chartInstance.destroy();
-  const ctx = document.getElementById("statusChart");
-
-  chartInstance = new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels: ["거래 성사", "미팅 완료", "미팅 요청", "부재중/미응답", "거절"],
-      datasets: [{
-        data: [
-          stats.deal,
-          stats.meetingDone,
-          stats.request,
-          stats.noAnswer,
-          stats.reject
-        ],
-        backgroundColor: [
-          STATUS_COLOR["거래 성사"],
-          STATUS_COLOR["미팅 완료"],
-          STATUS_COLOR["미팅 요청"],
-          STATUS_COLOR["부재중/미응답"],
-          STATUS_COLOR["거절"]
-        ]
-      }]
-    },
-    options: {
-      cutout: "60%",
-      responsive: true,
-      plugins: {
-        legend: {
-          position: "bottom",
-          labels: { boxWidth: 10, font: { size: 10 } }
-        }
-      }
-    }
-  });
-}
-
-/* 자동완성 */
-function showAutocomplete() {
-  const ac = document.getElementById("autocomplete");
-  const q = document.getElementById("searchInput").value.trim().toLowerCase();
-  if (!q) {
-    ac.style.display = "none";
-    return;
-  }
-
-  const matched = rawRows.filter(r => {
-    const text = [
-      r.name || "",
-      r.roadAddress || "",
-      r.keyword || ""
-    ].join(" ").toLowerCase();
-    return text.includes(q);
-  }).slice(0, 12);
-
-  if (!matched.length) {
-    ac.style.display = "none";
-    return;
-  }
-
-  ac.innerHTML = matched.map(r =>
-    `<div class="autocomplete-item">${r.name}</div>`
-  ).join("");
-
-  ac.style.display = "block";
-
-  const items = ac.querySelectorAll(".autocomplete-item");
-  items.forEach((el, i) => {
-    el.addEventListener("click", () => {
-      const store = matched[i];
-      document.getElementById("searchInput").value = store.name;
-      ac.style.display = "none";
-      // 해당 매장 선택 처리
-      const marker = allMarkers.find(m => m._store && m._store.name === store.name);
-      onSelectStore(store, marker);
-      applyFilters(); // 검색 필터 적용
+  /**************** 지도 초기화 ****************/
+  function initMap() {
+    map = L.map("map", {
+      center: [37.5665, 126.9780],
+      zoom: 11,
+      zoomControl: true
     });
-  });
-}
 
-/* 히스토리 로드 */
-async function loadHistory(storeName) {
-  const box = document.getElementById("historyList");
-  if (!storeName) {
-    box.innerHTML = "히스토리를 불러오려면 매장을 선택하세요.";
-    return;
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap"
+    }).addTo(map);
+
+    markerCluster = L.markerClusterGroup({
+      showCoverageOnHover: false,
+      maxClusterRadius: 40
+    });
+    map.addLayer(markerCluster);
   }
 
-  box.innerHTML = "불러오는 중...";
+  /**************** 이벤트 바인딩 ****************/
+  function initEvents() {
+    document
+      .getElementById("searchInput")
+      .addEventListener("input", applyFilters);
 
-  try {
-    const res = await fetch(`${API_BASE}?action=history&store_id=${encodeURIComponent(storeName)}`);
-    const logs = await res.json();
+    document
+      .getElementById("categorySelect")
+      .addEventListener("change", applyFilters);
 
-    if (!logs.length) {
-      box.innerHTML = "등록된 히스토리가 없습니다.";
+    document
+      .getElementById("statusFilterSelect")
+      .addEventListener("change", applyFilters);
+
+    document
+      .getElementById("sortSelect")
+      .addEventListener("change", applyFilters);
+
+    document
+      .getElementById("statusSaveBtn")
+      .addEventListener("click", saveStatus);
+
+    document
+      .getElementById("memoSaveBtn")
+      .addEventListener("click", saveMemo);
+  }
+
+  /**************** 데이터 로드 ****************/
+  async function loadData() {
+    try {
+      const res = await fetch(`${BASE_URL}?action=places`);
+      const json = await res.json();
+
+      console.log("📌 원본 데이터 예시", json.slice(0, 3));
+
+      rawRows = json
+        .filter(r => r.lat && r.lng)
+        .map(r => ({
+          ...r,
+          lat: Number(r.lat),
+          lng: Number(r.lng),
+          favorite: r.favorite === true || r.favorite === "TRUE"
+        }));
+
+      rawByName = {};
+      rawRows.forEach(r => {
+        if (r.name) rawByName[r.name] = r;
+      });
+
+      buildFilters(rawRows);
+      applyFilters();
+    } catch (e) {
+      console.error("데이터 로딩 오류:", e);
+      alert("데이터를 불러오는 중 오류가 발생했습니다.");
+    }
+  }
+
+  /**************** 필터 옵션 구성 ****************/
+  function buildFilters(rows) {
+    const categorySelect = document.getElementById("categorySelect");
+    const statusFilterSelect = document.getElementById("statusFilterSelect");
+
+    const categorySet = new Set();
+    const statusSet = new Set();
+
+    rows.forEach(r => {
+      if (r.category) {
+        const major = r.category.split(">")[0].trim();
+        categorySet.add(major);
+      }
+      if (r.Status) statusSet.add(r.Status);
+    });
+
+    // 카테고리 옵션
+    categorySelect.innerHTML =
+      '<option value="ALL">전체 카테고리</option>';
+    Array.from(categorySet)
+      .sort()
+      .forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        categorySelect.appendChild(opt);
+      });
+
+    // 상태 옵션
+    statusFilterSelect.innerHTML =
+      '<option value="ALL">전체 상태</option>';
+    Array.from(statusSet)
+      .sort((a, b) => (STATUS_ORDER[a] ?? 99) - (STATUS_ORDER[b] ?? 99))
+      .forEach(st => {
+        const opt = document.createElement("option");
+        opt.value = st;
+        opt.textContent = st;
+        statusFilterSelect.appendChild(opt);
+      });
+  }
+
+  /**************** 필터 적용 ****************/
+  function applyFilters() {
+    const q = document
+      .getElementById("searchInput")
+      .value.trim()
+      .toLowerCase();
+    const cat = document.getElementById("categorySelect").value;
+    const st = document.getElementById("statusFilterSelect").value;
+    const sortMode = document.getElementById("sortSelect").value;
+
+    filteredRows = rawRows.filter(r => {
+      const text =
+        `${r.name || ""} ${r.sigungu || ""} ${r.roadAddress || ""} ${
+          r.keyword || ""
+        }`.toLowerCase();
+      const matchSearch = !q || text.includes(q);
+
+      let major = "기타";
+      if (r.category) {
+        major = r.category.split(">")[0].trim();
+      }
+      const matchCat = cat === "ALL" || major === cat;
+
+      const matchStatus = st === "ALL" || (r.Status || "") === st;
+
+      return matchSearch && matchCat && matchStatus;
+    });
+
+    filteredRows = sortStores(filteredRows, sortMode);
+
+    renderAll();
+  }
+
+  /**************** 정렬 로직 ****************/
+  function sortStores(rows, mode) {
+    const list = [...rows];
+    list.sort((a, b) => {
+      // 즐겨찾기 우선
+      if (mode === "default") {
+        if (a.favorite !== b.favorite) {
+          return a.favorite ? -1 : 1;
+        }
+        const soA = STATUS_ORDER[a.Status] ?? 99;
+        const soB = STATUS_ORDER[b.Status] ?? 99;
+        if (soA !== soB) return soA - soB;
+        return (a.name || "").localeCompare(b.name || "", "ko");
+      }
+
+      if (mode === "name") {
+        return (a.name || "").localeCompare(b.name || "", "ko");
+      }
+
+      if (mode === "blog") {
+        const ba = Number(a.blog_count || 0);
+        const bb = Number(b.blog_count || 0);
+        if (bb !== ba) return bb - ba;
+        return (a.name || "").localeCompare(b.name || "", "ko");
+      }
+
+      return 0;
+    });
+    return list;
+  }
+
+  /**************** 전체 렌더링 ****************/
+  function renderAll() {
+    renderMarkers();
+    renderStoreList();
+    renderStats();
+  }
+
+  /**************** 마커 아이콘 ****************/
+  function createMarkerIcon(status, favorite = false, selected = false) {
+    const color = STATUS_COLOR[status] || "#7f8c8d";
+    const size = selected ? 22 : 16;
+    const borderColor = favorite ? "#fbbf24" : "#ffffff";
+
+    return L.divIcon({
+      className: "custom-marker",
+      html: `<div class="marker-dot ${
+        selected ? "marker-selected" : ""
+      }" style="
+        background:${color};
+        border-color:${borderColor};
+        width:${size}px;
+        height:${size}px;
+      "></div>`,
+      iconSize: [size + 4, size + 4],
+      iconAnchor: [(size + 4) / 2, (size + 4) / 2]
+    });
+  }
+
+  /**************** 마커 렌더링 ****************/
+  function renderMarkers() {
+    markerCluster.clearLayers();
+    markersByName = {};
+
+    filteredRows.forEach(r => {
+      const marker = L.marker([r.lat, r.lng], {
+        icon: createMarkerIcon(
+          r.Status,
+          r.favorite,
+          r.name === selectedStoreName
+        )
+      });
+
+      marker.bindTooltip(r.name || "", {
+        permanent: false,
+        direction: "top",
+        offset: [0, -10]
+      });
+
+      marker.on("click", () => {
+        focusOnStore(r);
+      });
+
+      markerCluster.addLayer(marker);
+      if (r.name) markersByName[r.name] = marker;
+    });
+
+    if (filteredRows.length > 0) {
+      const group = L.featureGroup(markerCluster.getLayers());
+      map.fitBounds(group.getBounds().pad(0.1));
+    }
+
+    document.getElementById("storeCountLabel").textContent =
+      `${filteredRows.length.toLocaleString()}개 매장`;
+  }
+
+  /**************** 좌측 리스트 렌더링 ****************/
+  function renderStoreList() {
+    const listEl = document.getElementById("storeList");
+    listEl.innerHTML = "";
+
+    filteredRows.slice(0, 500).forEach(r => {
+      const li = document.createElement("li");
+      li.className = "store-item";
+
+      const major = (r.category || "").split(">")[0] || "";
+      const statusLabel = r.Status || "상태 없음";
+
+      li.innerHTML = `
+        <div class="store-header">
+          <span class="fav-icon">${r.favorite ? "⭐" : "☆"}</span>
+          <div class="store-name">${r.name || "매장명 없음"}</div>
+        </div>
+        <div class="store-meta-line">
+          <span class="status-badge">${statusLabel}</span>
+          <span class="meta-text">${r.sigungu || ""} · ${major}</span>
+        </div>
+        <div class="store-meta-address">${r.roadAddress || ""}</div>
+      `;
+
+      // 매장 선택
+      li.addEventListener("click", () => {
+        focusOnStore(r);
+      });
+
+      // 즐겨찾기 토글
+      const favSpan = li.querySelector(".fav-icon");
+      favSpan.addEventListener("click", e => {
+        e.stopPropagation();
+        toggleFavorite(r);
+      });
+
+      listEl.appendChild(li);
+    });
+  }
+
+  /**************** 매장 선택 시 포커스 ****************/
+  function focusOnStore(store) {
+    selectedStoreName = store.name;
+
+    // 지도 이동
+    if (!isNaN(store.lat) && !isNaN(store.lng)) {
+      map.setView([store.lat, store.lng], 17);
+    }
+
+    // 마커 하이라이트 업데이트
+    Object.keys(markersByName).forEach(name => {
+      const marker = markersByName[name];
+      const row = rawByName[name];
+      if (!row) return;
+      const selected = name === selectedStoreName;
+      marker.setIcon(
+        createMarkerIcon(row.Status, row.favorite, selected)
+      );
+    });
+
+    showStoreDetail(store);
+    setStatusDropdown(store);
+    loadHistory(store.name);
+  }
+
+  /**************** 상세정보 표시 ****************/
+  function showStoreDetail(r) {
+    const box = document.getElementById("storeDetailBody");
+    if (!r) {
+      box.textContent = "매장을 선택하면 상세정보가 여기에 표시됩니다.";
       return;
     }
 
-    box.innerHTML = logs.map(log => `
-      <div class="history-item">
-        <div class="history-meta">
-          ${log.timestamp} · ${log.manager || ""}
-        </div>
-        <div>${log.memo || ""}</div>
+    const majorCat = (r.category || "").split(">")[0] || "-";
+    const urlHtml = r.URL
+      ? `<a href="${r.URL}" target="_blank" style="color:#2563eb;font-weight:600;">네이버 플레이스 열기</a>`
+      : "-";
+
+    box.innerHTML = `
+      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:6px;">
+        ${r.name || ""}
       </div>
-    `).join("");
-
-  } catch (e) {
-    console.error(e);
-    box.innerHTML = "히스토리를 불러오지 못했습니다.";
-  }
-}
-
-/* 상태 변경 저장 */
-async function onClickStatusChange() {
-  if (!currentStore) return;
-
-  const select = document.getElementById("statusChangeSelect");
-  const btn = document.getElementById("statusChangeBtn");
-  const newStatus = select.value;
-
-  if (!newStatus || newStatus === currentStore.Status) {
-    alert("변경할 상태를 선택해주세요.");
-    return;
+      <div class="info-item"><span>🏠 주소</span>${r.roadAddress || "-"}</div>
+      <div class="info-item"><span>📍 지역</span>${r.sigungu || "-"}</div>
+      <div class="info-item"><span>🍽 업종</span>${majorCat}</div>
+      <div class="info-item"><span>⭐ 상태</span>${r.Status || "-"}</div>
+      <div class="info-item"><span>📝 키워드</span>${r.keyword || "-"}</div>
+      <div class="info-item"><span>🔗 링크</span>${urlHtml}</div>
+    `;
   }
 
-  btn.disabled = true;
-  btn.textContent = "저장 중...";
+  function setStatusDropdown(store) {
+    const select = document.getElementById("statusChangeSelect");
+    select.value = store?.Status || "";
+  }
 
-  try {
-    const body = new URLSearchParams({
-      action: "updateStatus",
-      store_id: currentStore.name,
-      status: newStatus
-    });
+  /**************** 상태 변경 저장 ****************/
+  function saveStatus() {
+    if (!selectedStoreName) {
+      alert("먼저 매장을 선택해주세요.");
+      return;
+    }
+    const newStatus =
+      document.getElementById("statusChangeSelect").value;
+    if (!newStatus) {
+      alert("변경할 상태를 선택해주세요.");
+      return;
+    }
 
-    const res = await fetch(API_BASE, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body
-    });
+    const row = rawByName[selectedStoreName];
+    if (!row) return;
 
-    const json = await res.json();
-    if (json && json.result === "ok") {
-      // 프론트 데이터 갱신
-      currentStore.Status = newStatus;
-      rawRows.forEach(r => {
-        if (r.name === currentStore.name) r.Status = newStatus;
+    row.Status = newStatus;
+
+    // 필터/통계/마커 리렌더링
+    applyFilters();
+
+    // Apps Script 업데이트 (단순 GET)
+    const url = `${BASE_URL}?action=updateStatus&name=${encodeURIComponent(
+      selectedStoreName
+    )}&status=${encodeURIComponent(newStatus)}`;
+    fetch(url).catch(e =>
+      console.error("상태 업데이트 오류:", e)
+    );
+  }
+
+  /**************** 즐겨찾기 토글 ****************/
+  function toggleFavorite(store) {
+    store.favorite = !store.favorite;
+    const raw = rawByName[store.name];
+    if (raw) raw.favorite = store.favorite;
+
+    // 다시 정렬 & 렌더링
+    applyFilters();
+
+    const url = `${BASE_URL}?action=favorite&name=${encodeURIComponent(
+      store.name
+    )}&fav=${store.favorite ? "TRUE" : "FALSE"}`;
+    fetch(url).catch(e =>
+      console.error("즐겨찾기 저장 오류:", e)
+    );
+  }
+
+  /**************** 히스토리 불러오기 ****************/
+  function loadHistory(storeName) {
+    const listEl = document.getElementById("historyList");
+    if (!storeName) {
+      listEl.innerHTML =
+        '<div class="history-empty">매장을 선택하면 히스토리가 여기에 표시됩니다.</div>';
+      return;
+    }
+
+    listEl.innerHTML = "불러오는 중...";
+
+    fetch(
+      `${BASE_URL}?action=history&name=${encodeURIComponent(
+        storeName
+      )}`
+    )
+      .then(res => res.json())
+      .then(items => {
+        if (!Array.isArray(items) || !items.length) {
+          listEl.innerHTML =
+            '<div class="history-empty">히스토리가 없습니다.</div>';
+          return;
+        }
+
+        listEl.innerHTML = items
+          .map(it => {
+            const date = it.date || it.Date || "";
+            const mgr = it.manager || it.Manager || "";
+            const memo = it.memo || it.Memo || it.note || "";
+            return `
+              <div class="history-item">
+                <div class="history-meta">${date} · ${mgr}</div>
+                <div class="history-text">${memo}</div>
+              </div>
+            `;
+          })
+          .join("");
+      })
+      .catch(e => {
+        console.error("히스토리 로딩 오류:", e);
+        listEl.innerHTML =
+          '<div class="history-empty">히스토리를 불러오지 못했습니다.</div>';
       });
-      applyFilters();
-      showStoreDetail(currentStore);
-      loadHistory(currentStore.name); // 상태 변경 히스토리도 함께 기록됨
-      alert("상태가 변경되었습니다.");
-    } else {
-      alert("상태 변경에 실패했습니다.");
+  }
+
+  /**************** 메모 저장 ****************/
+  function saveMemo() {
+    if (!selectedStoreName) {
+      alert("먼저 매장을 선택해주세요.");
+      return;
     }
-  } catch (e) {
-    console.error(e);
-    alert("상태 변경 중 오류가 발생했습니다.");
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "상태 변경 저장";
+    const textarea = document.getElementById("memoInput");
+    const text = textarea.value.trim();
+    if (!text) {
+      alert("메모 내용을 입력해주세요.");
+      return;
+    }
+
+    // 화면에 즉시 반영
+    const now = new Date();
+    const ts = now.toLocaleString("ko-KR");
+    const listEl = document.getElementById("historyList");
+    const newItem = `
+      <div class="history-item">
+        <div class="history-meta">${ts}</div>
+        <div class="history-text">${text}</div>
+      </div>
+    `;
+    listEl.insertAdjacentHTML("afterbegin", newItem);
+    textarea.value = "";
+
+    // Apps Script 저장 (GET 방식)
+    const url = `${BASE_URL}?action=addMemo&name=${encodeURIComponent(
+      selectedStoreName
+    )}&memo=${encodeURIComponent(text)}`;
+    fetch(url).catch(e => console.error("메모 저장 오류:", e));
   }
-}
 
-/* 메모 저장 */
-async function onClickMemoSave() {
-  if (!currentStore) return;
-  const textarea = document.getElementById("memoInput");
-  const btn = document.getElementById("memoSaveBtn");
-  const memo = textarea.value.trim();
-  if (!memo) {
-    alert("메모 내용을 입력해주세요.");
-    return;
-  }
+  /**************** 통계 + 차트 ****************/
+  function renderStats() {
+    const stats = {
+      total: filteredRows.length,
+      deal: 0,
+      meetingDone: 0,
+      request: 0,
+      noAnswer: 0,
+      reject: 0
+    };
 
-  btn.disabled = true;
-  btn.textContent = "저장 중...";
-
-  try {
-    const body = new URLSearchParams({
-      action: "addHistory",
-      store_id: currentStore.name,
-      memo: memo
+    filteredRows.forEach(r => {
+      if (r.Status === "거래 성사") stats.deal++;
+      else if (r.Status === "미팅 완료") stats.meetingDone++;
+      else if (r.Status === "미팅 요청") stats.request++;
+      else if (r.Status === "부재중/미응답") stats.noAnswer++;
+      else if (r.Status === "거절") stats.reject++;
     });
 
-    const res = await fetch(API_BASE, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body
+    const total = stats.total || 1;
+    const pct = v => ((v / total) * 100).toFixed(1);
+
+    // 숫자 카드
+    document.getElementById("statTotal").textContent =
+      stats.total.toLocaleString();
+    document.getElementById("statDeal").textContent =
+      stats.deal.toLocaleString();
+    document.getElementById("statMeetingDone").textContent =
+      stats.meetingDone.toLocaleString();
+    document.getElementById("statRequest").textContent =
+      stats.request.toLocaleString();
+    document.getElementById("statNoAnswer").textContent =
+      stats.noAnswer.toLocaleString();
+    document.getElementById("statReject").textContent =
+      stats.reject.toLocaleString();
+
+    document.getElementById(
+      "statDealPct"
+    ).textContent = `${pct(stats.deal)}%`;
+    document.getElementById(
+      "statMeetingDonePct"
+    ).textContent = `${pct(stats.meetingDone)}%`;
+    document.getElementById(
+      "statRequestPct"
+    ).textContent = `${pct(stats.request)}%`;
+    document.getElementById(
+      "statNoAnswerPct"
+    ).textContent = `${pct(stats.noAnswer)}%`;
+    document.getElementById(
+      "statRejectPct"
+    ).textContent = `${pct(stats.reject)}%`;
+
+    // 도넛 차트
+    if (chartInstance) chartInstance.destroy();
+    const ctx = document.getElementById("statusChart");
+
+    chartInstance = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: [
+          "거래 성사",
+          "미팅 완료",
+          "미팅 요청",
+          "부재중/미응답",
+          "거절"
+        ],
+        datasets: [
+          {
+            data: [
+              stats.deal,
+              stats.meetingDone,
+              stats.request,
+              stats.noAnswer,
+              stats.reject
+            ],
+            backgroundColor: [
+              "#2ecc71",
+              "#3498db",
+              "#f1c40f",
+              "#95a5a6",
+              "#e74c3c"
+            ]
+          }
+        ]
+      },
+      options: {
+        cutout: "65%",
+        plugins: {
+          legend: { position: "bottom" }
+        }
+      }
     });
 
-    const json = await res.json();
-    if (json && json.result === "ok") {
-      textarea.value = "";
-      loadHistory(currentStore.name);
-      alert("메모가 저장되었습니다.");
-    } else {
-      alert("메모 저장에 실패했습니다.");
-    }
-  } catch (e) {
-    console.error(e);
-    alert("메모 저장 중 오류가 발생했습니다.");
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "메모 저장";
+    document.getElementById("chartStats").innerHTML = `
+      <div><b>거래 성사:</b> ${stats.deal}개 (${pct(stats.deal)}%)</div>
+      <div><b>미팅 완료:</b> ${stats.meetingDone}개 (${pct(stats.meetingDone)}%)</div>
+      <div><b>미팅 요청:</b> ${stats.request}개 (${pct(stats.request)}%)</div>
+      <div><b>부재중/미응답:</b> ${stats.noAnswer}개 (${pct(stats.noAnswer)}%)</div>
+      <div><b>거절:</b> ${stats.reject}개 (${pct(stats.reject)}%)</div>
+    `;
   }
-}
-
-/* 필터 저장/불러오기 */
-function saveFilters() {
-  localStorage.setItem("kb_statusFilter", document.getElementById("statusSelect").value);
-  localStorage.setItem("kb_categoryFilter", document.getElementById("categorySelect").value);
-  localStorage.setItem("kb_search", document.getElementById("searchInput").value);
-}
-function loadFilters() {
-  const st = localStorage.getItem("kb_statusFilter");
-  const cat = localStorage.getItem("kb_categoryFilter");
-  const q = localStorage.getItem("kb_search");
-  if (st) document.getElementById("statusSelect").value = st;
-  if (cat) document.getElementById("categorySelect").value = cat;
-  if (q) document.getElementById("searchInput").value = q;
-}
-
-/* 현재 선택 매장 라벨 */
-function updateCurrentStoreLabel() {
-  const label = document.getElementById("currentStoreLabel");
-  if (currentStore && currentStore.name) {
-    label.textContent = currentStore.name;
-  } else {
-    label.textContent = "";
-  }
-}
-
-/* 매장 선택/비선택 시 버튼 활성/비활성 */
-function enableStoreControls(enabled) {
-  document.getElementById("statusChangeSelect").disabled = !enabled;
-  document.getElementById("statusChangeBtn").disabled = !enabled;
-  document.getElementById("memoInput").disabled = !enabled;
-  document.getElementById("memoSaveBtn").disabled = !enabled;
-}
 </script>
 </body>
 </html>

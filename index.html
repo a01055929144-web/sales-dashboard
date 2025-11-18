@@ -33,6 +33,15 @@
       display: flex;
       flex-direction: column;
     }
+    /* 🔒 버튼 비활성화 스타일 */
+.primary-btn:disabled {
+  background: #93a5d3 !important;
+  cursor: not-allowed;
+  box-shadow: none !important;
+  transform: none !important;
+  opacity: 0.7;
+}
+
 
     /* 상단 바 */
     header {
@@ -666,7 +675,9 @@
         <option value="거절">거절</option>
       </select>
       <button id="statusSaveBtn" class="primary-btn">상태 변경 저장</button>
+      <button id="memoSaveBtn" class="primary-btn" disabled>메모 저장</button>
     </div>
+
     
     <!-- 히스토리 + 메모 -->
     <div class="history-section">
@@ -1425,6 +1436,66 @@ document.getElementById("managerInput").addEventListener("change", () => {
   fetch(url).catch(err => console.error("담당자 자동 기록 오류:", err));
 });
 
+/*********************  
+ * 담당자 필수 선택  
+ * → 두 버튼 자동 활성화/비활성화
+ *********************/
+const managerSelect = document.getElementById("managerInput");
+const statusBtn = document.getElementById("statusSaveBtn");
+const memoBtn = document.getElementById("memoSaveBtn");
+
+managerSelect.addEventListener("change", () => {
+  const manager = managerSelect.value.trim();
+  const enable = manager !== "";
+
+  statusBtn.disabled = !enable;
+  memoBtn.disabled = !enable;
+});
+
+/*********************
+ * 상태 변경 시 담당자 미선택 방지
+ *********************/
+function saveStatus() {
+  if (!selectedStoreName) {
+    alert("먼저 매장을 선택해주세요.");
+    return;
+  }
+  const manager = managerSelect.value.trim();
+  if (!manager) {
+    alert("담당자를 먼저 선택해주세요.");
+    return;
+  }
+
+  const newStatus =
+    document.getElementById("statusChangeSelect").value;
+  if (!newStatus) {
+    alert("변경할 상태를 선택해주세요.");
+    return;
+  }
+
+  const row = rawByName[selectedStoreName];
+  if (!row) return;
+
+  row.Status = newStatus;
+  applyFilters();
+
+  // GAS 업데이트
+  const url = `${BASE_URL}?action=updateStatus&name=${encodeURIComponent(
+    selectedStoreName
+  )}&status=${encodeURIComponent(newStatus)}`;
+  fetch(url).catch(e => console.error("상태 업데이트 오류:", e));
+
+  // 히스토리 자동 기록
+  const memoText = `상태를 '${newStatus}'로 변경했습니다.`;
+  const url2 =
+    `${BASE_URL}?action=addMemo` +
+    `&name=${encodeURIComponent(selectedStoreName)}` +
+    `&memo=${encodeURIComponent(memoText)}` +
+    `&manager=${encodeURIComponent(manager)}`;
+  fetch(url2).catch(e =>
+    console.error("상태 변경 히스토리 기록 실패:", e)
+  );
+}
 
 </script>
 </body>

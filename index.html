@@ -644,8 +644,6 @@
 <!-- 담당자 입력 -->
 <div class="detail-card">
   <div class="detail-title">담당자</div>
-<div class="detail-card">
-  <div class="detail-title">담당자</div>
   <select id="managerInput" class="select-input full-width">
     <option value="">담당자 선택</option>
     <option value="Zero">Zero</option>
@@ -669,39 +667,7 @@
       </select>
       <button id="statusSaveBtn" class="primary-btn">상태 변경 저장</button>
     </div>
-/**************** 담당자 선택 시 자동 히스토리 기록 ****************/
-document.getElementById("managerInput").addEventListener("change", () => {
-  if (!selectedStoreName) return;
-
-  const manager = document.getElementById("managerInput").value;
-  if (!manager) return; // 선택 안 하면 무시
-
-  const now = new Date().toLocaleString("ko-KR");
-  const memoText = `담당자를 ${manager}로 설정했습니다.`;
-
-  // 화면 즉시 반영
-  const listEl = document.getElementById("historyList");
-  const newItem = `
-    <div class="timeline-item">
-      <div class="timeline-dot"></div>
-      <div class="timeline-date">${now}</div>
-      <div class="timeline-card">
-        <div class="timeline-manager">${manager}</div>
-        <div class="timeline-memo">${memoText}</div>
-      </div>
-    </div>`;
-  listEl.insertAdjacentHTML("afterbegin", newItem);
-
-  // Apps Script에 저장
-  const url =
-    `${BASE_URL}?action=addMemo` +
-    `&name=${encodeURIComponent(selectedStoreName)}` +
-    `&memo=${encodeURIComponent(memoText)}` +
-    `&manager=${encodeURIComponent(manager)}`;
-
-  fetch(url).catch(err => console.error("담당자 자동 기록 오류:", err));
-});
-
+    
     <!-- 히스토리 + 메모 -->
     <div class="history-section">
       <div class="history-header">🕒 히스토리</div>
@@ -1430,4 +1396,36 @@ function saveMemo() {
 </body>
 </html>
 
+/**************** 담당자 선택 시 자동 히스토리 기록 ****************/
+document.getElementById("managerInput").addEventListener("change", () => {
+  if (!selectedStoreName) return;
+
+  const manager = document.getElementById("managerInput").value;
+  if (!manager) return;
+
+  const now = new Date().toLocaleString("ko-KR");
+  const memoText = `담당자를 ${manager}로 설정했습니다.`;
+
+  // 화면 즉시 반영 (타임라인 스타일)
+  const listEl = document.getElementById("historyList");
+  const newItem = `
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-date">${now}</div>
+      <div class="timeline-card">
+        <div class="timeline-manager">${manager}</div>
+        <div class="timeline-memo">${memoText}</div>
+      </div>
+    </div>`;
+  listEl.insertAdjacentHTML("afterbegin", newItem);
+
+  // GAS 저장
+  const url =
+    `${BASE_URL}?action=addMemo` +
+    `&name=${encodeURIComponent(selectedStoreName)}` +
+    `&memo=${encodeURIComponent(memoText)}` +
+    `&manager=${encodeURIComponent(manager)}`;
+
+  fetch(url).catch(err => console.error("담당자 자동 기록 오류:", err));
+});
 

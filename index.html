@@ -1392,11 +1392,7 @@ function saveMemo() {
       <div><b>거절:</b> ${stats.reject}개 (${pct(stats.reject)}%)</div>
     `;
   }
-</script>
-</body>
-</html>
-
-/**************** 담당자 선택 시 자동 히스토리 기록 ****************/
+  /**************** 담당자 선택 시 자동 히스토리 기록 ****************/
 document.getElementById("managerInput").addEventListener("change", () => {
   if (!selectedStoreName) return;
 
@@ -1428,4 +1424,9 @@ document.getElementById("managerInput").addEventListener("change", () => {
 
   fetch(url).catch(err => console.error("담당자 자동 기록 오류:", err));
 });
+
+
+</script>
+</body>
+</html>
 

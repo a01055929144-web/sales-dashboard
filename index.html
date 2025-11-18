@@ -6,25 +6,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <!-- Leaflet & MarkerCluster -->
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
-/>
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
-/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-      system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     background: #f3f4f6;
     color: #111827;
     height: 100vh;
@@ -32,7 +25,6 @@
     flex-direction: column;
   }
 
-  /* 상단 바 */
   header {
     padding: 10px 16px;
     background: #ffffff;
@@ -55,6 +47,7 @@
     gap: 8px;
     flex: 1;
     align-items: center;
+    position: relative;
   }
   .search-input,
   .select-input {
@@ -65,26 +58,8 @@
     outline: none;
     background: #f9fafb;
   }
-  .search-input {
-    flex: 1;
-  }
-  .select-input {
-    min-width: 140px;
-  }
+  .search-input { flex: 1; }
 
-  .dashboard-toggle {
-    border-radius: 999px;
-    border: 1px solid #e5e7eb;
-    background: #f9fafb;
-    padding: 6px 10px;
-    font-size: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  /* 메인 레이아웃 */
   .layout {
     flex: 1;
     display: grid;
@@ -93,250 +68,115 @@
     overflow: hidden;
   }
 
-  /* 왼쪽 매장 리스트 */
   .store-panel {
     background: #ffffff;
     border-right: 1px solid #e5e7eb;
     padding: 12px;
     overflow-y: auto;
   }
-  .store-panel h2 {
-    font-size: 14px;
-    margin: 0 0 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .store-count {
-    font-size: 11px;
-    color: #6b7280;
-  }
-  .store-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+  .store-list { list-style: none; margin: 0; padding: 0; }
   .store-item {
     padding: 8px 6px;
     border-radius: 8px;
     cursor: pointer;
-    border: 1px solid transparent;
     margin-bottom: 4px;
+    border: 1px solid transparent;
   }
   .store-item:hover {
     background: #f3f4ff;
     border-color: #e0e7ff;
   }
-  .store-name {
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 2px;
-  }
-  .store-meta {
-    font-size: 11px;
-    color: #6b7280;
-  }
-  .store-url {
-    font-size: 11px;
-    color: #2563eb;
-    text-decoration: none;
-  }
 
-  /* 지도 */
-  #map {
-    width: 100%;
-    height: 100%;
-  }
+  #map { width: 100%; height: 100%; }
 
-  /* 우측 대시보드 */
   .dashboard-panel {
     background: #ffffff;
     border-left: 1px solid #e5e7eb;
     padding: 12px;
     overflow-y: auto;
-    transition: transform 0.2s ease;
   }
-  .dashboard-panel.hidden {
-    transform: translateX(100%);
-  }
-  .dashboard-title {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-  .stat-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-  .stat-card {
-    padding: 8px 10px;
-    border-radius: 10px;
-    background: #f9fafb;
+
+  .autocomplete {
+    position: absolute;
+    background: white;
     border: 1px solid #e5e7eb;
+    width: 260px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 50;
+    border-radius: 8px;
+    display: none;
   }
-  .stat-label {
-    font-size: 11px;
-    color: #6b7280;
-    margin-bottom: 4px;
+  .autocomplete-item {
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 13px;
   }
-  .stat-value {
-    font-size: 15px;
-    font-weight: 700;
-  }
+  .autocomplete-item:hover { background: #f3f4f6; }
 
-  .legend {
-    margin-top: 8px;
-    border-top: 1px solid #e5e7eb;
-    padding-top: 8px;
-  }
-  .legend-title {
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    margin-bottom: 2px;
-  }
-  .legend-color {
-    width: 10px;
-    height: 10px;
-    border-radius: 999px;
-  }
-
-  /* 커스텀 마커 */
-  .custom-marker {
-    border-radius: 999px;
-    background: transparent;
-  }
   .marker-dot {
     width: 14px;
     height: 14px;
     border-radius: 999px;
     border: 2px solid #ffffff;
     box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    animation: pop 0.3s ease-out;
+  }
+  @keyframes pop {
+    0% { transform: scale(0.2); }
+    80% { transform: scale(1.2); }
+    100% { transform: scale(1); }
   }
 
-  /* 스크롤바 약하게 */
-  .store-panel::-webkit-scrollbar,
-  .dashboard-panel::-webkit-scrollbar {
-    width: 6px;
+  .store-detail {
+    margin-top: 15px;
+    padding: 10px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 13px;
   }
-  .store-panel::-webkit-scrollbar-thumb,
-  .dashboard-panel::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 999px;
-  }
-
-  @media (max-width: 1024px) {
-    .layout {
-      grid-template-columns: 0 minmax(0, 1fr) 0;
-    }
-    .store-panel {
-      display: none;
-    }
-    .dashboard-panel {
-      position: absolute;
-      right: 0;
-      top: 52px;
-      bottom: 0;
-      width: 260px;
-      z-index: 20;
-      box-shadow: -4px 0 12px rgba(0,0,0,0.08);
-    }
-  }
+  .store-detail h3 { margin: 0 0 8px; font-size: 15px; }
 </style>
 </head>
 <body>
+
 <header>
   <h1>📍 Sales Store Map Dashboard</h1>
   <div class="header-controls">
+
+    <select id="statusSelect" class="select-input">
+      <option value="ALL">전체 상태</option>
+    </select>
+
+    <select id="categorySelect" class="select-input">
+      <option value="ALL">전체 카테고리</option>
+    </select>
+
     <input
       id="searchInput"
       class="search-input"
       type="text"
       placeholder="매장명 / 지역 / 도로명주소 / 키워드 검색"
     />
-    <select id="categorySelect" class="select-input">
-      <option value="ALL">전체 카테고리</option>
-    </select>
-    <select id="statusSelect" class="select-input">
-      <option value="ALL">전체 상태</option>
-    </select>
+
+    <div id="autocomplete" class="autocomplete"></div>
   </div>
-  <button id="dashboardToggle" class="dashboard-toggle">
-    📊 대시보드 접기
-  </button>
 </header>
 
 <div class="layout">
-  <!-- 왼쪽: 매장 리스트 -->
   <aside class="store-panel">
-    <h2>
-      ⭐ 매장 리스트
-      <span class="store-count" id="storeCountLabel"></span>
-    </h2>
+    <h2>⭐ 매장 리스트 <span class="store-count" id="storeCountLabel"></span></h2>
     <ul id="storeList" class="store-list"></ul>
   </aside>
 
-  <!-- 가운데: 지도 -->
-  <main>
-    <div id="map"></div>
-  </main>
+  <main><div id="map"></div></main>
 
-  <!-- 오른쪽: 대시보드 -->
-  <aside id="dashboardPanel" class="dashboard-panel">
+  <aside class="dashboard-panel">
     <div class="dashboard-title">📊 대시보드</div>
-    <div class="stat-grid">
-      <div class="stat-card">
-        <div class="stat-label">총 매장 수 (필터 기준)</div>
-        <div class="stat-value" id="statTotal">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">거래 성사</div>
-        <div class="stat-value" id="statDeal">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">미팅 완료</div>
-        <div class="stat-value" id="statMeetingDone">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">미팅 요청</div>
-        <div class="stat-value" id="statRequest">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">부재중 / 미응답</div>
-        <div class="stat-value" id="statNoAnswer">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">거절</div>
-        <div class="stat-value" id="statReject">0</div>
-      </div>
-    </div>
+    <canvas id="statusChart" style="width:100%; height:180px;"></canvas>
 
-    <div class="legend">
-      <div class="legend-title">마커 색상 (Status)</div>
-      <div class="legend-item">
-        <span class="legend-color" style="background:#2ecc71"></span>거래 성사
-      </div>
-      <div class="legend-item">
-        <span class="legend-color" style="background:#3498db"></span>미팅 완료
-      </div>
-      <div class="legend-item">
-        <span class="legend-color" style="background:#f1c40f"></span>미팅 요청
-      </div>
-      <div class="legend-item">
-        <span class="legend-color" style="background:#95a5a6"></span>부재중 / 미응답
-      </div>
-      <div class="legend-item">
-        <span class="legend-color" style="background:#e74c3c"></span>거절
-      </div>
-    </div>
+    <div id="storeDetail" class="store-detail"></div>
   </aside>
 </div>
 
@@ -345,13 +185,13 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 <script>
-// ⭐ Apps Script WebApp URL
+/* ⭐ 두영님 WebApp URL 넣기! */
 const API_URL =
   "https://script.google.com/macros/s/AKfycbz3V3zX-zdYbwajKaZjktsClGesOFEoTHqDsHHFrWdr6BdbYmgDPaXiNbYH5gNNtTVv/exec?action=places";
 
 let rawRows = [];
 let filteredRows = [];
-let map, markerCluster;
+let map, markerCluster, chartInstance;
 
 // 상태별 색상
 const STATUS_COLOR = {
@@ -362,14 +202,15 @@ const STATUS_COLOR = {
   "거절": "#e74c3c"
 };
 
-// 초기화
+// 초기 로드
 window.addEventListener("load", async () => {
   initMap();
   initEvents();
+  loadFilters();
   await loadData();
 });
 
-// 지도 생성
+// 지도 초기화
 function initMap() {
   map = L.map("map", {
     center: [37.5665, 126.9780],
@@ -389,107 +230,72 @@ function initMap() {
   map.addLayer(markerCluster);
 }
 
-// 이벤트
 function initEvents() {
-  document.getElementById("searchInput").addEventListener("input", applyFilters);
-  document.getElementById("categorySelect").addEventListener("change", applyFilters);
-  document.getElementById("statusSelect").addEventListener("change", applyFilters);
-
-  const toggleBtn = document.getElementById("dashboardToggle");
-  const dashboardPanel = document.getElementById("dashboardPanel");
-  toggleBtn.addEventListener("click", () => {
-    dashboardPanel.classList.toggle("hidden");
-    toggleBtn.textContent = dashboardPanel.classList.contains("hidden")
-      ? "📊 대시보드 열기"
-      : "📊 대시보드 접기";
+  document.getElementById("searchInput").addEventListener("input", () => {
+    applyFilters();
+    saveFilters();
+    showAutocomplete();
+  });
+  document.getElementById("categorySelect").addEventListener("change", () => {
+    applyFilters(); saveFilters();
+  });
+  document.getElementById("statusSelect").addEventListener("change", () => {
+    applyFilters(); saveFilters();
   });
 }
 
 // 데이터 로드
 async function loadData() {
-  try {
-    const res = await fetch(API_URL);
-    const json = await res.json();
+  const res = await fetch(API_URL);
+  const json = await res.json();
 
-    console.log("📌 원본 데이터", json.slice(0, 3));
-
-    rawRows = json.filter(r => r.lat && r.lng); // 위치 있는 것만
-    console.log("📌 고유 Status 값:", Array.from(new Set(rawRows.map(r => r.Status))));
-
-    buildFilters(rawRows);
-    filteredRows = rawRows;
-    renderAll();
-
-  } catch (e) {
-    console.error("데이터 로딩 오류:", e);
-    alert("데이터를 불러오지 못했습니다.");
-  }
+  rawRows = json.filter(r => r.lat && r.lng);
+  buildFilters(rawRows);
+  applyFilters();
 }
 
-// 필터 옵션 구성
-function buildFilters(rows) {
-  const categorySelect = document.getElementById("categorySelect");
-  const statusSelect = document.getElementById("statusSelect");
+/* 🔎 자동완성 */
+function showAutocomplete() {
+  const ac = document.getElementById("autocomplete");
+  const q = document.getElementById("searchInput").value.trim().toLowerCase();
+  if (!q) { ac.style.display = "none"; return; }
 
-  const categorySet = new Set();
-  const statusSet = new Set();
+  const matched = rawRows.filter(r =>
+    (r.name || "").toLowerCase().includes(q) ||
+    (r.roadAddress || "").toLowerCase().includes(q) ||
+    (r.keyword || "").toLowerCase().includes(q)
+  ).slice(0, 10);
 
-  rows.forEach(r => {
-    if (r.category) {
-      const major = r.category.split(">")[0].trim();
-      categorySet.add(major);
-    }
-    if (r.Status) {
-      statusSet.add(r.Status);
-    }
-  });
+  ac.innerHTML = matched.map(r =>
+    `<div class="autocomplete-item">${r.name}</div>`
+  ).join("");
 
-  // 카테고리 옵션
-  categorySelect.innerHTML = '<option value="ALL">전체 카테고리</option>';
-  Array.from(categorySet).sort().forEach(cat => {
-    const opt = document.createElement("option");
-    opt.value = cat;
-    opt.textContent = cat;
-    categorySelect.appendChild(opt);
-  });
+  ac.style.display = matched.length ? "block" : "none";
 
-  // 상태 옵션
-  statusSelect.innerHTML = '<option value="ALL">전체 상태</option>';
-  Array.from(statusSet).forEach(st => {
-    const opt = document.createElement("option");
-    opt.value = st;
-    opt.textContent = st;
-    statusSelect.appendChild(opt);
+  document.querySelectorAll(".autocomplete-item").forEach((el, i) => {
+    el.addEventListener("click", () => {
+      document.getElementById("searchInput").value = matched[i].name;
+      ac.style.display = "none";
+      map.setView([matched[i].lat, matched[i].lng], 17);
+      showStoreDetail(matched[i]);
+      applyFilters();
+    });
   });
 }
 
-// 필터 적용
+/* 🔧 필터링 */
 function applyFilters() {
   const q = document.getElementById("searchInput").value.trim().toLowerCase();
   const cat = document.getElementById("categorySelect").value;
   const st = document.getElementById("statusSelect").value;
 
   filteredRows = rawRows.filter(r => {
-    // 검색
-    const text =
-      (r.name || "") +
-      " " +
-      (r.sigungu || "") +
-      " " +
-      (r.roadAddress || "") +
-      " " +
-      (r.keyword || "");
-    const matchSearch = !q || text.toLowerCase().includes(q);
+    const text = `${r.name} ${r.sigungu} ${r.roadAddress} ${r.keyword}`.toLowerCase();
+    const matchSearch = !q || text.includes(q);
 
-    // 카테고리(대분류)
-    let major = "기타";
-    if (r.category) {
-      major = r.category.split(">")[0].trim();
-    }
+    const major = r.category ? r.category.split(">")[0].trim() : "기타";
     const matchCat = cat === "ALL" || major === cat;
-
-    // 상태
-    const matchStatus = st === "ALL" || (r.Status || "") === st;
+    const matchStatus = st === "ALL" || r.Status === st;
 
     return matchSearch && matchCat && matchStatus;
   });
@@ -497,125 +303,124 @@ function applyFilters() {
   renderAll();
 }
 
-// 렌더링 전체
+/* 렌더링 */
 function renderAll() {
-  renderMarkers(filteredRows);
-  renderStoreList(filteredRows);
-  renderStats(filteredRows);
+  renderMarkers();
+  renderStoreList();
+  renderStats();
 }
 
-// 마커 아이콘
+/* 마커 */
 function createMarkerIcon(status) {
-  const color = STATUS_COLOR[status] || "#7f8c8d";
   return L.divIcon({
     className: "custom-marker",
-    html: `<div class="marker-dot" style="background:${color}"></div>`,
-    iconSize: [18, 18],
-    iconAnchor: [9, 9]
+    html: `<div class="marker-dot" style="background:${STATUS_COLOR[status] || "#7f8c8d"}"></div>`,
+    iconSize: [18, 18], iconAnchor: [9, 9]
   });
 }
 
-// 마커 렌더링
-function renderMarkers(rows) {
+function renderMarkers() {
   markerCluster.clearLayers();
-
-  rows.forEach(r => {
-    const lat = Number(r.lat);
-    const lng = Number(r.lng);
-    if (isNaN(lat) || isNaN(lng)) return;
-
-    const marker = L.marker([lat, lng], {
+  filteredRows.forEach(r => {
+    const marker = L.marker([r.lat, r.lng], {
       icon: createMarkerIcon(r.Status)
     });
-
-    const html = `
-      <div style="font-size:12px;">
-        <div style="font-weight:600;margin-bottom:4px;">${r.name || "매장"}</div>
-        <div>${r.roadAddress || ""}</div>
-        ${r.Status ? `<div style="margin-top:4px;">상태: ${r.Status}</div>` : ""}
-        ${r.URL ? `<div style="margin-top:4px;"><a href="${r.URL}" target="_blank">바로가기</a></div>` : ""}
-      </div>
-    `;
-    marker.bindPopup(html);
     markerCluster.addLayer(marker);
   });
-
-  if (rows.length > 0) {
-    const group = L.featureGroup(markerCluster.getLayers());
-    map.fitBounds(group.getBounds().pad(0.1));
-  }
 }
 
-// 매장 리스트 렌더링
-function renderStoreList(rows) {
-  const listEl = document.getElementById("storeList");
-  const countLabel = document.getElementById("storeCountLabel");
-  listEl.innerHTML = "";
+/* 좌측 리스트 */
+function renderStoreList() {
+  const list = document.getElementById("storeList");
+  list.innerHTML = "";
+  document.getElementById("storeCountLabel").textContent =
+    `${filteredRows.length}개`;
 
-  countLabel.textContent = `${rows.length.toLocaleString()}개 매장`;
-
-  rows.slice(0, 300).forEach(r => {
+  filteredRows.slice(0, 300).forEach(r => {
     const li = document.createElement("li");
     li.className = "store-item";
 
     li.innerHTML = `
-      <div class="store-name">${r.name || "매장명 없음"}</div>
-      <div class="store-meta">
-        ${(r.sigungu || "")} · ${(r.category || "").split(">")[0] || ""}
-        ${r.Status ? " · " + r.Status : ""}
-      </div>
-      <div class="store-meta">${r.roadAddress || ""}</div>
-      ${r.URL ? `<a class="store-url" href="${r.URL}" target="_blank">바로가기</a>` : ""}
+      <div class="store-name">${r.name}</div>
+      <div class="store-meta">${r.sigungu} · ${(r.category || "").split(">")[0]} · ${r.Status}</div>
+      <div class="store-meta">${r.roadAddress}</div>
     `;
 
     li.addEventListener("click", () => {
-      if (r.lat && r.lng) {
-        map.setView([Number(r.lat), Number(r.lng)], 16);
-      }
+      map.setView([r.lat, r.lng], 17);
+      showStoreDetail(r);
     });
 
-    listEl.appendChild(li);
+    list.appendChild(li);
   });
 }
 
-// 대시보드 통계 렌더링
-function renderStats(rows) {
-  const stats = {
-    total: rows.length,
-    deal: 0,          // 거래 성사
-    meetingDone: 0,   // 미팅 완료
-    request: 0,       // 미팅 요청
-    noAnswer: 0,      // 부재중/미응답
-    reject: 0         // 거절
-  };
+/* 상세 정보 */
+function showStoreDetail(r) {
+  const box = document.getElementById("storeDetail");
+  box.innerHTML = `
+    <h3>${r.name}</h3>
+    <div><strong>주소:</strong> ${r.roadAddress}</div>
+    <div><strong>상태:</strong> ${r.Status}</div>
+    <div><strong>카테고리:</strong> ${(r.category || "").split(">")[0]}</div>
+    <div><strong>블로그 수:</strong> ${r.blog_count}</div>
+    <div><strong>키워드:</strong> ${r.keyword}</div>
+    ${r.URL ? `<div><a href="${r.URL}" target="_blank">매장 링크</a></div>` : ""}
+  `;
+}
 
-  rows.forEach(r => {
-    switch (r.Status) {
-      case "거래 성사":
-        stats.deal++;
-        break;
-      case "미팅 완료":
-        stats.meetingDone++;
-        break;
-      case "미팅 요청":
-        stats.request++;
-        break;
-      case "부재중/미응답":
-        stats.noAnswer++;
-        break;
-      case "거절":
-        stats.reject++;
-        break;
+/* 도넛 차트 */
+function renderStats() {
+  const stats = { deal: 0, meetingDone: 0, request: 0, noAnswer: 0, reject: 0 };
+
+  filteredRows.forEach(r => {
+    if (r.Status === "거래 성사") stats.deal++;
+    else if (r.Status === "미팅 완료") stats.meetingDone++;
+    else if (r.Status === "미팅 요청") stats.request++;
+    else if (r.Status === "부재중/미응답") stats.noAnswer++;
+    else if (r.Status === "거절") stats.reject++;
+  });
+
+  if (chartInstance) chartInstance.destroy();
+  const ctx = document.getElementById("statusChart");
+
+  chartInstance = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["거래 성사", "미팅 완료", "미팅 요청", "부재중/미응답", "거절"],
+      datasets: [{
+        data: [
+          stats.deal, stats.meetingDone, stats.request,
+          stats.noAnswer, stats.reject
+        ],
+        backgroundColor: ["#2ecc71","#3498db","#f1c40f","#95a5a6","#e74c3c"]
+      }]
+    },
+    options: {
+      cutout: "60%", responsive: true,
+      plugins: { legend: { position: "bottom" } }
     }
   });
-
-  document.getElementById("statTotal").textContent = stats.total.toLocaleString();
-  document.getElementById("statDeal").textContent = stats.deal.toLocaleString();
-  document.getElementById("statMeetingDone").textContent = stats.meetingDone.toLocaleString();
-  document.getElementById("statRequest").textContent = stats.request.toLocaleString();
-  document.getElementById("statNoAnswer").textContent = stats.noAnswer.toLocaleString();
-  document.getElementById("statReject").textContent = stats.reject.toLocaleString();
 }
+
+/* 필터 저장 */
+function saveFilters() {
+  localStorage.setItem("filterStatus", document.getElementById("statusSelect").value);
+  localStorage.setItem("filterCategory", document.getElementById("categorySelect").value);
+  localStorage.setItem("filterSearch", document.getElementById("searchInput").value);
+}
+
+/* 필터 불러오기 */
+function loadFilters() {
+  const st = localStorage.getItem("filterStatus");
+  const cat = localStorage.getItem("filterCategory");
+  const q = localStorage.getItem("filterSearch");
+
+  if (st) document.getElementById("statusSelect").value = st;
+  if (cat) document.getElementById("categorySelect").value = cat;
+  if (q) document.getElementById("searchInput").value = q;
+}
+
 </script>
 </body>
 </html>

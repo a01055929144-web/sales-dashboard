@@ -57,6 +57,7 @@
       gap: 8px;
       flex: 1;
       align-items: center;
+      flex-wrap: wrap;
     }
     .search-input,
     .select-input {
@@ -67,7 +68,7 @@
       outline: none;
       background: #f9fafb;
     }
-    .search-input { flex: 1; }
+    .search-input { flex: 1; min-width: 160px; }
     .select-input { min-width: 140px; }
     .select-input.full-width { width: 100%; }
 
@@ -484,7 +485,20 @@
       <option value="ALL">전체 카테고리</option>
     </select>
 
-    <!-- 검색 -->
+    <!-- 지역(시군구) 필터 -->
+    <select id="regionSelect" class="select-input">
+      <option value="ALL">전체 지역</option>
+    </select>
+
+    <!-- 상단 검색 (추가) -->
+    <input
+      id="globalSearchInput"
+      class="search-input"
+      type="text"
+      placeholder="검색 (매장명 / 지역 / 도로명주소 / 키워드)"
+    />
+
+    <!-- 기존 검색창 (그대로 유지) -->
     <input
       id="searchInput"
       class="search-input"
@@ -612,9 +626,16 @@
 
 <script>
   /*************************************************
-   * 🔑 두영님 Apps Script WebApp 기본 URL
-   *  예시: https://script.google.com/macros/s/XXXXX/exec
-   *  뒤에 ?action=... 은 JS에서 붙입니다.
+   * 🔑 Apps Script WebApp URL
+   *  - places_raw 시트에서 매장 데이터 제공 (action=places)
+   *  - 상태 변경 (action=updateStatus)
+   *  - 즐겨찾기 (action=favorite)
+   *  - 히스토리 조회 (action=history)
+   *  - 메모 저장 (action=addMemo)
+   *
+   *  📌 히스토리 시트 예시
+   *  시트명: history
+   *  헤더: name | date | manager | memo | source
    *************************************************/
   const BASE_URL =
     "https://script.google.com/macros/s/AKfycbxm1O5Ff9GC-q9MCRZAfGQucqtKyjAMsaNY0uU2ijhruta10ZdmOm2a9V5FOMK7LTMN/exec";
@@ -675,11 +696,19 @@
       .addEventListener("input", applyFilters);
 
     document
+      .getElementById("globalSearchInput")
+      .addEventListener("input", applyFilters);
+
+    document
       .getElementById("categorySelect")
       .addEventListener("change", applyFilters);
 
     document
       .getElementById("statusFilterSelect")
+      .addEventListener("change", applyFilters);
+
+    document
+      .getElementById("regionSelect")
       .addEventListener("change", applyFilters);
 
     document
@@ -760,9 +789,11 @@
   function buildFilters(rows) {
     const categorySelect = document.getElementById("categorySelect");
     const statusFilterSelect = document.getElementById("statusFilterSelect");
+    const regionSelect = document.getElementById("regionSelect");
 
     const categorySet = new Set();
     const statusSet = new Set();
+    const regionSet = new Set();
 
     rows.forEach(r => {
       if (r.category) {
@@ -770,6 +801,7 @@
         categorySet.add(major);
       }
       if (r.Status) statusSet.add(r.Status);
+      if (r.sigungu) regionSet.add(r.sigungu.trim());
     });
 
     // 카테고리 옵션
@@ -795,16 +827,37 @@
         opt.textContent = st;
         statusFilterSelect.appendChild(opt);
       });
+
+    // 지역(시군구) 옵션
+    regionSelect.innerHTML =
+      '<option value="ALL">전체 지역</option>';
+    Array.from(regionSet)
+      .sort()
+      .forEach(region => {
+        const opt = document.createElement("option");
+        opt.value = region;
+        opt.textContent = region;
+        regionSelect.appendChild(opt);
+      });
   }
 
   /**************** 필터 적용 ****************/
   function applyFilters() {
-    const q = document
+    const q1 = document
       .getElementById("searchInput")
       .value.trim()
       .toLowerCase();
+    const q2 = document
+      .getElementById("globalSearchInput")
+      .value.trim()
+      .toLowerCase();
+
+    // 두 검색창을 모두 사용 (합쳐서 검색)
+    const q = (q1 + " " + q2).trim();
+
     const cat = document.getElementById("categorySelect").value;
     const st = document.getElementById("statusFilterSelect").value;
+    const region = document.getElementById("regionSelect").value;
     const sortMode = document.getElementById("sortSelect").value;
 
     filteredRows = rawRows.filter(r => {
@@ -819,10 +872,10 @@
         major = r.category.split(">")[0].trim();
       }
       const matchCat = cat === "ALL" || major === cat;
-
       const matchStatus = st === "ALL" || (r.Status || "") === st;
+      const matchRegion = region === "ALL" || (r.sigungu || "") === region;
 
-      return matchSearch && matchCat && matchStatus;
+      return matchSearch && matchCat && matchStatus && matchRegion;
     });
 
     filteredRows = sortStores(filteredRows, sortMode);
@@ -1008,8 +1061,14 @@
     }
 
     const majorCat = (r.category || "").split(">")[0] || "-";
-    const urlHtml = r.URL
-      ? `<a href="${r.URL}" target="_blank" style="color:#2563eb;font-weight:600;">네이버 플레이스 열기</a>`
+
+    // 🔹 URL 자동 보정 (http/https 없으면 https:// 붙이기)
+    let safeUrl = r.URL || r.url || "";
+    if (safeUrl && !/^https?:\/\//i.test(safeUrl)) {
+      safeUrl = "https://" + safeUrl;
+    }
+    const urlHtml = safeUrl
+      ? `<a href="${safeUrl}" target="_blank" style="color:#2563eb;font-weight:600;">네이버 플레이스 열기</a>`
       : "-";
 
     box.innerHTML = `
@@ -1108,7 +1167,7 @@
             const memo = it.memo || it.Memo || it.note || "";
             return `
               <div class="history-item">
-                <div class="history-meta">${date} · ${mgr}</div>
+                <div class="history-meta">${date} ${mgr ? "· " + mgr : ""}</div>
                 <div class="history-text">${memo}</div>
               </div>
             `;

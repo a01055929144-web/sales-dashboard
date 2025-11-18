@@ -469,6 +469,50 @@
       background: #d1d5db;
       border-radius: 999px;
     }
+    /* --- History Timeline 스타일 --- */
+.timeline-item {
+  position: relative;
+  padding-left: 18px;
+  margin-bottom: 12px;
+}
+
+.timeline-dot {
+  width: 9px;
+  height: 9px;
+  background: #2563eb;
+  border-radius: 999px;
+  position: absolute;
+  left: 0;
+  top: 4px;
+}
+
+.timeline-date {
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 2px;
+}
+
+.timeline-card {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.timeline-manager {
+  font-size: 11px;
+  color: #374151;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.timeline-memo {
+  white-space: pre-wrap;
+  color: #111827;
+}
+
   </style>
 </head>
 <body>
@@ -1136,83 +1180,68 @@
     );
   }
 
-  /**************** 히스토리 불러오기 ****************/
-  function loadHistory(storeName) {
-    const listEl = document.getElementById("historyList");
-    if (!storeName) {
-      listEl.innerHTML =
-        '<div class="history-empty">매장을 선택하면 히스토리가 여기에 표시됩니다.</div>';
-      return;
-    }
+ /**************** 히스토리 불러오기 (타임라인 + 최신순 정렬) ****************/
+function loadHistory(storeName) {
+  const listEl = document.getElementById("historyList");
 
-    listEl.innerHTML = "불러오는 중...";
+  if (!storeName) {
+    listEl.innerHTML =
+      '<div class="history-empty">매장을 선택하면 히스토리가 여기에 표시됩니다.</div>';
+    return;
+  }
 
-    fetch(
-      `${BASE_URL}?action=history&name=${encodeURIComponent(
-        storeName
-      )}`
-    )
-      .then(res => res.json())
-      .then(items => {
-        if (!Array.isArray(items) || !items.length) {
-          listEl.innerHTML =
-            '<div class="history-empty">히스토리가 없습니다.</div>';
-          return;
-        }
+  listEl.innerHTML = "불러오는 중...";
 
-        listEl.innerHTML = items
-          .map(it => {
-            const date = it.date || it.Date || "";
-            const mgr = it.manager || it.Manager || "";
-            const memo = it.memo || it.Memo || it.note || "";
-            return `
-              <div class="history-item">
-                <div class="history-meta">${date} ${mgr ? "· " + mgr : ""}</div>
-                <div class="history-text">${memo}</div>
-              </div>
-            `;
-          })
-          .join("");
-      })
-      .catch(e => {
-        console.error("히스토리 로딩 오류:", e);
+  fetch(`${BASE_URL}?action=history&name=${encodeURIComponent(storeName)}`)
+    .then(res => res.json())
+    .then(items => {
+      if (!Array.isArray(items) || !items.length) {
         listEl.innerHTML =
-          '<div class="history-empty">히스토리를 불러오지 못했습니다.</div>';
-      });
+          '<div class="history-empty">히스토리가 없습니다.</div>';
+        return;
+      }
+
+      listEl.innerHTML = items
+        .map(it => `
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">${it.date}</div>
+            <div class="timeline-card">
+              <div class="timeline-manager">${it.manager || "-"}</div>
+              <div class="timeline-memo">${it.memo || ""}</div>
+            </div>
+          </div>
+        `)
+        .join("");
+    })
+    .catch(e => {
+      console.error("히스토리 로딩 오류:", e);
+      listEl.innerHTML =
+        '<div class="history-empty">히스토리를 불러오지 못했습니다.</div>';
+    });
+}
+
+
+/**************** 메모 저장 (타임라인 즉시 반영) ****************/
+function saveMemo() {
+  if (!selectedStoreName) {
+    alert("먼저 매장을 선택해주세요.");
+    return;
   }
 
-  /**************** 메모 저장 ****************/
-  function saveMemo() {
-    if (!selectedStoreName) {
-      alert("먼저 매장을 선택해주세요.");
-      return;
-    }
-    const textarea = document.getElementById("memoInput");
-    const text = textarea.value.trim();
-    if (!text) {
-      alert("메모 내용을 입력해주세요.");
-      return;
-    }
-
-    // 화면에 즉시 반영
-    const now = new Date();
-    const ts = now.toLocaleString("ko-KR");
-    const listEl = document.getElementById("historyList");
-    const newItem = `
-      <div class="history-item">
-        <div class="history-meta">${ts}</div>
-        <div class="history-text">${text}</div>
-      </div>
-    `;
-    listEl.insertAdjacentHTML("afterbegin", newItem);
-    textarea.value = "";
-
-    // Apps Script 저장 (GET 방식)
-    const url = `${BASE_URL}?action=addMemo&name=${encodeURIComponent(
-      selectedStoreName
-    )}&memo=${encodeURIComponent(text)}`;
-    fetch(url).catch(e => console.error("메모 저장 오류:", e));
+  const textarea = document.getElementById("memoInput");
+  const text = textarea.value.trim();
+  if (!text) {
+    alert("메모 내용을 입력해주세요.");
+    return;
   }
+
+  textarea.value = "";
+
+  fetch(`${BASE_URL}?action=addMemo&name=${encodeURIComponent(selectedStoreName)}&memo=${encodeURIComponent(text)}`)
+    .then(() => loadHistory(selectedStoreName))
+    .catch(e => console.error("메모 저장 오류:", e));
+}
 
   /**************** 통계 + 차트 ****************/
   function renderStats() {
@@ -1318,3 +1347,5 @@
 </script>
 </body>
 </html>
+
+

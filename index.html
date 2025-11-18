@@ -63,37 +63,95 @@
   .layout {
     flex: 1;
     display: grid;
-    grid-template-columns: 280px minmax(0, 1fr) 260px;
+    grid-template-columns: 320px minmax(0, 1fr) 320px;
     height: calc(100vh - 52px);
     overflow: hidden;
   }
 
+  /* 좌측 패널 */
   .store-panel {
     background: #ffffff;
     border-right: 1px solid #e5e7eb;
     padding: 12px;
     overflow-y: auto;
   }
+  .store-panel h2 {
+    font-size: 14px;
+    margin: 0 0 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .store-count { font-size: 11px; color: #6b7280; }
   .store-list { list-style: none; margin: 0; padding: 0; }
   .store-item {
-    padding: 8px 6px;
-    border-radius: 8px;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: 1px solid #f3f4f6;
+    margin-bottom: 6px;
+    background: #fff;
     cursor: pointer;
-    margin-bottom: 4px;
-    border: 1px solid transparent;
+    transition: all 0.15s ease;
   }
   .store-item:hover {
-    background: #f3f4ff;
-    border-color: #e0e7ff;
+    background: #eef2ff;
+    border-color: #dbe4ff;
+    transform: translateY(-1px);
+  }
+  .store-name {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .store-meta {
+    font-size: 11px;
+    color: #6b7280;
+  }
+  .status-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 10px;
+    border-radius: 999px;
+    color: #ffffff;
+    margin-right: 4px;
   }
 
   #map { width: 100%; height: 100%; }
 
+  /* 우측 대시보드 */
   .dashboard-panel {
     background: #ffffff;
     border-left: 1px solid #e5e7eb;
     padding: 12px;
     overflow-y: auto;
+  }
+  .dashboard-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .number-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .number-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 8px;
+    text-align: center;
+  }
+  .number-title {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+  .number-value {
+    font-size: 16px;
+    font-weight: 700;
   }
 
   .autocomplete {
@@ -106,6 +164,8 @@
     z-index: 50;
     border-radius: 8px;
     display: none;
+    top: 34px;
+    right: 0;
   }
   .autocomplete-item {
     padding: 6px 10px;
@@ -137,6 +197,65 @@
     font-size: 13px;
   }
   .store-detail h3 { margin: 0 0 8px; font-size: 15px; }
+
+  .photo-carousel {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    margin-top: 8px;
+  }
+  .photo-carousel img {
+    width: 120px;
+    height: 90px;
+    border-radius: 8px;
+    object-fit: cover;
+    cursor: pointer;
+  }
+
+  .history-log {
+    margin-top: 10px;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    padding: 10px;
+    max-height: 180px;
+    overflow-y: auto;
+    font-size: 12px;
+  }
+  .history-item {
+    padding: 6px 4px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-date { font-weight: 600; color: #374151; }
+  .history-user { color: #6b7280; font-size: 11px; }
+  .history-text { margin-top: 2px; }
+
+  .status-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .status-buttons button {
+    border: none;
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    background: #e5e7eb;
+    color: #111827;
+  }
+
+  .toggle-btn {
+    margin-top: 10px;
+    padding: 6px 10px;
+    background: #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    font-size: 12px;
+  }
 </style>
 </head>
 <body>
@@ -174,9 +293,33 @@
 
   <aside class="dashboard-panel">
     <div class="dashboard-title">📊 대시보드</div>
+
+    <!-- 숫자 요약 카드 -->
+    <div id="numberStats" class="number-stats"></div>
+
+    <!-- 상태 도넛 차트 -->
     <canvas id="statusChart" style="width:100%; height:180px;"></canvas>
 
+    <!-- 동선 토글 버튼 -->
+    <button id="routeToggle" class="toggle-btn">동선 보기 토글</button>
+
+    <!-- 상세 정보 -->
     <div id="storeDetail" class="store-detail"></div>
+
+    <!-- 사진 캐러셀 -->
+    <div id="storePhotos" class="photo-carousel"></div>
+
+    <!-- 히스토리 로그 -->
+    <div id="historyLog" class="history-log"></div>
+
+    <!-- 상태 변경 버튼 -->
+    <div class="status-buttons">
+      <button class="status-button" data-status="거래 성사">거래 성사</button>
+      <button class="status-button" data-status="미팅 완료">미팅 완료</button>
+      <button class="status-button" data-status="미팅 요청">미팅 요청</button>
+      <button class="status-button" data-status="부재중/미응답">부재중/미응답</button>
+      <button class="status-button" data-status="거절">거절</button>
+    </div>
   </aside>
 </div>
 
@@ -185,13 +328,17 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 <script>
-/* ⭐ WebApp URL */
-const API_URL =
-  "https://script.google.com/macros/s/AKfycbz3V3zX-zdYbwajKaZjktsClGesOFEoTHqDsHHFrWdr6BdbYmgDPaXiNbYH5gNNtTVv/exec?action=places";
+/* ⭐ WebApp BASE URL (action 없음) */
+const BASE_URL =
+  "https://script.google.com/macros/s/AKfycbz3V3zX-zdYbwajKaZjktsClGesOFEoTHqDsHHFrWdr6BdbYmgDPaXiNbYH5gNNtTVv/exec";
+
+const PLACES_URL  = BASE_URL + "?action=places";
 
 let rawRows = [];
 let filteredRows = [];
 let map, markerCluster, chartInstance;
+let currentStore = null;
+let routeLayer = null;
 
 /* 상태 색상 */
 const STATUS_COLOR = {
@@ -242,20 +389,28 @@ function initEvents() {
   document.getElementById("statusSelect").addEventListener("change", () => {
     applyFilters(); saveFilters();
   });
+
+  document.getElementById("routeToggle").addEventListener("click", toggleRoute);
+
+  document.querySelectorAll(".status-button").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      const newStatus = e.target.dataset.status;
+      await onChangeStatus(newStatus);
+    });
+  });
 }
 
 /* 데이터 불러오기 */
 async function loadData() {
-  const res = await fetch(API_URL);
+  const res = await fetch(PLACES_URL);
   const json = await res.json();
 
   rawRows = json.filter(r => r.lat && r.lng);
-
-  buildFilters(rawRows);  // ⭐ 누락됐던 함수
+  buildFilters(rawRows);
   applyFilters();
 }
 
-/* 🔧 필터 목록 생성 — ★ 핵심! */
+/* 필터 목록 생성 */
 function buildFilters(rows) {
   const statusSet = new Set();
   const categorySet = new Set();
@@ -268,19 +423,24 @@ function buildFilters(rows) {
   const statusSelect = document.getElementById("statusSelect");
   const categorySelect = document.getElementById("categorySelect");
 
-  [...statusSet].sort().forEach(s => {
-    const opt = document.createElement("option");
-    opt.value = s;
-    opt.textContent = s;
-    statusSelect.appendChild(opt);
-  });
+  // 기존 옵션 유지(ALL 제외 제거 후 재생성)할 수도 있지만, 간단히 한 번만 생성하는 전제
+  if (statusSelect.options.length === 1) {
+    [...statusSet].sort().forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s;
+      opt.textContent = s;
+      statusSelect.appendChild(opt);
+    });
+  }
 
-  [...categorySet].sort().forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = c;
-    categorySelect.appendChild(opt);
-  });
+  if (categorySelect.options.length === 1) {
+    [...categorySet].sort().forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      categorySelect.appendChild(opt);
+    });
+  }
 }
 
 /* 자동완성 */
@@ -303,10 +463,11 @@ function showAutocomplete() {
 
   document.querySelectorAll(".autocomplete-item").forEach((el, i) => {
     el.addEventListener("click", () => {
-      document.getElementById("searchInput").value = matched[i].name;
+      const store = matched[i];
+      document.getElementById("searchInput").value = store.name;
       ac.style.display = "none";
-      map.setView([matched[i].lat, matched[i].lng], 17);
-      showStoreDetail(matched[i]);
+      map.setView([store.lat, store.lng], 17);
+      showStoreDetail(store);
       applyFilters();
     });
   });
@@ -336,7 +497,13 @@ function applyFilters() {
 function renderAll() {
   renderMarkers();
   renderStoreList();
-  renderStats();
+  renderStats(filteredRows);
+
+  // 동선 다시 그림
+  if (routeLayer) {
+    map.removeLayer(routeLayer);
+    drawRouteLine();
+  }
 }
 
 /* 마커 */
@@ -365,14 +532,19 @@ function renderStoreList() {
   document.getElementById("storeCountLabel").textContent =
     `${filteredRows.length}개`;
 
-  filteredRows.slice(0, 300).forEach(r => {
+  filteredRows.slice(0, 500).forEach(r => {
     const li = document.createElement("li");
     li.className = "store-item";
 
+    const major = (r.category || "").split(">")[0];
+
     li.innerHTML = `
-      <div class="store-name">${r.name}</div>
-      <div class="store-meta">${r.sigungu} · ${(r.category || "").split(">")[0]} · ${r.Status}</div>
-      <div class="store-meta">${r.roadAddress}</div>
+      <div class="store-name">${r.name || "매장명 없음"}</div>
+      <div class="store-meta">
+        <span class="status-badge" style="background:${STATUS_COLOR[r.Status] || "#9ca3af"}">${r.Status || "상태 없음"}</span>
+        ${major || "기타"} · ${r.sigungu || ""}
+      </div>
+      <div class="store-meta">${r.roadAddress || ""}</div>
     `;
 
     li.addEventListener("click", () => {
@@ -384,25 +556,88 @@ function renderStoreList() {
   });
 }
 
-/* 상세 정보 */
-function showStoreDetail(r) {
+/* 상세 정보 + 히스토리 + 사진 */
+async function showStoreDetail(r) {
+  currentStore = r;
+
   const box = document.getElementById("storeDetail");
+  const photosBox = document.getElementById("storePhotos");
+  const historyBox = document.getElementById("historyLog");
+
   box.innerHTML = `
-    <h3>${r.name}</h3>
-    <div><strong>주소:</strong> ${r.roadAddress}</div>
-    <div><strong>상태:</strong> ${r.Status}</div>
+    <h3>${r.name || "매장명 없음"}</h3>
+    <div><strong>주소:</strong> ${r.roadAddress || ""}</div>
+    <div><strong>상태:</strong> ${r.Status || ""}</div>
     <div><strong>카테고리:</strong> ${(r.category || "").split(">")[0]}</div>
-    <div><strong>블로그 수:</strong> ${r.blog_count}</div>
-    <div><strong>키워드:</strong> ${r.keyword}</div>
-    ${r.URL ? `<div><a href="${r.URL}" target="_blank">매장 링크</a></div>` : ""}
+    <div><strong>시군구:</strong> ${r.sigungu || ""}</div>
+    <div><strong>블로그 수:</strong> ${r.blog_count || "-"}</div>
+    <div><strong>키워드:</strong> ${r.keyword || ""}</div>
+    ${r.URL ? `<div><a href="${r.URL}" target="_blank">네이버 플레이스 열기</a></div>` : ""}
   `;
+
+  photosBox.innerHTML = "";
+  historyBox.innerHTML = "히스토리를 불러오는 중...";
+
+  // 히스토리 로드
+  try {
+    const storeId = r.store_id || (r.name + "|" + r.roadAddress);
+    const resH = await fetch(`${BASE_URL}?action=history&storeId=${encodeURIComponent(storeId)}`);
+    const logs = await resH.json();
+    if (logs.length === 0) {
+      historyBox.innerHTML = "<div class='history-item'>히스토리가 없습니다.</div>";
+    } else {
+      historyBox.innerHTML = logs.map(log => `
+        <div class="history-item">
+          <div class="history-date">${formatDate(log.date)}</div>
+          <div class="history-user">${log.user || ""}</div>
+          <div class="history-text">${log.memo || ""}</div>
+        </div>
+      `).join("");
+    }
+  } catch (e) {
+    historyBox.innerHTML = "<div class='history-item'>히스토리를 불러오지 못했습니다.</div>";
+  }
+
+  // 사진 로드 (og:image 1개)
+  if (r.URL) {
+    try {
+      const resP = await fetch(`${BASE_URL}?action=photos&url=${encodeURIComponent(r.URL)}`);
+      const imgs = await resP.json();
+      if (imgs.length > 0) {
+        photosBox.innerHTML = imgs.slice(0, 5).map(src =>
+          `<img src="${src}" onclick="window.open('${src}')" />`
+        ).join("");
+      } else {
+        photosBox.innerHTML = "";
+      }
+    } catch (e) {
+      photosBox.innerHTML = "";
+    }
+  }
 }
 
-/* 차트 */
-function renderStats() {
-  const stats = { deal: 0, meetingDone: 0, request: 0, noAnswer: 0, reject: 0 };
+function formatDate(d) {
+  if (!d) return "";
+  const dt = new Date(d);
+  if (isNaN(dt)) return d;
+  const y = dt.getFullYear();
+  const m = String(dt.getMonth() + 1).padStart(2, "0");
+  const day = String(dt.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
-  filteredRows.forEach(r => {
+/* 숫자 + 차트 */
+function renderStats(rows) {
+  const stats = {
+    total: rows.length,
+    deal: 0,
+    meetingDone: 0,
+    request: 0,
+    noAnswer: 0,
+    reject: 0
+  };
+
+  rows.forEach(r => {
     if (r.Status === "거래 성사") stats.deal++;
     else if (r.Status === "미팅 완료") stats.meetingDone++;
     else if (r.Status === "미팅 요청") stats.request++;
@@ -410,36 +645,124 @@ function renderStats() {
     else if (r.Status === "거절") stats.reject++;
   });
 
-  if (chartInstance) chartInstance.destroy();
+  renderNumberStats(stats);
+  renderStatusChart(stats);
+}
+
+function renderNumberStats(stats) {
+  const progress = stats.total > 0
+    ? ((stats.deal + stats.meetingDone) / stats.total * 100).toFixed(1)
+    : 0;
+
+  document.getElementById("numberStats").innerHTML = `
+    <div class="number-card">
+      <div class="number-title">총 매장 수</div>
+      <div class="number-value">${stats.total}</div>
+    </div>
+    <div class="number-card">
+      <div class="number-title">거래 성사</div>
+      <div class="number-value">${stats.deal}</div>
+    </div>
+    <div class="number-card">
+      <div class="number-title">미팅 완료</div>
+      <div class="number-value">${stats.meetingDone}</div>
+    </div>
+    <div class="number-card">
+      <div class="number-title">진행률</div>
+      <div class="number-value">${progress}%</div>
+    </div>
+    <div class="number-card">
+      <div class="number-title">미팅 요청</div>
+      <div class="number-value">${stats.request}</div>
+    </div>
+    <div class="number-card">
+      <div class="number-title">부재중/미응답</div>
+      <div class="number-value">${stats.noAnswer}</div>
+    </div>
+  `;
+}
+
+function renderStatusChart(stats) {
   const ctx = document.getElementById("statusChart");
+
+  const labels = ["거래 성사", "미팅 완료", "미팅 요청", "부재중/미응답", "거절"];
+  const values = [
+    stats.deal,
+    stats.meetingDone,
+    stats.request,
+    stats.noAnswer,
+    stats.reject
+  ];
+
+  if (chartInstance) chartInstance.destroy();
 
   chartInstance = new Chart(ctx, {
     type: "doughnut",
     data: {
-      labels: ["거래 성사", "미팅 완료", "미팅 요청", "부재중/미응답", "거절"],
+      labels,
       datasets: [{
-        data: [
-          stats.deal, stats.meetingDone, stats.request,
-          stats.noAnswer, stats.reject
-        ],
+        data: values,
         backgroundColor: ["#2ecc71","#3498db","#f1c40f","#95a5a6","#e74c3c"]
       }]
     },
     options: {
-      cutout: "60%", responsive: true,
+      cutout: "60%",
+      responsive: true,
       plugins: { legend: { position: "bottom" } }
     }
   });
 }
 
-/* 저장 */
+/* 동선 (Polyline) */
+function toggleRoute() {
+  if (routeLayer) {
+    map.removeLayer(routeLayer);
+    routeLayer = null;
+  } else {
+    drawRouteLine();
+  }
+}
+
+function drawRouteLine() {
+  if (filteredRows.length < 2) return;
+  const points = filteredRows.map(r => [r.lat, r.lng]);
+  routeLayer = L.polyline(points, {
+    color: "#3498db",
+    weight: 3,
+    dashArray: "4, 6"
+  }).addTo(map);
+}
+
+/* 상태 변경 */
+async function onChangeStatus(newStatus) {
+  if (!currentStore) {
+    alert("먼저 매장을 선택해주세요.");
+    return;
+  }
+  if (!confirm(`상태를 "${newStatus}"(으)로 변경할까요?`)) return;
+
+  const rowId = currentStore._row;
+  const storeId = currentStore.store_id || (currentStore.name + "|" + currentStore.roadAddress);
+
+  const url =
+    `${BASE_URL}?action=updateStatus&id=${encodeURIComponent(rowId)}&status=${encodeURIComponent(newStatus)}&storeId=${encodeURIComponent(storeId)}`;
+
+  await fetch(url);
+  await loadData();
+  applyFilters();
+
+  // 변경된 매장 다시 찾아서 상세정보 갱신
+  const updated = rawRows.find(r => r._row === rowId);
+  if (updated) showStoreDetail(updated);
+}
+
+/* 필터 저장/불러오기 */
 function saveFilters() {
   localStorage.setItem("filterStatus", document.getElementById("statusSelect").value);
   localStorage.setItem("filterCategory", document.getElementById("categorySelect").value);
   localStorage.setItem("filterSearch", document.getElementById("searchInput").value);
 }
 
-/* 불러오기 */
 function loadFilters() {
   const st = localStorage.getItem("filterStatus");
   const cat = localStorage.getItem("filterCategory");
@@ -449,7 +772,6 @@ function loadFilters() {
   if (cat) document.getElementById("categorySelect").value = cat;
   if (q) document.getElementById("searchInput").value = q;
 }
-
 </script>
 </body>
 </html>

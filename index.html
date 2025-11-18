@@ -36,6 +36,7 @@
       top: 0;
       z-index: 20;
     }
+
     header h1 { margin: 0; font-size: 18px; font-weight: 700; }
 
     .required-text {
@@ -45,28 +46,28 @@
       margin-left: 4px;
     }
 
-    .primary-btn, .secondary-btn {
-      border-radius: 12px;
+    /** primary 버튼 **/
+    .primary-btn {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
       border: none;
       padding: 10px 14px;
       font-size: 13px;
+      font-weight: 700;
+      border-radius: 12px;
+      width: 100%;
       cursor: pointer;
       margin-top: 6px;
-      width: 100%;
-      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+      transition: all 0.18s ease-out;
     }
 
-    .primary-btn {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: white;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
-      transition: all .18s ease-out;
-    }
     .primary-btn:hover {
       background: linear-gradient(135deg, #1e40af, #1e3a8a);
       transform: translateY(-2px);
       box-shadow: 0 6px 14px rgba(30, 64, 175, 0.45);
     }
+
     .primary-btn:disabled {
       background: #9db4e0 !important;
       cursor: not-allowed;
@@ -74,7 +75,7 @@
       transform: none;
     }
 
-    /* 레이아웃 */
+    /* Layout */
     .layout {
       flex: 1;
       display: grid;
@@ -93,7 +94,6 @@
 
     #map { width: 100%; height: 100%; }
 
-    /* History Timeline */
     .timeline-item {
       position: relative;
       padding-left: 18px;
@@ -131,13 +131,12 @@
       color: #111827;
       white-space: pre-wrap;
     }
-
   </style>
 </head>
+
 <body>
 
 <header>
-  
   <h1>📍 Sales Store Map</h1>
 
   <div class="header-controls" style="flex:1; display:flex; gap:8px;">
@@ -156,10 +155,11 @@
     <input id="searchInput" class="search-input" placeholder="검색어 입력" />
   </div>
 </header>
-  <div class="layout">   <!-- ⭐ 반드시 추가 -->
 
-<aside class="store-panel">
-    <!-- 좌측 패널: 매장 리스트 -->
+<!-- ⭐⭐⭐⭐⭐ 여기 layout 시작이 반드시 있어야 함 ⭐⭐⭐⭐⭐ -->
+<div class="layout">
+
+  <!-- 좌측 패널: 매장 리스트 -->
   <aside class="store-panel" id="storePanel">
     <h2 style="font-size:14px; margin-bottom:6px;">⭐ 매장 리스트</h2>
     <div id="storeCountLabel" style="font-size:11px; color:#6b7280; margin-bottom:10px;"></div>
@@ -289,7 +289,8 @@
       <button id="memoSaveBtn" class="primary-btn" disabled>메모 저장</button>
     </div>
   </aside>
-</div>
+</div> <!-- layout 끝 -->
+
 <!-- Leaflet -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
@@ -362,7 +363,7 @@ function initMap() {
 }
 
 /*************************************************
- * 2) 이벤트 등록
+ * 2) 전체 이벤트 초기화
  *************************************************/
 function initEvents() {
   document.getElementById("searchInput").addEventListener("input", applyFilters);
@@ -374,7 +375,7 @@ function initEvents() {
   document.getElementById("statusSaveBtn").addEventListener("click", saveStatus);
   document.getElementById("memoSaveBtn").addEventListener("click", saveMemo);
 
-  /* 담당자 변경 시 자동 저장 + 버튼 활성화 */
+  /* 담당자 변경 시 자동 기록 */
   const managerSelect = document.getElementById("managerInput");
   managerSelect.addEventListener("change", () => {
     const manager = managerSelect.value.trim();
@@ -388,7 +389,7 @@ function initEvents() {
     const memoText = `담당자를 ${manager}로 설정했습니다.`;
     const now = new Date().toLocaleString("ko-KR");
 
-    // 화면 타임라인 반영
+    // UI 반영
     const listEl = document.getElementById("historyList");
     listEl.insertAdjacentHTML("afterbegin", `
       <div class="timeline-item">
@@ -400,7 +401,7 @@ function initEvents() {
         </div>
       </div>`);
 
-    // GAS 반영
+    // 서버 저장
     fetch(`${BASE_URL}?action=addMemo&name=${encodeURIComponent(selectedStoreName)}&memo=${encodeURIComponent(memoText)}&manager=${encodeURIComponent(manager)}`);
   });
 }
@@ -434,7 +435,7 @@ async function loadData() {
 }
 
 /*************************************************
- * 4) 필터 구성
+ * 4) 필터 생성
  *************************************************/
 function buildFilters(rows) {
   const categorySelect = document.getElementById("categorySelect");
@@ -535,10 +536,9 @@ function renderAll() {
   renderStoreList();
   renderStats();
 }
-</script>
-<script>
+
 /*************************************************
- * 8) 마커 아이콘 생성
+ * 8) 마커 아이콘
  *************************************************/
 function createMarkerIcon(status, favorite = false, selected = false) {
   const color = STATUS_COLOR[status] || "#7f8c8d";
@@ -650,7 +650,7 @@ function focusOnStore(store) {
 }
 
 /*************************************************
- * 12) 매장 상세정보
+ * 12) 상세정보
  *************************************************/
 function showStoreDetail(r) {
   const box = document.getElementById("storeDetailBody");
@@ -681,14 +681,14 @@ function showStoreDetail(r) {
 }
 
 /*************************************************
- * 13) 상태 드롭다운 값 세팅
+ * 13) 상태 드롭다운 세팅
  *************************************************/
 function setStatusDropdown(store) {
   document.getElementById("statusChangeSelect").value = store?.Status || "";
 }
 
 /*************************************************
- * 14) 상태 변경 저장 + 히스토리 자동 기록
+ * 14) 상태 변경 저장
  *************************************************/
 async function saveStatus() {
   if (!selectedStoreName) return alert("매장을 먼저 선택하세요.");
@@ -702,7 +702,7 @@ async function saveStatus() {
   const now = new Date().toLocaleString("ko-KR");
   const memoText = `상태를 '${newStatus}'로 변경했습니다.`;
 
-  // UI 즉시 반영
+  // UI 반영
   document.getElementById("historyList").insertAdjacentHTML("afterbegin", `
     <div class="timeline-item">
       <div class="timeline-dot"></div>
@@ -714,13 +714,12 @@ async function saveStatus() {
     </div>
   `);
 
-  // GAS — 상태 변경
+  // GAS — 상태 업데이트
   fetch(`${BASE_URL}?action=updateStatus&name=${encodeURIComponent(selectedStoreName)}&status=${encodeURIComponent(newStatus)}`);
 
-  // GAS — 히스토리 기록
+  // GAS — 히스토리 추가
   fetch(`${BASE_URL}?action=addMemo&name=${encodeURIComponent(selectedStoreName)}&memo=${encodeURIComponent(memoText)}&manager=${encodeURIComponent(manager)}`);
 
-  // 화면 전체 갱신
   rawByName[selectedStoreName].Status = newStatus;
   applyFilters();
 }
@@ -765,10 +764,10 @@ function saveMemo() {
   if (!selectedStoreName) return alert("매장을 먼저 선택하세요.");
 
   const manager = document.getElementById("managerInput").value.trim();
-  if (!manager) return alert("담당자를 먼저 선택하세요.");
+  if (!manager) return alert("담당자를 선택해주세요.");
 
   const text = document.getElementById("memoInput").value.trim();
-  if (!text) return alert("메모 내용을 입력하세요.");
+  if (!text) return alert("메모 내용을 입력해주세요.");
 
   const now = new Date().toLocaleString("ko-KR");
 
@@ -784,14 +783,14 @@ function saveMemo() {
     </div>
   `);
 
-  // GAS 전송
+  // 저장
   fetch(`${BASE_URL}?action=addMemo&name=${encodeURIComponent(selectedStoreName)}&memo=${encodeURIComponent(text)}&manager=${encodeURIComponent(manager)}`);
 
   document.getElementById("memoInput").value = "";
 }
 
 /*************************************************
- * 17) 즐겨찾기
+ * 17) 즐겨찾기 저장
  *************************************************/
 function toggleFavorite(store) {
   store.favorite = !store.favorite;
@@ -862,5 +861,8 @@ function renderStats() {
 }
 </script>
 
-</body>
-</html>
+  
+
+
+
+  

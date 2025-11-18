@@ -44,7 +44,7 @@
       gap: 12px;
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 20;
     }
     header h1 {
       margin: 0;
@@ -71,7 +71,7 @@
     .select-input { min-width: 140px; }
     .select-input.full-width { width: 100%; }
 
-    /* 메인 레이아웃 */
+    /* 메인 레이아웃 (PC 기준) */
     .layout {
       flex: 1;
       display: grid;
@@ -86,6 +86,7 @@
       border-right: 1px solid #e5e7eb;
       padding: 12px;
       overflow-y: auto;
+      z-index: 15;
     }
     .store-header-row {
       display: flex;
@@ -127,6 +128,7 @@
       border: 1px solid transparent;
       margin-bottom: 6px;
       transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+      background: #ffffff;
     }
     .store-item:hover {
       background: #f3f4ff;
@@ -190,6 +192,7 @@
       border-left: 1px solid #e5e7eb;
       padding: 12px;
       overflow-y: auto;
+      z-index: 15;
     }
     .dashboard-title {
       font-size: 14px;
@@ -385,6 +388,74 @@
       100% { transform: scale(1); }
     }
 
+    /* 모바일 전용 플로팅 버튼 */
+    .mobile-fab-container {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      gap: 8px;
+      z-index: 40;
+    }
+    .fab {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 14px;
+      font-size: 12px;
+      background: rgba(15, 23, 42, 0.9);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* 모바일에서 패널을 Drawer처럼 사용 */
+    @media (max-width: 1024px) {
+      .layout {
+        grid-template-columns: 1fr; /* 지도만 기본 표시 */
+      }
+
+      #map {
+        height: calc(100vh - 52px); /* 헤더 제외 전체 */
+      }
+
+      .store-panel,
+      .dashboard-panel {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        max-height: 70vh;
+        background: #ffffff;
+        box-shadow: 0 -6px 12px rgba(15, 23, 42, 0.18);
+        transform: translateY(100%);
+        transition: transform 0.25s ease-out;
+        border-radius: 14px 14px 0 0;
+      }
+
+      .store-panel.open,
+      .dashboard-panel.open {
+        transform: translateY(0);
+      }
+
+      .store-panel {
+        border-right: none;
+        padding-top: 8px;
+      }
+
+      .dashboard-panel {
+        border-left: none;
+        padding-top: 10px;
+      }
+
+      .mobile-fab-container {
+        display: flex;
+      }
+    }
+
     /* 스크롤바 */
     .store-panel::-webkit-scrollbar,
     .dashboard-panel::-webkit-scrollbar,
@@ -397,18 +468,11 @@
       background: #d1d5db;
       border-radius: 999px;
     }
-
-    @media (max-width: 1200px) {
-      .layout {
-        grid-template-columns: 0 minmax(0, 1fr) 320px;
-      }
-      .store-panel { display: none; }
-    }
   </style>
 </head>
 <body>
 <header>
-  <h1>📍 Sales Store Map Dashboard</h1>
+  <h1>📍 Sales Store Map</h1>
   <div class="header-controls">
     <!-- 상태 필터 -->
     <select id="statusFilterSelect" class="select-input">
@@ -431,8 +495,8 @@
 </header>
 
 <div class="layout">
-  <!-- 좌측: 매장 리스트 -->
-  <aside class="store-panel">
+  <!-- 좌측: 매장 리스트 (PC) / 하단 Drawer (모바일) -->
+  <aside class="store-panel" id="storePanel">
     <div class="store-header-row">
       <h2>⭐ 매장 리스트</h2>
       <span class="store-count" id="storeCountLabel"></span>
@@ -453,8 +517,8 @@
     <div id="map"></div>
   </main>
 
-  <!-- 오른쪽: 대시보드 -->
-  <aside class="dashboard-panel">
+  <!-- 오른쪽: 대시보드 (PC) / 하단 Drawer (모바일) -->
+  <aside class="dashboard-panel" id="dashboardPanel">
     <div class="dashboard-title">📊 대시보드</div>
 
     <!-- 도넛 차트 + 상태 비율 -->
@@ -536,6 +600,12 @@
   </aside>
 </div>
 
+<!-- 모바일용 플로팅 버튼 -->
+<div class="mobile-fab-container" id="mobileFab">
+  <button id="mobileListBtn" class="fab">📋 매장</button>
+  <button id="mobileDashboardBtn" class="fab">📊 대시보드</button>
+</div>
+
 <!-- Leaflet Scripts -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
@@ -547,7 +617,8 @@
    *  뒤에 ?action=... 은 JS에서 붙입니다.
    *************************************************/
   const BASE_URL =
-"https://script.google.com/macros/s/AKfycbw6CX8h-SpxKYyakhYkjGqo9iz4PSN-LzZz2pkSD2UtxrDeYbGstDoi8D5gOnScgy61/exec";
+    "https://script.google.com/macros/s/AKfycbxm1O5Ff9GC-q9MCRZAfGQucqtKyjAMsaNY0uU2ijhruta10ZdmOm2a9V5FOMK7LTMN/exec";
+
   let rawRows = [];
   let rawByName = {};
   let filteredRows = [];
@@ -622,6 +693,37 @@
     document
       .getElementById("memoSaveBtn")
       .addEventListener("click", saveMemo);
+
+    // 모바일 플로팅 버튼
+    document
+      .getElementById("mobileListBtn")
+      .addEventListener("click", () => {
+        toggleMobilePanel("list");
+      });
+
+    document
+      .getElementById("mobileDashboardBtn")
+      .addEventListener("click", () => {
+        toggleMobilePanel("dashboard");
+      });
+  }
+
+  /**************** 모바일 Drawer 토글 ****************/
+  function toggleMobilePanel(which) {
+    if (window.innerWidth > 1024) return; // PC에서는 무시
+
+    const storePanel = document.getElementById("storePanel");
+    const dashboardPanel = document.getElementById("dashboardPanel");
+
+    if (which === "list") {
+      const isOpen = storePanel.classList.contains("open");
+      storePanel.classList.toggle("open", !isOpen);
+      dashboardPanel.classList.remove("open");
+    } else if (which === "dashboard") {
+      const isOpen = dashboardPanel.classList.contains("open");
+      dashboardPanel.classList.toggle("open", !isOpen);
+      storePanel.classList.remove("open");
+    }
   }
 
   /**************** 데이터 로드 ****************/
@@ -732,7 +834,7 @@
   function sortStores(rows, mode) {
     const list = [...rows];
     list.sort((a, b) => {
-      // 즐겨찾기 우선
+      // 즐겨찾기 우선 + 상태 + 이름
       if (mode === "default") {
         if (a.favorite !== b.favorite) {
           return a.favorite ? -1 : 1;
@@ -887,6 +989,14 @@
     showStoreDetail(store);
     setStatusDropdown(store);
     loadHistory(store.name);
+
+    // 모바일에서는 상세정보 Drawer(대시보드 패널) 자동 오픈
+    if (window.innerWidth <= 1024) {
+      const storePanel = document.getElementById("storePanel");
+      const dashboardPanel = document.getElementById("dashboardPanel");
+      storePanel.classList.remove("open");
+      dashboardPanel.classList.add("open");
+    }
   }
 
   /**************** 상세정보 표시 ****************/

@@ -15,312 +15,691 @@
 <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 
 <style>
-    body {
-        margin: 0;
-        font-family: 'Apple SD Gothic Neo', sans-serif;
-        overflow: hidden;
-        background: #f8f9fb;
-    }
+  :root {
+    --bg: #f4f6fb;
+    --card-bg: #ffffff;
+    --border: #e3e5ee;
+    --text-main: #222;
+    --text-sub: #666;
+  }
 
-    /* 상단 필터 영역 */
-    .top-bar {
-        width: 100%;
-        padding: 10px;
-        display: flex;
-        gap: 10px;
-        background: #ffffff;
-        border-bottom: 1px solid #eee;
-        position: fixed;
-        top: 0;
-        z-index: 999;
-    }
+  * { box-sizing: border-box; }
 
-    .top-bar input,
-    .top-bar select {
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 14px;
-    }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+      "맑은 고딕", system-ui, sans-serif;
+    background: var(--bg);
+    overflow: hidden;
+  }
 
-    /* 전체 레이아웃 */
+  /* 상단 필터바 */
+  .top-bar {
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 8px 12px;
+    display: flex;
+    gap: 8px;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .top-bar input,
+  .top-bar select {
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    font-size: 13px;
+    outline: none;
+  }
+
+  .top-bar input {
+    flex: 1.6;
+  }
+
+  .top-bar select {
+    flex: 0.7;
+  }
+
+  /* 메인 레이아웃 */
+  .layout {
+    display: flex;
+    height: 100vh;
+    padding-top: 52px; /* top-bar 높이 */
+  }
+
+  /* 좌측 리스트 */
+  .sidebar {
+    width: 340px;
+    min-width: 260px;
+    max-width: 420px;
+    background: #fff;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 10px 0;
+  }
+
+  .sidebar-header {
+    padding: 4px 16px 8px;
+    font-size: 13px;
+    color: var(--text-sub);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .store-item {
+    padding: 10px 16px;
+    border-bottom: 1px solid #f1f1f1;
+    cursor: pointer;
+  }
+
+  .store-item:hover {
+    background: #f5f7ff;
+  }
+
+  .store-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 2px;
+  }
+
+  .store-address {
+    font-size: 12px;
+    color: var(--text-sub);
+    margin-bottom: 2px;
+  }
+
+  .store-meta {
+    font-size: 11px;
+    color: var(--text-sub);
+  }
+
+  .store-url {
+    font-size: 11px;
+    color: #2563eb;
+    text-decoration: none;
+  }
+
+  /* 지도 */
+  #map {
+    flex: 1;
+    height: 100%;
+    position: relative;
+  }
+
+  /* 우측 대시보드 */
+  .dashboard {
+    width: 280px;
+    background: #fff;
+    border-left: 1px solid var(--border);
+    padding: 10px 14px;
+    overflow-y: auto;
+    transition: width 0.25s ease, padding 0.25s ease;
+  }
+
+  .dashboard.hidden {
+    width: 0;
+    padding: 0;
+    border-left: none;
+  }
+
+  .dash-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .dash-card {
+    padding: 7px 9px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #edf2ff;
+    font-size: 12px;
+  }
+
+  .dash-label {
+    color: var(--text-sub);
+    margin-bottom: 2px;
+  }
+
+  .dash-value {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* 대시보드 토글 버튼 */
+  .toggle-btn {
+    position: fixed;
+    top: 60px;
+    right: 290px;
+    z-index: 1100;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #fff;
+    cursor: pointer;
+  }
+
+  .dashboard.hidden + .toggle-btn {
+    right: 10px;
+  }
+
+  /* 상태 pill */
+  .status-pill {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    color: #fff;
+  }
+
+  .s-request { background: #facc15; }   /* 미팅 요청 (노랑) */
+  .s-miss   { background: #9ca3af; }   /* 부재중/미응답 (회색) */
+  .s-deny   { background: #ef4444; }   /* 거절 (빨강) */
+  .s-done   { background: #3b82f6; }   /* 미팅 완료 (파랑) */
+  .s-win    { background: #22c55e; }   /* 거래 성사 (초록) */
+
+  /* 하단 상세 바텀 시트 */
+  .detail-panel {
+    position: fixed;
+    left: 340px;
+    right: 280px;
+    bottom: 0;
+    background: #ffffff;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.15);
+    padding: 10px 14px;
+    font-size: 12px;
+    max-height: 160px;
+    transform: translateY(100%);
+    transition: transform 0.25s ease;
+    z-index: 1050;
+  }
+
+  .detail-panel.open {
+    transform: translateY(0);
+  }
+
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  .detail-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .detail-close {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .detail-row {
+    margin-bottom: 2px;
+  }
+
+  .detail-label {
+    color: var(--text-sub);
+    margin-right: 4px;
+  }
+
+  /* 모바일 대응 */
+  @media (max-width: 1024px) {
     .layout {
-        display: flex;
-        height: 100vh;
-        padding-top: 60px;
+      flex-direction: column;
     }
-
-    /* 좌측 사이드바 */
     .sidebar {
-        width: 360px;
-        background: #ffffff;
-        border-right: 1px solid #eee;
-        overflow-y: auto;
-        padding: 15px;
+      width: 100%;
+      max-width: 100%;
+      height: 35vh;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
     }
-
-    .store-item {
-        padding: 12px 10px;
-        border-bottom: 1px solid #efefef;
-        cursor: pointer;
-    }
-
-    .store-item:hover {
-        background: #f1f5ff;
-    }
-
-    .store-title { font-weight: bold; font-size: 15px; margin-bottom: 3px; }
-    .store-address { font-size: 13px; color: #666; }
-    .store-url { font-size: 13px; color: #0066ff; }
-
-    /* 지도 */
     #map {
-        flex: 1;
-        height: 100%;
-        position: relative;
+      height: calc(65vh - 120px);
     }
-
-    /* 우측 대시보드 */
     .dashboard {
-        width: 320px;
-        background: #ffffff;
-        border-left: 1px solid #eee;
-        padding: 15px;
-        overflow-y: auto;
-        transition: 0.3s ease;
+      position: fixed;
+      right: 0;
+      top: 52px;
+      bottom: 0;
+      width: 260px;
+      border-left: 1px solid var(--border);
+      border-top: none;
     }
-
-    /* 접힘 */
-    .dashboard.hidden {
-        width: 0;
-        padding: 0;
-        border: none;
-        overflow: hidden;
+    .detail-panel {
+      left: 0;
+      right: 0;
     }
-
     .toggle-btn {
-        position: absolute;
-        right: 330px;
-        top: 80px;
-        z-index: 999;
-        background: #fff;
-        border: 1px solid #ccc;
-        padding: 6px 10px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 12px;
+      top: 56px;
     }
-
-    /* 상태 색상 */
-    .status-pill {
-        display: inline-block;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: 12px;
-        color: #fff;
-    }
-
-    .s-요청 { background: #f8c200; }
-    .s-미응답 { background: #7d7d7d; }
-    .s-거절 { background: #e63946; }
-    .s-완료 { background: #007bff; }
-    .s-성사 { background: #3cb44b; }
+  }
 </style>
 </head>
-
 <body>
 
 <!-- 상단 필터 -->
 <div class="top-bar">
-    <input id="searchInput" placeholder="매장명 / 지번 / 키워드 검색" />
-    <select id="categoryFilter">
-        <option value="">전체 카테고리</option>
-    </select>
-    <select id="statusFilter">
-        <option value="">전체 상태</option>
-        <option value="미팅 요청">미팅 요청</option>
-        <option value="부재중/미응답">부재중/미응답</option>
-        <option value="거절">거절</option>
-        <option value="미팅 완료">미팅 완료</option>
-        <option value="거래 성사">거래 성사</option>
-    </select>
+  <input id="searchInput" placeholder="매장명 / 지번 / 키워드 검색" />
+  <select id="categoryFilter">
+    <option value="">전체 카테고리</option>
+  </select>
+  <select id="statusFilter">
+    <option value="">전체 상태</option>
+    <option value="미팅 요청">미팅 요청</option>
+    <option value="부재중/미응답">부재중/미응답</option>
+    <option value="거절">거절</option>
+    <option value="미팅 완료">미팅 완료</option>
+    <option value="거래 성사">거래 성사</option>
+  </select>
 </div>
 
 <div class="layout">
-    <!-- 왼쪽 매장 리스트 -->
-    <div class="sidebar" id="storeList"></div>
-
-    <!-- 지도 -->
-    <div id="map"></div>
-
-    <!-- 우측 대시보드 -->
-    <div class="dashboard" id="dashboard">
-        <h3>📊 대시보드</h3>
-        <div id="dashContent"></div>
+  <!-- 좌측 매장 리스트 -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <span>⭐ 매장 리스트</span>
+      <span id="listCount" style="float:right;">0개</span>
     </div>
+    <div id="storeList"></div>
+  </div>
 
-    <button class="toggle-btn" onclick="toggleDashboard()">대시보드 접기</button>
+  <!-- 지도 -->
+  <div id="map"></div>
+
+  <!-- 우측 대시보드 -->
+  <div class="dashboard" id="dashboard">
+    <div class="dash-title">📊 대시보드</div>
+    <div class="dash-grid">
+      <div class="dash-card">
+        <div class="dash-label">총 매장 수</div>
+        <div class="dash-value" id="dashTotal">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">거래 성사</div>
+        <div class="dash-value" id="dashWin">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">미팅 완료</div>
+        <div class="dash-value" id="dashDone">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">미팅 요청</div>
+        <div class="dash-value" id="dashRequest">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">부재중/미응답</div>
+        <div class="dash-value" id="dashMiss">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">거절</div>
+        <div class="dash-value" id="dashDeny">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 토글 버튼 -->
+  <button class="toggle-btn" id="dashToggleBtn" onclick="toggleDashboard()">대시보드 접기</button>
+</div>
+
+<!-- 하단 상세 패널 -->
+<div class="detail-panel" id="detailPanel">
+  <div class="detail-header">
+    <div class="detail-title" id="detailTitle">매장 상세정보</div>
+    <button class="detail-close" onclick="closeDetail()">&times;</button>
+  </div>
+  <div id="detailBody"></div>
 </div>
 
 <script>
-/* ---------------------------------------------------------
-   1) 상태 → 색상 매칭
---------------------------------------------------------- */
-const statusColor = {
-    "미팅 요청": "#f8c200",
-    "부재중/미응답": "#7d7d7d",
-    "거절": "#e63946",
-    "미팅 완료": "#007bff",
-    "거래 성사": "#3cb44b"
-};
+  /********************************************************
+   * 1. 상수 및 색상 테이블
+   ********************************************************/
+  // ⚠️ 여기만 두영님 WebApp URL로 교체
+  const API_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjG-mfQqwp21pjDoZ8VMnnVnHvQgoeDhy8f9UjzRLE0D5Gs53CEuCJ1_EmXkbns7X28H1cZ6kxoME_EQ5_zztRsFEDfRBzlc_WTF4VNsHmPSfQ5_52TRri_zbF_PifgjBzWuoIQ2-5VBLaXyg_6g2JNsF3LAmAfG3xrr-udWMKueJlBl8Fz0ml1g1D1FQHdXvj5nL2ErLo5OtGJr6VsxPBlPvlt95V8K8EF0eyuO4_5CsfP4pvWHkf6LlCwgeuqs7mrKjHXoEwd5eZ0gPWwE9216B5XIGYVRBMnHDrnAQ3WgQEu_08&lib=MCTt9Ziml74IIgZ1LHRXuHrbiB0og-dIC"";
 
-/* ---------------------------------------------------------
-   2) 구글시트 Web App URL (여기만 본인 것으로 교체!)
---------------------------------------------------------- */
-const API_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjG-mfQqwp21pjDoZ8VMnnVnHvQgoeDhy8f9UjzRLE0D5Gs53CEuCJ1_EmXkbns7X28H1cZ6kxoME_EQ5_zztRsFEDfRBzlc_WTF4VNsHmPSfQ5_52TRri_zbF_PifgjBzWuoIQ2-5VBLaXyg_6g2JNsF3LAmAfG3xrr-udWMKueJlBl8Fz0ml1g1D1FQHdXvj5nL2ErLo5OtGJr6VsxPBlPvlt95V8K8EF0eyuO4_5CsfP4pvWHkf6LlCwgeuqs7mrKjHXoEwd5eZ0gPWwE9216B5XIGYVRBMnHDrnAQ3WgQEu_08&lib=MCTt9Ziml74IIgZ1LHRXuHrbiB0og-dIC";
+  // 상태 → 색상
+  const STATUS_COLORS = {
+    "미팅 요청": "#facc15",
+    "부재중/미응답": "#9ca3af",
+    "거절": "#ef4444",
+    "미팅 완료": "#3b82f6",
+    "거래 성사": "#22c55e"
+  };
 
-/* ---------------------------------------------------------
-   3) 지도 초기화
---------------------------------------------------------- */
-const map = L.map('map').setView([37.55, 126.98], 11);
+  // 상태 → pill 클래스
+  const STATUS_CLASS = {
+    "미팅 요청": "s-request",
+    "부재중/미응답": "s-miss",
+    "거절": "s-deny",
+    "미팅 완료": "s-done",
+    "거래 성사": "s-win"
+  };
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  /********************************************************
+   * 2. 지도 초기화
+   ********************************************************/
+  const map = L.map("map").setView([37.56, 126.97], 11);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19
-}).addTo(map);
+  }).addTo(map);
 
-let markers = L.markerClusterGroup();
-map.addLayer(markers);
+  const markerCluster = L.markerClusterGroup({
+    chunkedLoading: true,
+    spiderfyOnMaxZoom: true
+  });
+  map.addLayer(markerCluster);
 
-let allData = [];
+  let allData = [];
+  let filteredData = [];
+  let markerMap = new Map(); // name+address → marker
 
-/* ---------------------------------------------------------
-   4) 데이터 불러오기
---------------------------------------------------------- */
-async function loadData() {
-    const res = await fetch(API_URL);
-    const json = await res.json();
-    allData = json;
-
-    buildCategoryFilter();
-    render();
-}
-
-loadData();
-
-/* ---------------------------------------------------------
-   5) 카테고리 필터 자동 생성
---------------------------------------------------------- */
-function buildCategoryFilter() {
-    const catSet = [...new Set(allData.map(r => r.category))];
-    const sel = document.getElementById("categoryFilter");
-
-    catSet.forEach(c => {
-        if (c && c.trim() !== "") {
-            const opt = document.createElement("option");
-            opt.value = c;
-            opt.innerText = c;
-            sel.appendChild(opt);
-        }
-    });
-}
-
-/* ---------------------------------------------------------
-   6) 렌더링: 지도 + 리스트 + 대시보드
---------------------------------------------------------- */
-function render() {
-    const search = document.getElementById("searchInput").value.trim();
-    const cat = document.getElementById("categoryFilter").value;
-    const status = document.getElementById("statusFilter").value;
-
-    markers.clearLayers();
-    document.getElementById("storeList").innerHTML = "";
-
-    const filtered = allData.filter(r => {
-        if (search) {
-            const key = (r.name + r.keyword + r.roadAddress).toLowerCase();
-            if (!key.includes(search.toLowerCase())) return false;
-        }
-        if (cat && r.category !== cat) return false;
-        if (status && r.Status !== status) return false;
-        return true;
-    });
-
-    filtered.forEach(store => {
-        const lat = parseFloat(store.lat);
-        const lng = parseFloat(store.lng);
-        if (!lat || !lng) return;
-
-        const color = statusColor[store.Status] || "#999";
-
-        const icon = L.divIcon({
-            html: `<div style="width:14px;height:14px;background:${color};border-radius:50%;border:2px solid white;"></div>`
-        });
-
-        const marker = L.marker([lat, lng], { icon });
-        marker.bindPopup(`<b>${store.name}</b><br>${store.roadAddress}<br><a href="${store.URL}" target="_blank">바로가기</a>`);
-        markers.addLayer(marker);
-
-        // 리스트 출력
-        const li = document.createElement("div");
-        li.className = "store-item";
-        li.innerHTML = `
-            <div class="store-title">${store.name}</div>
-            <div class="store-address">${store.roadAddress}</div>
-            <a class="store-url" href="${store.URL}" target="_blank">바로가기</a>
-        `;
-        li.onclick = () => {
-            map.setView([lat, lng], 17);
-            marker.openPopup();
-        };
-        document.getElementById("storeList").appendChild(li);
-    });
-
-    updateDashboard(filtered);
-}
-
-/* ---------------------------------------------------------
-   7) 대시보드 업데이트
---------------------------------------------------------- */
-function updateDashboard(list) {
-    const total = list.length;
-    const 성사 = list.filter(r => r.Status === "거래 성사").length;
-    const 완료 = list.filter(r => r.Status === "미팅 완료").length;
-    const 요청 = list.filter(r => r.Status === "미팅 요청").length;
-    const 미응답 = list.filter(r => r.Status === "부재중/미응답").length;
-    const 거절 = list.filter(r => r.Status === "거절").length;
-
-    document.getElementById("dashContent").innerHTML = `
-        <p>총 매장 수: <b>${total}</b></p>
-        <p>거래 성사: ${성사}</p>
-        <p>미팅 완료: ${완료}</p>
-        <p>미팅 요청: ${요청}</p>
-        <p>부재중/미응답: ${미응답}</p>
-        <p>거절: ${거절}</p>
-    `;
-}
-
-/* ---------------------------------------------------------
-   8) 대시보드 토글
---------------------------------------------------------- */
-function toggleDashboard() {
-    const d = document.getElementById("dashboard");
-    const btn = document.querySelector(".toggle-btn");
-
-    if (d.classList.contains("hidden")) {
-        d.classList.remove("hidden");
-        btn.innerText = "대시보드 접기";
-    } else {
-        d.classList.add("hidden");
-        btn.innerText = "대시보드 열기";
+  /********************************************************
+   * 3. WebApp에서 데이터 로드
+   ********************************************************/
+  async function loadData() {
+    try {
+      const res = await fetch(API_URL);
+      const json = await res.json();
+      allData = json || [];
+      buildCategoryFilter();
+      renderAll();
+    } catch (e) {
+      console.error("데이터 로드 오류:", e);
+      alert("데이터를 불러오지 못했습니다. (콘솔 확인)");
     }
-}
+  }
 
-/* ---------------------------------------------------------
-   9) 필터 이벤트
---------------------------------------------------------- */
-document.getElementById("searchInput").addEventListener("input", render);
-document.getElementById("categoryFilter").addEventListener("change", render);
-document.getElementById("statusFilter").addEventListener("change", render);
+  loadData();
+
+  /********************************************************
+   * 4. 카테고리 필터: 대분류만 (예: '음식점>양식' → '음식점')
+   ********************************************************/
+  function getCategoryGroup(row) {
+    const cat = row.category || "";
+    if (!cat) return "";
+    // '음식점>양식' 형태라면 맨 앞만 사용
+    return cat.split(">")[0].trim();
+  }
+
+  function buildCategoryFilter() {
+    const set = new Set();
+    allData.forEach(r => {
+      const g = getCategoryGroup(r);
+      if (g) set.add(g);
+    });
+
+    const sel = document.getElementById("categoryFilter");
+    [...set].sort().forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      sel.appendChild(opt);
+    });
+  }
+
+  /********************************************************
+   * 5. Status 키 자동 인식 (예방용)
+   ********************************************************/
+  function getStatus(row) {
+    // 기본: 정확히 'Status' 키 사용
+    if (row.Status !== undefined && row.Status !== null) return String(row.Status).trim();
+
+    // 혹시라도 키가 다른 경우 방어 코드
+    const keys = Object.keys(row);
+    const foundKey = keys.find(k =>
+      k.toLowerCase().replace(/\s+/g, "") === "status"
+    );
+    if (foundKey) return String(row[foundKey]).trim();
+
+    return "";
+  }
+
+  /********************************************************
+   * 6. 렌더링 전체 (지도 + 리스트 + 대시보드)
+   ********************************************************/
+  function renderAll() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const cat = document.getElementById("categoryFilter").value;
+    const statusFilter = document.getElementById("statusFilter").value;
+
+    markerCluster.clearLayers();
+    markerMap.clear();
+
+    // 필터링
+    filteredData = allData.filter(row => {
+      const name = (row.name || "").toLowerCase();
+      const keyword = (row.keyword || "").toLowerCase();
+      const addr = (row.roadAddress || "").toLowerCase();
+      const categoryGroup = getCategoryGroup(row);
+      const status = getStatus(row);
+
+      if (q) {
+        if (!name.includes(q) && !keyword.includes(q) && !addr.includes(q)) {
+          return false;
+        }
+      }
+      if (cat && categoryGroup !== cat) return false;
+      if (statusFilter && status !== statusFilter) return false;
+      return true;
+    });
+
+    renderList();
+    renderMarkers();
+    updateDashboard();
+  }
+
+  /********************************************************
+   * 7. 리스트 렌더링 (좌측)
+   ********************************************************/
+  function renderList() {
+    const box = document.getElementById("storeList");
+    box.innerHTML = "";
+    const frag = document.createDocumentFragment();
+
+    filteredData.forEach(row => {
+      const status = getStatus(row);
+
+      const div = document.createElement("div");
+      div.className = "store-item";
+
+      const catText = row.category || "";
+      const callDate = row.Call_date || "";
+      const manager = row["Manager(Call)"] || "";
+
+      div.innerHTML = `
+        <div class="store-title">${row.name || "이름 없음"}</div>
+        <div class="store-address">${row.roadAddress || ""}</div>
+        <div class="store-meta">
+          ${catText ? `카테고리: ${catText} · ` : ""}
+          ${manager ? `담당: ${manager} · ` : ""}
+          ${callDate ? `콜일: ${callDate}` : ""}
+        </div>
+        <a class="store-url" href="${row.URL || "#"}" target="_blank">바로가기</a>
+      `;
+
+      div.addEventListener("click", () => {
+        focusStore(row);
+      });
+
+      frag.appendChild(div);
+    });
+
+    box.appendChild(frag);
+    document.getElementById("listCount").textContent = filteredData.length + "개";
+  }
+
+  /********************************************************
+   * 8. 마커 렌더링 + 클러스터
+   ********************************************************/
+  function renderMarkers() {
+    filteredData.forEach(row => {
+      const lat = parseFloat(row.lat);
+      const lng = parseFloat(row.lng);
+      if (!lat || !lng) return;
+
+      const status = getStatus(row);
+      const color = STATUS_COLORS[status] || "#6b7280";
+
+      const icon = L.divIcon({
+        html: `<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid #fff;"></div>`,
+        className: ""
+      });
+
+      const marker = L.marker([lat, lng], { icon });
+
+      marker.bindPopup(`
+        <b>${row.name || "매장"}</b><br/>
+        ${row.roadAddress || ""}<br/>
+        ${status ? `<span style="display:inline-block;margin-top:2px;padding:2px 6px;border-radius:10px;font-size:11px;color:#fff;background:${color};">${status}</span><br/>` : ""}
+        ${row.URL ? `<a href="${row.URL}" target="_blank">바로가기</a>` : ""}
+      `);
+
+      marker.on("click", () => openDetail(row));
+
+      const key = (row.name || "") + "|" + (row.roadAddress || "");
+      markerMap.set(key, marker);
+
+      markerCluster.addLayer(marker);
+    });
+
+    if (filteredData.length > 0) {
+      const first = filteredData[0];
+      const lat = parseFloat(first.lat);
+      const lng = parseFloat(first.lng);
+      if (lat && lng) map.setView([lat, lng], 12);
+    }
+  }
+
+  /********************************************************
+   * 9. 특정 매장 포커스 (리스트 클릭 시)
+   ********************************************************/
+  function focusStore(row) {
+    const lat = parseFloat(row.lat);
+    const lng = parseFloat(row.lng);
+    if (!lat || !lng) return;
+
+    const key = (row.name || "") + "|" + (row.roadAddress || "");
+    const marker = markerMap.get(key);
+
+    map.setView([lat, lng], 16);
+    if (marker) marker.openPopup();
+    openDetail(row);
+  }
+
+  /********************************************************
+   * 10. 대시보드 업데이트 (상태값 카운트)
+   ********************************************************/
+  function updateDashboard() {
+    const total = filteredData.length;
+
+    let win = 0, done = 0, req = 0, miss = 0, deny = 0;
+
+    filteredData.forEach(r => {
+      const s = getStatus(r);
+      if (s === "거래 성사") win++;
+      else if (s === "미팅 완료") done++;
+      else if (s === "미팅 요청") req++;
+      else if (s === "부재중/미응답") miss++;
+      else if (s === "거절") deny++;
+    });
+
+    document.getElementById("dashTotal").textContent = total;
+    document.getElementById("dashWin").textContent = win;
+    document.getElementById("dashDone").textContent = done;
+    document.getElementById("dashRequest").textContent = req;
+    document.getElementById("dashMiss").textContent = miss;
+    document.getElementById("dashDeny").textContent = deny;
+  }
+
+  /********************************************************
+   * 11. 상세 패널 (하단 바텀시트)
+   ********************************************************/
+  function openDetail(row) {
+    const panel = document.getElementById("detailPanel");
+    const body = document.getElementById("detailBody");
+    const title = document.getElementById("detailTitle");
+
+    const status = getStatus(row);
+    const statusClass = STATUS_CLASS[status] || "";
+    const statusHtml = status
+      ? `<span class="status-pill ${statusClass}">${status}</span>`
+      : "";
+
+    title.textContent = row.name || "매장 상세정보";
+
+    body.innerHTML = `
+      <div class="detail-row">
+        ${statusHtml}
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">주소</span>${row.roadAddress || ""}
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">카테고리</span>${row.category || ""}
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">담당(Call)</span>${row["Manager(Call)"] || ""} 
+        &nbsp; · &nbsp;
+        <span class="detail-label">담당(Sales)</span>${row["Manager(Sales)"] || ""}
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">콜일</span>${row.Call_date || ""} 
+        &nbsp; · &nbsp;
+        <span class="detail-label">완료일</span>${row.Completed_Meeting_Date || ""}
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">비고</span>${row.Notes || ""}
+      </div>
+      ${row.URL ? `<div class="detail-row"><a href="${row.URL}" target="_blank">네이버 바로가기</a></div>` : ""}
+    `;
+
+    panel.classList.add("open");
+  }
+
+  function closeDetail() {
+    document.getElementById("detailPanel").classList.remove("open");
+  }
+
+  /********************************************************
+   * 12. 대시보드 토글
+   ********************************************************/
+  function toggleDashboard() {
+    const dash = document.getElementById("dashboard");
+    const btn = document.getElementById("dashToggleBtn");
+    dash.classList.toggle("hidden");
+    btn.textContent = dash.classList.contains("hidden") ? "대시보드 열기" : "대시보드 접기";
+  }
+
+  /********************************************************
+   * 13. 필터 이벤트
+   ********************************************************/
+  document.getElementById("searchInput").addEventListener("input", () => {
+    renderAll();
+  });
+  document.getElementById("categoryFilter").addEventListener("change", () => {
+    renderAll();
+  });
+  document.getElementById("statusFilter").addEventListener("change", () => {
+    renderAll();
+  });
 </script>
 </body>
 </html>

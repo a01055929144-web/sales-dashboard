@@ -1164,52 +1164,72 @@
     select.value = store?.Status || "";
   }
 
-  /**************** 상태 변경 저장 ****************/
-  function saveStatus() {
-    if (!selectedStoreName) {
-      alert("먼저 매장을 선택해주세요.");
-      return;
-    }
-    const newStatus =
-      document.getElementById("statusChangeSelect").value;
-    if (!newStatus) {
-      alert("변경할 상태를 선택해주세요.");
-      return;
-    }
-
-    const row = rawByName[selectedStoreName];
-    if (!row) return;
-
-    row.Status = newStatus;
-
-    // 필터/통계/마커 리렌더링
-    applyFilters();
-
-    // Apps Script 업데이트 (단순 GET)
-    const url = `${BASE_URL}?action=updateStatus&name=${encodeURIComponent(
-      selectedStoreName
-    )}&status=${encodeURIComponent(newStatus)}`;
-    fetch(url).catch(e =>
-      console.error("상태 업데이트 오류:", e)
-    );
+ /**************** 상태 변경 저장 + 자동 히스토리 기록 ****************/
+function saveStatus() {
+  if (!selectedStoreName) {
+    alert("먼저 매장을 선택해주세요.");
+    return;
   }
 
-  /**************** 즐겨찾기 토글 ****************/
-  function toggleFavorite(store) {
-    store.favorite = !store.favorite;
-    const raw = rawByName[store.name];
-    if (raw) raw.favorite = store.favorite;
-
-    // 다시 정렬 & 렌더링
-    applyFilters();
-
-    const url = `${BASE_URL}?action=favorite&name=${encodeURIComponent(
-      store.name
-    )}&fav=${store.favorite ? "TRUE" : "FALSE"}`;
-    fetch(url).catch(e =>
-      console.error("즐겨찾기 저장 오류:", e)
-    );
+  // 담당자 필수 체크
+  const manager = document.getElementById("managerInput").value.trim();
+  if (!manager) {
+    alert("담당자를 먼저 선택해주세요.");
+    return;
   }
+
+  const newStatus = document.getElementById("statusChangeSelect").value;
+  if (!newStatus) {
+    alert("변경할 상태를 선택해주세요.");
+    return;
+  }
+
+  const row = rawByName[selectedStoreName];
+  if (!row) return;
+
+  row.Status = newStatus;
+
+  // 화면 전체 업데이트
+  applyFilters();
+
+  /* 🔵 1) 히스토리 UI에 즉시 추가 */
+  const now = new Date().toLocaleString("ko-KR");
+  const memoText = `상태를 '${newStatus}'로 변경했습니다.`;
+
+  const listEl = document.getElementById("historyList");
+  const newItem = `
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-date">${now}</div>
+      <div class="timeline-card">
+        <div class="timeline-manager">${manager}</div>
+        <div class="timeline-memo">${memoText}</div>
+      </div>
+    </div>`;
+  listEl.insertAdjacentHTML("afterbegin", newItem);
+
+  /* 🔵 2) 상태 업데이트 저장 */
+  const url1 =
+    `${BASE_URL}?action=updateStatus` +
+    `&name=${encodeURIComponent(selectedStoreName)}` +
+    `&status=${encodeURIComponent(newStatus)}` +
+    `&manager=${encodeURIComponent(manager)}`;
+
+  fetch(url1).catch(e =>
+    console.error("상태 업데이트 오류:", e)
+  );
+
+  /* 🔵 3) 히스토리 저장 */
+  const url2 =
+    `${BASE_URL}?action=addMemo` +
+    `&name=${encodeURIComponent(selectedStoreName)}` +
+    `&memo=${encodeURIComponent(memoText)}` +
+    `&manager=${encodeURIComponent(manager)}`;
+
+  fetch(url2).catch(e =>
+    console.error("상태 변경 히스토리 저장 오류:", e)
+  );
+}
 
  /**************** 히스토리 불러오기 (타임라인 + 최신순 정렬) ****************/
 function loadHistory(storeName) {

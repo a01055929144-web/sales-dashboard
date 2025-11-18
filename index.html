@@ -287,24 +287,40 @@
       margin-bottom: 6px;
     }
 
-    .primary-btn,
-    .secondary-btn {
-      border-radius: 999px;
-      border: none;
-      padding: 6px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      margin-top: 6px;
-    }
-    .primary-btn {
-      background: #2563eb;
-      color: #ffffff;
-    }
-    .primary-btn:hover { background: #1d4ed8; }
-    .secondary-btn {
-      background: #e5e7eb;
-      color: #111827;
-    }
+  .primary-btn,
+.secondary-btn {
+  border-radius: 999px;
+  border: none;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+/* 🔥 강화된 primary 버튼 */
+.primary-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 12px;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  transition: all 0.18s ease-out;
+}
+
+.primary-btn:hover {
+  background: linear-gradient(135deg, #1e40af, #1e3a8a);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(30, 64, 175, 0.45);
+}
+
+.secondary-btn {
+  background: #e5e7eb;
+  color: #111827;
+}
+
     .secondary-btn:hover { background: #d1d5db; }
 
     .history-section {

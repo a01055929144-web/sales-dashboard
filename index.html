@@ -41,6 +41,25 @@
     }
     header h1 { margin: 0; font-size: 18px; font-weight: 700; }
 
+    .header-controls {
+      flex: 1;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .search-input,
+    .select-input {
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      padding: 6px 12px;
+      font-size: 13px;
+      outline: none;
+      background: #f9fafb;
+    }
+    .search-input { flex: 1; min-width: 120px; }
+    .select-input { min-width: 120px; }
+
     .required-text {
       color: #dc2626;
       font-weight: 700;
@@ -68,7 +87,7 @@
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
       transition: all .18s ease-out;
     }
-    .primary-btn:hover {
+    .primary-btn:hover:not(:disabled) {
       background: linear-gradient(135deg, #1e40af, #1e3a8a);
       transform: translateY(-2px);
       box-shadow: 0 6px 14px rgba(30, 64, 175, 0.45);
@@ -99,15 +118,204 @@
       overflow-y: auto;
     }
 
+    .store-panel { border-right: 1px solid #e5e7eb; }
+    .dashboard-panel { border-left: 1px solid #e5e7eb; }
+
     #map { width: 100%; height: 100%; }
+
+    /***********************************************
+     * STORE LIST
+     ***********************************************/
+    .store-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .store-list-header h2 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .store-count {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .store-sort-row {
+      margin-bottom: 8px;
+    }
+
+    .store-item {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: 0.15s;
+      background: #ffffff;
+    }
+    .store-item:hover {
+      background: #f9fafb;
+      border-color: #e5e7ff;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.12);
+    }
+
+    .store-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .store-name {
+      font-size: 13px;
+      font-weight: 700;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fav-icon {
+      cursor: pointer;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .store-meta-line {
+      display: flex;
+      gap: 6px;
+      font-size: 11px;
+      color: #6b7280;
+      margin-bottom: 3px;
+    }
+    .store-meta-address {
+      font-size: 11px;
+      color: #374151;
+    }
+
+    .status-badge {
+      padding: 2px 6px;
+      background: #eef2ff;
+      border-radius: 999px;
+      font-size: 11px;
+      color: #4f46e5;
+      font-weight: 600;
+    }
+
+    /***********************************************
+     * DASHBOARD
+     ***********************************************/
+    .dashboard-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .chart-wrapper {
+      padding: 10px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .stat-card {
+      background: #ffffff;
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: #6b7280;
+      margin-bottom: 2px;
+    }
+    .stat-value {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .stat-sub {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .detail-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #f9fafb;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .detail-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .detail-name {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .info-item {
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .info-item span {
+      display: inline-block;
+      width: 55px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .status-change-box {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #fafafa;
+    }
+    .status-change-header {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
 
     /***********************************************
      * HISTORY TIMELINE
      ***********************************************/
+    .history-section {
+      margin-top: 10px;
+    }
+    .history-header{
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .history-empty {
+      font-size: 12px;
+      color: #9ca3af;
+      padding: 6px;
+    }
+    .history-list {
+      font-size: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #f9fafb;
+      padding: 6px;
+      max-height: 160px;
+      overflow-y: auto;
+      margin-bottom: 6px;
+    }
+
     .timeline-item {
       position: relative;
       padding-left: 18px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .timeline-dot {
       width: 9px;
@@ -142,46 +350,22 @@
       white-space: pre-wrap;
     }
 
-    /***********************************************
-     * STORE LIST UI
-     ***********************************************/
-    .store-item {
-      border-bottom: 1px solid #e5e7eb;
-      padding: 10px 6px;
-      cursor: pointer;
-    }
-    .store-item:hover {
-      background: #f9fafb;
-    }
-    .store-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .store-name {
-      font-size: 13px;
-      font-weight: 700;
-    }
-    .store-meta-line {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      margin-top: 4px;
-      color: #6b7280;
-    }
-    .store-meta-address {
-      font-size: 11px;
-      color: #6b7280;
-      margin-top: 4px;
+    textarea#memoInput {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px;
+      width: 100%;
+      min-height: 48px;
+      font-size: 12px;
+      resize: vertical;
     }
 
-    .status-badge {
-      background: #eef2ff;
-      padding: 2px 6px;
-      border-radius: 6px;
-      font-size: 10px;
-      color: #3730a3;
-      font-weight: 600;
+    /***********************************************
+     * MARKER DOT
+     ***********************************************/
+    .marker-dot {
+      border-radius: 999px;
+      border: 2px solid #ffffff;
     }
 
   </style>
@@ -192,7 +376,7 @@
 <header>
   <h1>📍 Sales Store Map</h1>
 
-  <div class="header-controls" style="flex:1; display:flex; gap:8px;">
+  <div class="header-controls">
     <select id="statusFilterSelect" class="select-input">
       <option value="ALL">전체 상태</option>
     </select>
@@ -205,145 +389,143 @@
       <option value="ALL">전체 지역</option>
     </select>
 
-    <input id="searchInput" class="search-input" placeholder="검색어 입력" />
+    <input id="searchInput" class="search-input" placeholder="매장명 / 주소 / 키워드" />
   </div>
 </header>
 
 <div class="layout">
-<!-- ▼▼▼ 매장 리스트 스타일 ▼▼▼ -->
-<style>
-  .store-panel {
-    background:#fff;
-    border-right:1px solid #e5e7eb;
-    overflow-y:auto;
-  }
+  <!-- 좌측 패널: 매장 리스트 -->
+  <aside class="store-panel" id="storePanel">
+    <div class="store-list-header">
+      <h2>⭐ 매장 리스트</h2>
+      <span class="store-count" id="storeCountLabel">0개</span>
+    </div>
 
-  .store-item {
-    padding:10px;
-    border-bottom:1px solid #f3f4f6;
-    cursor:pointer;
-    transition:0.15s;
-  }
-  .store-item:hover {
-    background:#f9fafb;
-  }
+    <div class="store-sort-row">
+      <select id="sortSelect" class="select-input" style="width:100%;">
+        <option value="default">즐겨찾기 ▷ 상태 ▷ 이름</option>
+        <option value="name">이름순 (가나다)</option>
+        <option value="blog">블로그 많은순</option>
+      </select>
+    </div>
 
-  .store-header {
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:14px;
-    font-weight:700;
-    margin-bottom:4px;
-  }
+    <ul id="storeList" class="store-list" style="list-style:none; padding:0; margin:0;"></ul>
+  </aside>
 
-  .fav-icon {
-    cursor:pointer;
-    font-size:16px;
-  }
+  <!-- 가운데: 지도 -->
+  <main>
+    <div id="map"></div>
+  </main>
 
-  .store-meta-line {
-    display:flex;
-    gap:6px;
-    font-size:12px;
-    color:#6b7280;
-    margin-bottom:3px;
-  }
+  <!-- 우측 패널: 상세정보 + 대시보드 -->
+  <aside class="dashboard-panel" id="dashboardPanel">
+    <div class="dashboard-title">📊 대시보드</div>
 
-  .status-badge {
-    padding:2px 6px;
-    background:#eef2ff;
-    border-radius:6px;
-    font-size:11px;
-    color:#4f46e5;
-  }
+    <!-- 도넛 차트 -->
+    <div class="chart-wrapper">
+      <canvas id="statusChart"></canvas>
+      <div id="chartStats" style="font-size:11px; margin-top:6px; line-height:1.4;"></div>
+    </div>
 
-  .store-meta-address {
-    font-size:12px;
-    color:#374151;
-  }
-</style>
+    <!-- 숫자 카드 -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">총 매장 수</div>
+        <div class="stat-value" id="statTotal">0</div>
+      </div>
 
-<!-- ▼▼▼ 마커 스타일 ▼▼▼ -->
-<style>
-  .marker-dot {
-    border:2px solid #fff;
-    border-radius:50%;
-  }
+      <div class="stat-card">
+        <div class="stat-label">거래 성사</div>
+        <div class="stat-value" id="statDeal">0</div>
+        <div class="stat-sub" id="statDealPct"></div>
+      </div>
 
-  .marker-selected {
-    box-shadow:0 0 0 4px rgba(37,99,235,0.25);
-  }
-</style>
+      <div class="stat-card">
+        <div class="stat-label">미팅 완료</div>
+        <div class="stat-value" id="statMeetingDone">0</div>
+        <div class="stat-sub" id="statMeetingDonePct"></div>
+      </div>
 
-<!-- ▼▼▼ 대시보드 카드 스타일 ▼▼▼ -->
-<style>
-.stat-card {
-  background:#ffffff;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #e5e7eb;
-}
-.stat-label {
-  font-size:11px;
-  color:#6b7280;
-  margin-bottom:3px;
-}
-.stat-value {
-  font-size:18px;
-  font-weight:700;
-}
-.stat-sub {
-  font-size:11px;
-  color:#6b7280;
-}
-</style>
+      <div class="stat-card">
+        <div class="stat-label">미팅 요청</div>
+        <div class="stat-value" id="statRequest">0</div>
+        <div class="stat-sub" id="statRequestPct"></div>
+      </div>
 
-<!-- ▼▼▼ 매장 상세정보 ▼▼▼ -->
-<style>
-.detail-title {
-  font-size:13px;
-  font-weight:700;
-  margin-bottom:6px;
-  margin-top:12px;
-}
-.info-item {
-  font-size:12px;
-  margin-bottom:4px;
-}
-.info-item span {
-  display:inline-block;
-  width:55px;
-  font-weight:600;
-  color:#374151;
-}
-</style>
+      <div class="stat-card">
+        <div class="stat-label">부재중/미응답</div>
+        <div class="stat-value" id="statNoAnswer">0</div>
+        <div class="stat-sub" id="statNoAnswerPct"></div>
+      </div>
 
-<!-- ▼▼▼ 히스토리 ▼▼▼ -->
-<style>
-.history-section {
-  margin-top:10px;
-}
-.history-header{
-  font-size:13px;
-  font-weight:700;
-  margin-bottom:6px;
-}
-.history-empty {
-  font-size:12px;
-  color:#9ca3af;
-  padding:6px;
-}
-.history-list {
-  font-size:12px;
-}
-</style>
+      <div class="stat-card">
+        <div class="stat-label">거절</div>
+        <div class="stat-value" id="statReject">0</div>
+        <div class="stat-sub" id="statRejectPct"></div>
+      </div>
+    </div>
+
+    <!-- 상세 정보 -->
+    <div class="detail-card">
+      <div class="detail-title">🏪 매장 상세정보</div>
+      <div id="storeDetailBody" class="detail-body">
+        매장을 선택하면 상세정보가 표시됩니다.
+      </div>
+    </div>
+
+    <!-- 담당자 선택 -->
+    <div class="detail-title">
+      담당자 <span class="required-text">*필수*</span>
+    </div>
+
+    <select id="managerInput" class="select-input" style="width:100%; margin-bottom:10px;">
+      <option value="">담당자 선택</option>
+      <option value="Zero">Zero</option>
+      <option value="Grandal">Grandal</option>
+      <option value="Jose">Jose</option>
+      <option value="Aimee">Aimee</option>
+      <option value="Merry">Merry</option>
+    </select>
+
+    <!-- 상태 변경 -->
+    <div class="status-change-box">
+      <div class="status-change-header">상태 변경</div>
+
+      <select id="statusChangeSelect" class="select-input" style="width:100%;">
+        <option value="">상태 선택</option>
+        <option value="거래 성사">거래 성사</option>
+        <option value="미팅 완료">미팅 완료</option>
+        <option value="미팅 요청">미팅 요청</option>
+        <option value="부재중/미응답">부재중/미응답</option>
+        <option value="거절">거절</option>
+      </select>
+
+      <button id="statusSaveBtn" class="primary-btn" disabled>상태 변경 저장</button>
+    </div>
+
+    <!-- 히스토리 + 메모 -->
+    <div class="history-section">
+      <div class="history-header">🕒 히스토리</div>
+
+      <div id="historyList" class="history-list">
+        매장을 선택하면 히스토리가 표시됩니다.
+      </div>
+
+      <textarea id="memoInput" placeholder="메모 입력 (저장 시 일시 자동 기록)"></textarea>
+      <button id="memoSaveBtn" class="primary-btn" disabled>메모 저장</button>
+    </div>
+  </aside>
+</div>
+
+<!-- Leaflet Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 <script>
 /*************************************************
  * 🔑 Apps Script WebApp URL
  *************************************************/
-const BASE_URL = 
+const BASE_URL =
   "https://script.google.com/macros/s/AKfycbyTEpSlrv6vFRU4jwICu5ZM9z_xRBskTl5hxyjNZs1Wp1jXd1EzMEejnWGS0hHMKzWK/exec";
 
 /*************************************************
@@ -369,7 +551,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /*************************************************
- * 1) 지도 정상 초기화
+ * 1) 지도 초기화
  *************************************************/
 function initMap() {
   map = L.map("map", {
@@ -378,7 +560,6 @@ function initMap() {
     zoomControl: true
   });
 
-  // 안전한 OSM 타일
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: "&copy; OpenStreetMap"
@@ -437,7 +618,9 @@ async function loadData() {
       }));
 
     rawByName = {};
-    rawRows.forEach(r => rawByName[r.name] = r);
+    rawRows.forEach(r => {
+      if (r.name) rawByName[r.name] = r;
+    });
 
     buildFilters(rawRows);
     applyFilters();
@@ -469,7 +652,9 @@ function buildFilters(rows) {
 function fillSelect(id, label, arr) {
   const el = document.getElementById(id);
   el.innerHTML = `<option value="ALL">${label}</option>`;
-  arr.sort().forEach(v => el.insertAdjacentHTML("beforeend", `<option value="${v}">${v}</option>`));
+  arr.sort().forEach(v =>
+    el.insertAdjacentHTML("beforeend", `<option value="${v}">${v}</option>`)
+  );
 }
 
 /*************************************************
@@ -483,13 +668,15 @@ function applyFilters() {
   const sortMode = document.getElementById("sortSelect").value;
 
   filteredRows = rawRows.filter(r => {
-    const text = `${r.name} ${r.roadAddress} ${r.keyword}`.toLowerCase();
+    const text = `${r.name} ${r.sigungu} ${r.roadAddress} ${r.keyword}`.toLowerCase();
     const major = (r.category || "").split(">")[0].trim();
 
-    return (!q || text.includes(q)) &&
-      (cat === "ALL" || major === cat) &&
-      (st === "ALL" || r.Status === st) &&
-      (region === "ALL" || r.sigungu === region);
+    const matchSearch = !q || text.includes(q);
+    const matchCat = cat === "ALL" || major === cat;
+    const matchStatus = st === "ALL" || (r.Status || "") === st;
+    const matchRegion = region === "ALL" || (r.sigungu || "") === region;
+
+    return matchSearch && matchCat && matchStatus && matchRegion;
   });
 
   filteredRows = sortStores(filteredRows, sortMode);
@@ -501,13 +688,29 @@ function applyFilters() {
  * 6) 정렬
  *************************************************/
 function sortStores(list, mode) {
-  return [...list].sort((a, b) => {
-    if (mode === "name") return (a.name || "").localeCompare(b.name || "", "ko");
-    if (mode === "blog") return Number(b.blog_count || 0) - Number(a.blog_count || 0);
+  const copy = [...list];
 
-    // Default: 즐겨찾기 → 상태 → 이름
+  if (mode === "name") {
+    return copy.sort((a, b) =>
+      (a.name || "").localeCompare(b.name || "", "ko")
+    );
+  }
+
+  if (mode === "blog") {
+    return copy.sort((a, b) => {
+      const ba = Number(b.blog_count || 0);
+      const aa = Number(a.blog_count || 0);
+      if (ba !== aa) return ba - aa;
+      return (a.name || "").localeCompare(b.name || "", "ko");
+    });
+  }
+
+  // default: 즐겨찾기 → 상태 → 이름
+  return copy.sort((a, b) => {
     if (a.favorite !== b.favorite) return a.favorite ? -1 : 1;
-    if (a.Status !== b.Status) return (a.Status || "").localeCompare(b.Status || "", "ko");
+    const sa = a.Status || "";
+    const sb = b.Status || "";
+    if (sa !== sb) return sa.localeCompare(sb, "ko");
     return (a.name || "").localeCompare(b.name || "", "ko");
   });
 }
@@ -520,9 +723,7 @@ function renderAll() {
   renderStoreList();
   renderStats();
 }
-</script>
 
-  <script>
 /*************************************************
  * 8) 마커 아이콘
  *************************************************/
@@ -545,10 +746,9 @@ function createMarkerIcon(status, favorite = false, selected = false) {
       <div class="marker-dot"
            style="
               background:${color};
-              border:2px solid ${borderColor};
+              border-color:${borderColor};
               width:${size}px;
               height:${size}px;
-              border-radius:50%;
            ">
       </div>`,
     iconSize: [size + 4, size + 4],
@@ -568,12 +768,20 @@ function renderMarkers() {
       icon: createMarkerIcon(store.Status, store.favorite, store.name === selectedStoreName)
     });
 
-    marker.bindTooltip(store.name, { direction: "top", offset: [0, -8] });
+    marker.bindTooltip(store.name || "", {
+      permanent: false,
+      direction: "top",
+      offset: [0, -8]
+    });
+
     marker.on("click", () => focusOnStore(store));
 
     markerCluster.addLayer(marker);
     markersByName[store.name] = marker;
   });
+
+  document.getElementById("storeCountLabel").textContent =
+    `${filteredRows.length.toLocaleString()}개 매장`;
 
   if (filteredRows.length > 0) {
     const group = L.featureGroup(markerCluster.getLayers());
@@ -582,7 +790,7 @@ function renderMarkers() {
 }
 
 /*************************************************
- * 10) 매장 리스트 UI
+ * 10) 매장 리스트 렌더링
  *************************************************/
 function renderStoreList() {
   const listEl = document.getElementById("storeList");
@@ -597,7 +805,7 @@ function renderStoreList() {
     li.innerHTML = `
       <div class="store-header">
         <span class="fav-icon">${store.favorite ? "⭐" : "☆"}</span>
-        <div class="store-name">${store.name}</div>
+        <div class="store-name">${store.name || "매장명 없음"}</div>
       </div>
       <div class="store-meta-line">
         <span class="status-badge">${store.Status || "상태 없음"}</span>
@@ -618,12 +826,14 @@ function renderStoreList() {
 }
 
 /*************************************************
- * 11) 매장 클릭 시 상세정보 표시
+ * 11) 매장 선택
  *************************************************/
 function focusOnStore(store) {
   selectedStoreName = store.name;
 
-  map.setView([store.lat, store.lng], 17);
+  if (!isNaN(store.lat) && !isNaN(store.lng)) {
+    map.setView([store.lat, store.lng], 17);
+  }
 
   Object.keys(markersByName).forEach(name => {
     const row = rawByName[name];
@@ -642,23 +852,33 @@ function focusOnStore(store) {
  *************************************************/
 function showStoreDetail(r) {
   const box = document.getElementById("storeDetailBody");
-  const major = (r.category || "").split(">")[0];
+  if (!r) {
+    box.textContent = "매장을 선택하면 상세정보가 표시됩니다.";
+    return;
+  }
 
-  let url = r.URL || r.url;
-  if (url && !url.startsWith("http")) url = "https://" + url;
+  const major = (r.category || "").split(">")[0] || "-";
+
+  let url = r.URL || r.url || "";
+  if (url && !/^https?:\/\//i.test(url)) url = "https://" + url;
+
+  const urlHtml = url
+    ? `<a href="${url}" target="_blank" style="color:#2563eb;font-weight:600;">네이버 플레이스 열기</a>`
+    : "-";
 
   box.innerHTML = `
-    <div class="detail-name">${r.name}</div>
+    <div class="detail-name">${r.name || ""}</div>
     <div class="info-item"><span>🏠 주소</span>${r.roadAddress || "-"}</div>
     <div class="info-item"><span>📍 지역</span>${r.sigungu || "-"}</div>
     <div class="info-item"><span>🍽 업종</span>${major}</div>
     <div class="info-item"><span>⭐ 상태</span>${r.Status || "-"}</div>
-    <div class="info-item"><span>🔗 링크</span>${url ? `<a href="${url}" target="_blank">네이버 플레이스</a>` : "-"}</div>
+    <div class="info-item"><span>📝 키워드</span>${r.keyword || "-"}</div>
+    <div class="info-item"><span>🔗 링크</span>${urlHtml}</div>
   `;
 }
 
 /*************************************************
- * 13) 상태 선택 자동 반영
+ * 13) 상태 드롭다운 값 세팅
  *************************************************/
 function setStatusDropdown(store) {
   document.getElementById("statusChangeSelect").value = store?.Status || "";
@@ -670,30 +890,29 @@ function setStatusDropdown(store) {
 function saveStatus() {
   if (!selectedStoreName) return alert("매장을 먼저 선택하세요.");
 
-  const manager = document.getElementById("managerInput").value;
-  if (!manager) return alert("담당자를 선택하세요.");
+  const manager = document.getElementById("managerInput").value.trim();
+  if (!manager) return alert("담당자를 선택해주세요.");
 
   const newStatus = document.getElementById("statusChangeSelect").value;
-  if (!newStatus) return alert("상태를 선택하세요.");
+  if (!newStatus) return alert("상태를 선택해주세요.");
 
   const memoText = `상태를 '${newStatus}'로 변경했습니다.`;
   const now = new Date().toLocaleString("ko-KR");
 
-  // UI 즉시 반영
   insertHistoryUI(now, manager, memoText);
 
-  // GAS — 상태 업데이트
   fetch(`${BASE_URL}?action=updateStatus&name=${encodeURIComponent(selectedStoreName)}&status=${encodeURIComponent(newStatus)}`);
 
-  // GAS — 히스토리 기록
   fetch(`${BASE_URL}?action=addMemo&name=${encodeURIComponent(selectedStoreName)}&memo=${encodeURIComponent(memoText)}&manager=${encodeURIComponent(manager)}`);
 
-  rawByName[selectedStoreName].Status = newStatus;
+  if (rawByName[selectedStoreName]) {
+    rawByName[selectedStoreName].Status = newStatus;
+  }
   applyFilters();
 }
 
 /*************************************************
- * 15) 히스토리 로드
+ * 15) 히스토리 로딩
  *************************************************/
 function loadHistory(name) {
   const listEl = document.getElementById("historyList");
@@ -702,25 +921,26 @@ function loadHistory(name) {
   fetch(`${BASE_URL}?action=history&name=${encodeURIComponent(name)}`)
     .then(res => res.json())
     .then(items => {
-      if (!items.length) {
-        listEl.innerHTML = "히스토리가 없습니다.";
+      if (!Array.isArray(items) || items.length === 0) {
+        listEl.innerHTML = `<div class="history-empty">히스토리가 없습니다.</div>`;
         return;
       }
 
       listEl.innerHTML = items
-        .map(it => {
-          return `
-            <div class="timeline-item">
-              <div class="timeline-dot"></div>
-              <div class="timeline-date">${it.date}</div>
-              <div class="timeline-card">
-                <div class="timeline-manager">${it.manager}</div>
-                <div class="timeline-memo">${it.memo}</div>
-              </div>
+        .map(it => `
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">${it.date}</div>
+            <div class="timeline-card">
+              <div class="timeline-manager">${it.manager || "-"}</div>
+              <div class="timeline-memo">${it.memo || ""}</div>
             </div>
-          `;
-        })
+          </div>
+        `)
         .join("");
+    })
+    .catch(() => {
+      listEl.innerHTML = `<div class="history-empty">히스토리를 불러오지 못했습니다.</div>`;
     });
 }
 
@@ -729,11 +949,12 @@ function loadHistory(name) {
  *************************************************/
 function saveMemo() {
   if (!selectedStoreName) return alert("매장을 먼저 선택하세요.");
-  const manager = document.getElementById("managerInput").value;
+
+  const manager = document.getElementById("managerInput").value.trim();
   if (!manager) return alert("담당자를 먼저 선택하세요.");
 
   const memo = document.getElementById("memoInput").value.trim();
-  if (!memo) return alert("메모를 입력하세요.");
+  if (!memo) return alert("메모 내용을 입력하세요.");
 
   const now = new Date().toLocaleString("ko-KR");
 
@@ -749,7 +970,9 @@ function saveMemo() {
  *************************************************/
 function toggleFavorite(store) {
   store.favorite = !store.favorite;
-  rawByName[store.name].favorite = store.favorite;
+  if (rawByName[store.name]) {
+    rawByName[store.name].favorite = store.favorite;
+  }
   applyFilters();
 
   fetch(`${BASE_URL}?action=favorite&name=${encodeURIComponent(store.name)}&fav=${store.favorite ? "TRUE" : "FALSE"}`);
@@ -759,6 +982,8 @@ function toggleFavorite(store) {
  * 18) 담당자 자동 히스토리 기록
  *************************************************/
 function addManagerHistory(manager) {
+  if (!selectedStoreName) return;
+
   const memoText = `담당자를 ${manager}로 설정했습니다.`;
   const now = new Date().toLocaleString("ko-KR");
 
@@ -787,4 +1012,79 @@ function insertHistoryUI(date, manager, memo) {
     `
   );
 }
+
+/*************************************************
+ * 19) 통계/차트
+ *************************************************/
+function renderStats() {
+  const stats = {
+    total: filteredRows.length,
+    deal: 0,
+    meetingDone: 0,
+    request: 0,
+    noAnswer: 0,
+    reject: 0
+  };
+
+  filteredRows.forEach(r => {
+    if (r.Status === "거래 성사") stats.deal++;
+    else if (r.Status === "미팅 완료") stats.meetingDone++;
+    else if (r.Status === "미팅 요청") stats.request++;
+    else if (r.Status === "부재중/미응답") stats.noAnswer++;
+    else if (r.Status === "거절") stats.reject++;
+  });
+
+  const total = stats.total || 1;
+  const pct = v => ((v / total) * 100).toFixed(1);
+
+  document.getElementById("statTotal").textContent = stats.total.toLocaleString();
+  document.getElementById("statDeal").textContent = stats.deal.toLocaleString();
+  document.getElementById("statMeetingDone").textContent = stats.meetingDone.toLocaleString();
+  document.getElementById("statRequest").textContent = stats.request.toLocaleString();
+  document.getElementById("statNoAnswer").textContent = stats.noAnswer.toLocaleString();
+  document.getElementById("statReject").textContent = stats.reject.toLocaleString();
+
+  document.getElementById("statDealPct").textContent = `${pct(stats.deal)}%`;
+  document.getElementById("statMeetingDonePct").textContent = `${pct(stats.meetingDone)}%`;
+  document.getElementById("statRequestPct").textContent = `${pct(stats.request)}%`;
+  document.getElementById("statNoAnswerPct").textContent = `${pct(stats.noAnswer)}%`;
+  document.getElementById("statRejectPct").textContent = `${pct(stats.reject)}%`;
+
+  if (chartInstance) chartInstance.destroy();
+
+  const ctx = document.getElementById("statusChart");
+  chartInstance = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["거래 성사", "미팅 완료", "미팅 요청", "부재중/미응답", "거절"],
+      datasets: [{
+        data: [
+          stats.deal,
+          stats.meetingDone,
+          stats.request,
+          stats.noAnswer,
+          stats.reject
+        ],
+        backgroundColor: ["#2ecc71", "#3498db", "#f1c40f", "#95a5a6", "#e74c3c"]
+      }]
+    },
+    options: {
+      cutout: "65%",
+      plugins: {
+        legend: { position: "bottom" }
+      }
+    }
+  });
+
+  document.getElementById("chartStats").innerHTML = `
+    <div><b>거래 성사:</b> ${stats.deal}개 (${pct(stats.deal)}%)</div>
+    <div><b>미팅 완료:</b> ${stats.meetingDone}개 (${pct(stats.meetingDone)}%)</div>
+    <div><b>미팅 요청:</b> ${stats.request}개 (${pct(stats.request)}%)</div>
+    <div><b>부재중/미응답:</b> ${stats.noAnswer}개 (${pct(stats.noAnswer)}%)</div>
+    <div><b>거절:</b> ${stats.reject}개 (${pct(stats.reject)}%)</div>
+  `;
+}
 </script>
+
+</body>
+</html>

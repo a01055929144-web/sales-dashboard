@@ -371,8 +371,7 @@
   </style>
 <!-- ✅ 모바일 최적화 미디어 쿼리 + 매장 리스트 고정 스크롤 -->
 <style>
-@media screen and (max-width: 768px) {
-
+@media screen and (max-width: 768px) 
   /* 전체 구조 block으로 변경 */
   .layout {
     display: block;
@@ -398,7 +397,7 @@
   overflow-y: auto;     /* 패널 내부만 스크롤 */
   border-bottom: 1px solid #ddd;
   padding-bottom: 8px;
-}}
+}
 
   .store-list-header {
     position: sticky;
@@ -449,8 +448,8 @@
   position: fixed;
   bottom: 80px;
   right: 20px;
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: white;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -460,7 +459,7 @@
   justify-content: center;
   align-items: center;
 
-  font-size: 22px;
+  font-size: 26px;
   cursor: pointer;
   z-index: 9999;
 
@@ -494,9 +493,6 @@
     </select>
 
     <input id="searchInput" class="search-input" placeholder="매장명 / 주소 / 키워드" />
-    <button id="myLocationBtn" class="secondary-btn" style="min-width:70px;">
-  내 위치
-    </button>
   </div>  
 </header>
 

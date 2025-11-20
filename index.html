@@ -687,25 +687,6 @@ function initMap() {
     maxClusterRadius: 35
   });
   map.addLayer(markerCluster);
-}
-
-function initMap() {
-  map = L.map("map", {
-    center: [37.5665, 126.9780],
-    zoom: 11,
-    zoomControl: true
-  });
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: "&copy; OpenStreetMap"
-  }).addTo(map);
-
-  markerCluster = L.markerClusterGroup({
-    showCoverageOnHover: false,
-    maxClusterRadius: 35
-  });
-  map.addLayer(markerCluster);
 
   // 🔥 지도 내부에 내 위치 버튼 추가
   const locateControl = L.control({ position: 'bottomright' });
@@ -793,8 +774,6 @@ function initEvents() {
 
   document.getElementById("statusSaveBtn").addEventListener("click", saveStatus);
   document.getElementById("memoSaveBtn").addEventListener("click", saveMemo);
-  document.getElementById("myLocationBtn").addEventListener("click", moveToMyLocation);
-
 
   // 담당자 선택 → 필수값 + 자동 기록
   const managerSelect = document.getElementById("managerInput");

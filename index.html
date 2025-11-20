@@ -373,25 +373,40 @@
 <style>
 @media screen and (max-width: 768px) {
   .layout {
-    display: flex;
-    flex-direction: column;
+    display: block;
     height: auto !important;
     overflow: auto;
   }
 
   .store-panel,
   .dashboard-panel {
-    width: 100% !important;
+    width: 100%;
+    height: auto;
     max-height: none;
+    overflow: visible;
     border: none;
+    padding: 8px;
+  }
+
+  #map {
+    height: 300px !important;
+    min-height: 240px;
+    margin-bottom: 12px;
+  }
+
+  .store-item {
+    border: 1px solid #ddd;
+    margin-bottom: 8px;
   }
 
   .store-list-header {
     position: sticky;
     top: 0;
+    z-index: 5;
     background: white;
-    z-index: 10;
   }
+}
+
 
   #map {
     height: 320px !important;

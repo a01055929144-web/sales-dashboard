@@ -369,6 +369,51 @@
     }
 
   </style>
+  <!-- ✅ 모바일 최적화 미디어 쿼리 추가 -->
+<style>
+@media screen and (max-width: 768px) {
+  .layout {
+    display: flex;
+    flex-direction: column;
+    height: auto !important;
+    overflow: auto;
+  }
+
+  .store-panel,
+  .dashboard-panel {
+    width: 100% !important;
+    max-height: none;
+    border: none;
+  }
+
+  .store-list-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+  }
+
+  #map {
+    height: 320px !important;
+    min-height: 280px;
+  }
+
+  header {
+    flex-wrap: wrap;
+  }
+
+  .select-input, .search-input {
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .primary-btn, .secondary-btn {
+    font-size: 15px;
+    padding: 12px;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -548,6 +593,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initMap();
   initEvents();
   loadData();
+  addMyLiveLocation(); // ✅ 내 위치 표시 함수 호출
+
 });
 
 /*************************************************

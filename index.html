@@ -537,6 +537,8 @@
 </div>
 
 <div id="dashboardContent">
+  <!-- 접힘 START -->
+  <div id="dashboardFoldArea">
   <!-- 도넛 차트 -->
   <div class="chart-wrapper">
       <canvas id="statusChart"></canvas>
@@ -580,6 +582,8 @@
         <div class="stat-sub" id="statRejectPct"></div>
       </div>
     </div>
+  </div> <!-- dashboardFoldArea → ⭐ 여기 추가 -->
+
 
     <!-- 상세 정보 -->
     <div class="detail-card">
@@ -667,7 +671,7 @@ document.addEventListener("DOMContentLoaded", () => {
    addMyLiveLocation(); // ✅ 데이터 로드 후 실행
  // 👉 여기 아래에 추가
   const toggleBtn = document.getElementById("dashboardToggleBtn");
-  const content = document.getElementById("dashboardContent");
+const content = document.getElementById("dashboardFoldArea");
 
   content.classList.add("dashboard-expanded");
 

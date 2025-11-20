@@ -463,6 +463,20 @@
 .leaflet-control-locate:hover {
   box-shadow: 0 3px 12px rgba(0,0,0,0.3);
 }
+#dashboardContent {
+  transition: max-height 0.25s ease-out;
+  overflow: hidden;
+}
+
+.dashboard-collapsed {
+  max-height: 0 !important;
+  opacity: 0;
+}
+
+.dashboard-expanded {
+  max-height: 1200px;
+  opacity: 1;
+}
 
 
   
@@ -517,10 +531,14 @@
 
   <!-- 우측 패널: 상세정보 + 대시보드 -->
   <aside class="dashboard-panel" id="dashboardPanel">
-    <div class="dashboard-title">📊 대시보드</div>
+<div class="dashboard-title" style="display:flex; justify-content:space-between; align-items:center;">
+  📊 대시보드
+  <span id="dashboardToggleBtn" style="cursor:pointer; font-size:16px;">▼</span>
+</div>
 
-    <!-- 도넛 차트 -->
-    <div class="chart-wrapper">
+<div id="dashboardContent">
+  <!-- 도넛 차트 -->
+  <div class="chart-wrapper">
       <canvas id="statusChart"></canvas>
       <div id="chartStats" style="font-size:11px; margin-top:6px; line-height:1.4;"></div>
     </div>
@@ -647,6 +665,24 @@ document.addEventListener("DOMContentLoaded", () => {
   initEvents();
   loadData().then(() => {
    addMyLiveLocation(); // ✅ 데이터 로드 후 실행
+ // 👉 여기 아래에 추가
+  const toggleBtn = document.getElementById("dashboardToggleBtn");
+  const content = document.getElementById("dashboardContent");
+
+  content.classList.add("dashboard-expanded");
+
+  toggleBtn.addEventListener("click", () => {
+    const collapsed = content.classList.contains("dashboard-collapsed");
+
+    if (collapsed) {
+      content.classList.remove("dashboard-collapsed");
+      content.classList.add("dashboard-expanded");
+      toggleBtn.textContent = "▼";
+    } else {
+      content.classList.remove("dashboard-expanded");
+      content.classList.add("dashboard-collapsed");
+      toggleBtn.textContent = "▲";
+    }    
   });
 });
 

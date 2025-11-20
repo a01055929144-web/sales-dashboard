@@ -901,7 +901,7 @@ function saveStatus() {
 
   insertHistoryUI(now, manager, memoText);
 
-  fetch(`${BASE_URL}?action=updateStatus&name=${encodeURIComponent(selectedStoreName)}&status=${encodeURIComponent(newStatus)}`);
+  fetch(`${BASE_URL}?action=updateStatus&name=${encodeURIComponent(selectedStoreName)}&status=${encodeURIComponent(newStatus)}&manager=${encodeURIComponent(manager)}`);
 
   fetch(`${BASE_URL}?action=addMemo&name=${encodeURIComponent(selectedStoreName)}&memo=${encodeURIComponent(memoText)}&manager=${encodeURIComponent(manager)}`);
 

@@ -372,33 +372,41 @@
 <!-- ✅ 모바일 최적화 미디어 쿼리 + 매장 리스트 고정 스크롤 -->
 <style>
 @media screen and (max-width: 768px) {
+
+  /* 전체 구조 block으로 변경 */
   .layout {
     display: block;
     height: auto !important;
-    overflow: auto;
+    overflow-y: auto;
   }
 
+  /* 1) 검색창은 상단 고정 */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: wrap;
+  }
+
+  /* 2) 매장 리스트 - header 바로 아래 고정 */
   .store-panel {
     position: sticky;
-    top: 52px; /* header 높이 고려 */
-    z-index: 10;
+    top: 70px; /* header 높이 + 여백 */
     background: white;
-    max-height: 200px;
-    overflow-y: auto;
+    z-index: 90;
+
+    max-height: 240px;   /* 매장 3개 정도 보이는 높이 */
+    overflow-y: auto;    /* 패널 내부만 스크롤 */
     border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
   }
 
-  .dashboard-panel {
-    width: 100%;
-    height: auto;
-    border: none;
-    padding: 8px;
-  }
-
-  #map {
-    height: 320px !important;
-    min-height: 280px;
-    margin-top: 12px;
+  .store-list-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 95;
+    padding-top: 4px;
   }
 
   .store-item {
@@ -406,28 +414,37 @@
     margin-bottom: 8px;
   }
 
-  .store-list-header {
-    position: sticky;
-    top: 0;
-    z-index: 5;
-    background: white;
+  /* 3) 지도는 일반 스크롤 영역 */
+  #map {
+    width: 100%;
+    height: 320px !important;
+    min-height: 280px;
+    margin-top: 16px;
   }
 
-  header {
-    flex-wrap: wrap;
+  /* 4) 대시보드도 일반 스크롤 영역 */
+  .dashboard-panel {
+    width: 100%;
+    height: auto;
+    border: none;
+    padding: 12px;
+    margin-top: 12px;
   }
 
-  .select-input, .search-input {
+  /* 입력 UI */
+  .search-input,
+  .select-input {
     font-size: 15px;
     padding: 10px;
+    width: 100%;
   }
 
   .primary-btn, .secondary-btn {
     font-size: 15px;
     padding: 12px;
+    width: 100%;
   }
 }
-
 </style>
 </head>
 
@@ -450,7 +467,10 @@
     </select>
 
     <input id="searchInput" class="search-input" placeholder="매장명 / 주소 / 키워드" />
-  </div>
+    <button id="myLocationBtn" class="secondary-btn" style="min-width:70px;">
+  내 위치
+    </button>
+  </div>  
 </header>
 
 <div class="layout">
@@ -639,7 +659,7 @@ function addMyLiveLocation() {
     console.warn("Geolocation is not supported.");
     return;
   }
-
+  
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       const lat = pos.coords.latitude;
@@ -654,7 +674,7 @@ function addMyLiveLocation() {
         fillOpacity: 0.8
       }).addTo(map);
 
-      myMarker.bindTooltip("📍 내 위치", { permanent: false });
+      myMarker.bindTooltip("📍내 위치", { permanent: false });
 
       map.setView([lat, lng], 14); // 지도 중심 이동
     },
@@ -668,7 +688,30 @@ function addMyLiveLocation() {
     }
   );
 }
+// "내 위치" 버튼 눌렀을 때 지도만 이동시키는 함수
+function moveToMyLocation() {
+  if (!navigator.geolocation) {
+    alert("위치 정보를 지원하지 않습니다.");
+    return;
+  }
 
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      map.setView([lat, lng], 14); // 🔥 현재 위치로 재이동
+    },
+    (err) => {
+      console.error("위치 불러오기 실패", err);
+      alert("현 위치를 가져올 수 없습니다.");
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    }
+  );
+}
   
 
 /*************************************************
@@ -683,6 +726,8 @@ function initEvents() {
 
   document.getElementById("statusSaveBtn").addEventListener("click", saveStatus);
   document.getElementById("memoSaveBtn").addEventListener("click", saveMemo);
+  document.getElementById("myLocationBtn").addEventListener("click", moveToMyLocation);
+
 
   // 담당자 선택 → 필수값 + 자동 기록
   const managerSelect = document.getElementById("managerInput");

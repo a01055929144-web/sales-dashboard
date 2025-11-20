@@ -371,7 +371,8 @@
   </style>
 <!-- ✅ 모바일 최적화 미디어 쿼리 + 매장 리스트 고정 스크롤 -->
 <style>
-@media screen and (max-width: 768px) 
+@media screen and (max-width: 768px) {
+
   /* 전체 구조 block으로 변경 */
   .layout {
     display: block;
@@ -379,7 +380,6 @@
     overflow-y: auto;
   }
 
-  /* 1) 검색창은 상단 고정 */
   header {
     position: sticky;
     top: 0;
@@ -387,17 +387,16 @@
     flex-wrap: wrap;
   }
 
-  /* 2) 매장 리스트 - header 바로 아래 (일반 스크롤) */
-.store-panel {
-  position: static;
-  background: white;
-  z-index: 90;
+  .store-panel {
+    position: static;
+    background: white;
+    z-index: 90;
 
-  max-height: 240px;    /* 매장 3개 정도 보이는 높이 */
-  overflow-y: auto;     /* 패널 내부만 스크롤 */
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 8px;
-}
+    max-height: 240px;
+    overflow-y: auto;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+  }
 
   .store-list-header {
     position: sticky;
@@ -407,12 +406,6 @@
     padding-top: 4px;
   }
 
-  .store-item {
-    border: 1px solid #ddd;
-    margin-bottom: 8px;
-  }
-
-  /* 3) 지도는 일반 스크롤 영역 */
   #map {
     width: 100%;
     height: 320px !important;
@@ -420,7 +413,6 @@
     margin-top: 16px;
   }
 
-  /* 4) 대시보드도 일반 스크롤 영역 */
   .dashboard-panel {
     width: 100%;
     height: auto;
@@ -429,7 +421,6 @@
     margin-top: 12px;
   }
 
-  /* 입력 UI */
   .search-input,
   .select-input {
     font-size: 15px;
@@ -443,6 +434,7 @@
     width: 100%;
   }
 }
+
  /* ⭐ 카카오맵/네이버 지도 스타일 Floating 버튼 */
 .floating-location-btn {
   position: fixed;

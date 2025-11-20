@@ -462,7 +462,27 @@
   transform: scale(0.92);
   box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
- 
+.leaflet-control-locate {
+  background: white;
+  padding: 8px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 20px;
+  text-align: center;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.leaflet-control-locate:hover {
+  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+}
+
+
+  
 </style>
 </head>
 
@@ -668,6 +688,38 @@ function initMap() {
   });
   map.addLayer(markerCluster);
 }
+
+function initMap() {
+  map = L.map("map", {
+    center: [37.5665, 126.9780],
+    zoom: 11,
+    zoomControl: true
+  });
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap"
+  }).addTo(map);
+
+  markerCluster = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    maxClusterRadius: 35
+  });
+  map.addLayer(markerCluster);
+
+  // 🔥 지도 내부에 내 위치 버튼 추가
+  const locateControl = L.control({ position: 'bottomright' });
+
+  locateControl.onAdd = function(map) {
+    const btn = L.DomUtil.create('div', 'leaflet-control-locate');
+    btn.innerHTML = '📍';
+    btn.onclick = () => moveToMyLocation();
+    return btn;
+  };
+
+  locateControl.addTo(map);
+}
+  
 // ✅ 여기 추가
 function addMyLiveLocation() {
   if (!navigator.geolocation) {
@@ -1244,8 +1296,7 @@ function renderStats() {
   `;
 }
 </script>
-  <!-- 🔥 Floating 내 위치 버튼 -->
-<button id="myLocationBtn" class="floating-location-btn">📍</button>
+
 
 
 </body>

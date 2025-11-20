@@ -388,18 +388,17 @@
     flex-wrap: wrap;
   }
 
-  /* 2) 매장 리스트 - header 바로 아래 고정 */
-  .store-panel {
-    position: sticky;
-    top: 70px; /* header 높이 + 여백 */
-    background: white;
-    z-index: 90;
+  /* 2) 매장 리스트 - header 바로 아래 (일반 스크롤) */
+.store-panel {
+  position: static;
+  background: white;
+  z-index: 90;
 
-    max-height: 240px;   /* 매장 3개 정도 보이는 높이 */
-    overflow-y: auto;    /* 패널 내부만 스크롤 */
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 8px;
-  }
+  max-height: 240px;    /* 매장 3개 정도 보이는 높이 */
+  overflow-y: auto;     /* 패널 내부만 스크롤 */
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 8px;
+}}
 
   .store-list-header {
     position: sticky;
@@ -445,6 +444,34 @@
     width: 100%;
   }
 }
+ /* ⭐ 카카오맵/네이버 지도 스타일 Floating 버튼 */
+.floating-location-btn {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border: 1px solid #ddd;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 9999;
+
+  transition: 0.2s;
+}
+
+.floating-location-btn:active {
+  transform: scale(0.92);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+ 
 </style>
 </head>
 
@@ -1229,6 +1256,9 @@ function renderStats() {
   `;
 }
 </script>
+  <!-- 🔥 Floating 내 위치 버튼 -->
+<button id="myLocationBtn" class="floating-location-btn">📍</button>
+
 
 </body>
 </html>

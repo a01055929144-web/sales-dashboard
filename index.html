@@ -372,24 +372,62 @@
 <!-- ✅ 모바일 최적화 미디어 쿼리 + 매장 리스트 고정 스크롤 -->
 <style>
 @media screen and (max-width: 768px) {
-  .store-panel {
-    max-height: 320px;  /* 🔥 높이 제한 */
-    overflow-y: auto;   /* 🔽 스크롤 가능하게 */
-    margin-bottom: 12px;
+  .layout {
+    display: block;
+    height: auto !important;
+    overflow: auto;
   }
 
-  .store-list {
-    padding-bottom: 8px;
+  .store-panel {
+    position: sticky;
+    top: 52px; /* header 높이 고려 */
+    z-index: 10;
+    background: white;
+    max-height: 200px;
+    overflow-y: auto;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .dashboard-panel {
+    width: 100%;
+    height: auto;
+    border: none;
+    padding: 8px;
+  }
+
+  #map {
+    height: 320px !important;
+    min-height: 280px;
+    margin-top: 12px;
   }
 
   .store-item {
-    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 8px;
+  }
+
+  .store-list-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: white;
+  }
+
+  header {
+    flex-wrap: wrap;
+  }
+
+  .select-input, .search-input {
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .primary-btn, .secondary-btn {
+    font-size: 15px;
     padding: 12px;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    background: #fff;
   }
 }
+
 </style>
 </head>
 

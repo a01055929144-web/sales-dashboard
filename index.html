@@ -662,9 +662,9 @@ let chartInstance;
 document.addEventListener("DOMContentLoaded", () => {
   initMap();
   initEvents();
-  loadData();
-  addMyLiveLocation(); // ✅ 내 위치 표시 함수 호출
-
+  loadData().then(() => {
+   addMyLiveLocation(); // ✅ 데이터 로드 후 실행
+  });
 });
 
 /*************************************************
@@ -814,11 +814,15 @@ async function loadData() {
 
     buildFilters(rawRows);
     applyFilters();
+
+    return true;   // 🔥 추가: then() 사용 가능하도록
   } catch (e) {
     alert("데이터 불러오기 실패!");
     console.error(e);
+    return false;
   }
 }
+
 
 /*************************************************
  * 4) 필터 UI 구성

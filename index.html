@@ -1118,8 +1118,9 @@ function setStatusDropdown(store) {
 function saveStatus() {
   if (!selectedStoreName) return alert("매장을 먼저 선택하세요.");
 
-  const manager = document.getElementById("managerInput").value.trim();
-  if (!manager) return alert("담당자를 선택해주세요.");
+  // 🔥 여기 있는 manager는 쓰지 말고
+  let managerUI = document.getElementById("managerInput").value.trim();
+  if (!managerUI) return alert("담당자를 선택해주세요.");
 
   const newStatus = document.getElementById("statusChangeSelect").value;
   if (!newStatus) return alert("상태를 선택해주세요.");
@@ -1127,7 +1128,10 @@ function saveStatus() {
   const memoText = `상태를 '${newStatus}'로 변경했습니다.`;
   const now = new Date().toLocaleString("ko-KR");
 
-  insertHistoryUI(now, manager, memoText);
+  insertHistoryUI(now, managerUI, memoText);
+
+  // 🔥 fetch 직전에 manager 다시 읽기 (이게 핵심)
+  const manager = document.getElementById("managerInput").value.trim();
 
   const qs = new URLSearchParams({
     action: "updateStatus",
@@ -1143,7 +1147,7 @@ function saveStatus() {
     manager: manager
   });
 
-  // 🔥 상태 업데이트 먼저 → 그 후에 메모 저장
+  // 순서 보장
   fetch(`${BASE_URL}?${qs.toString()}`)
     .then(() => fetch(`${BASE_URL}?${qsMemo.toString()}`));
 
@@ -1153,7 +1157,6 @@ function saveStatus() {
 
   applyFilters();
 }
-
 
 /*************************************************
  * 15) 히스토리 로딩

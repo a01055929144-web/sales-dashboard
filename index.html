@@ -692,7 +692,7 @@
 let managerType = "call";
 
 const BASE_URL =
-  "https://script.google.com/macros/s/AKfycbyTEpSlrv6vFRU4jwICu5ZM9z_xRBskTl5hxyjNZs1Wp1jXd1EzMEejnWGS0hHMKzWK/exec";
+  "https://script.google.com/macros/s/AKfycbzaQi_u74vqBdzg61Q9it4J0NfjM4YyZAuiaJKZZaxY1dtvtKZUav-UkcthtKOizeqE/exec";
 
 /*************************************************
  * 전역 변수
@@ -1211,51 +1211,33 @@ function saveStatus() {
   if (!manager) return alert("담당자를 선택해주세요.");
   if (!managerType) return alert("담당 유형(Call/Sales)을 선택해주세요.");
 
-
   const newStatus = document.getElementById("statusChangeSelect").value;
   if (!newStatus) return alert("상태를 선택해주세요.");
 
   const memoText = `상태를 '${newStatus}'로 변경했습니다.`;
-  const now = new Date().toLocaleString("ko-KR");
 
-  insertHistoryUI(now, manager, memoText);
+  const qs = new URLSearchParams({
+    action: "updateStatus",
+    name: selectedStoreName,
+    status: newStatus,
+    manager: manager,
+    managerType: managerType
+  });
 
-  // 🔥 여기 추가 — manager 값 local 저장
-  if (rawByName[selectedStoreName]) {
-   if (managerType === "call") {
-  rawByName[selectedStoreName]["Manager(Call)"] = manager;
-}
-if (managerType === "sales") {
-  rawByName[selectedStoreName]["Manager(Sales)"] = manager;
-}
-rawByName[selectedStoreName].Status = newStatus;
-  }
+  const qsMemo = new URLSearchParams({
+    action: "addMemo",
+    name: selectedStoreName,
+    memo: memoText,
+    manager: manager
+  });
 
-const qs = new URLSearchParams({
-  action: "updateStatus",
-  name: selectedStoreName,
-  status: newStatus,
-  manager: manager,
-  managerType: managerType
-});
-
-
-const qsMemo = new URLSearchParams({
-  action: "addMemo",
-  name: selectedStoreName,
-  memo: memoText,
-  manager: manager
-});
-
-
-
+  // 🔥 POST 제거 → GET 방식으로 변경
   fetch(`${BASE_URL}?${qs.toString()}`)
     .then(() => fetch(`${BASE_URL}?${qsMemo.toString()}`))
     .then(() => {
-      applyFilters();
+      applyFilters(); // UI 업데이트
     });
 }
-
 
 
 /*************************************************

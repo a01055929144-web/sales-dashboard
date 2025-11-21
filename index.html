@@ -600,7 +600,17 @@
         매장을 선택하면 상세정보가 표시됩니다.
       </div>
     </div>
-
+    
+    <!-- 담당 유형 선택 (CALL / SALES) -->
+  <div style="margin-bottom:10px;">
+    <label style="font-size:13px; font-weight:700;"> 구분 <span style="color:#dc2626;">*필수*</span></label>
+  
+      <div id="managerTypeButtons" style="display:flex; gap:8px; margin-top:6px;">
+    <button type="button" id="btnCall" class="type-btn inactive">Call</button>
+    <button type="button" id="btnSales" class="type-btn inactive">Sales</button>
+    </div>
+  </div>
+    
     <!-- 담당자 선택 -->
     <div class="detail-title">
       담당자 <span class="required-text">*필수*</span>
@@ -613,17 +623,6 @@
       <option value="Aimee">Aimee</option>
       <option value="Merry">Merry</option>
     </select>
-
-    
-    <!-- 담당 유형 선택 (CALL / SALES) -->
-<div style="margin-bottom:10px;">
-  <label style="font-size:13px; font-weight:700;">담당 유형 <span style="color:#dc2626;">*필수*</span></label>
-  
-  <div id="managerTypeButtons" style="display:flex; gap:8px; margin-top:6px;">
-    <button type="button" id="btnCall" class="type-btn inactive">CALL</button>
-    <button type="button" id="btnSales" class="type-btn inactive">SALES</button>
-  </div>
-</div>
 
 <style>
 .type-btn {

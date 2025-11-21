@@ -1212,6 +1212,14 @@ function saveStatus() {
 
   const memoText = `상태를 '${newStatus}'로 변경했습니다.`;
 
+  // 🔥 UI에 먼저 반영 (지연 사라짐)
+  insertHistoryUI(
+    new Date().toLocaleString("ko-KR"),
+    manager,
+    memoText
+  );
+
+  // 🔥 서버 저장
   const qs = new URLSearchParams({
     action: "updateStatus",
     name: selectedStoreName,
@@ -1227,13 +1235,12 @@ function saveStatus() {
     manager: manager
   });
 
-  // 🔥 POST 제거 → GET 방식으로 변경
+  // GET 방식으로 서버 처리
   fetch(`${BASE_URL}?${qs.toString()}`)
     .then(() => fetch(`${BASE_URL}?${qsMemo.toString()}`))
-    .then(() => {
-      applyFilters(); // UI 업데이트
-    });
+    .then(() => applyFilters());
 }
+
 
 
 /*************************************************

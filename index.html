@@ -1140,19 +1140,19 @@ function saveStatus() {
   }
 
   // 🔥 서버 전송
-  const qs = new URLSearchParams({
-    action: "updateStatus",
-    name: selectedStoreName,
-    status: newStatus,
-    manager: manager
-  });
+const qs = new URLSearchParams({
+  action: "updateStatus",
+  name: selectedStoreName,
+  status: newStatus,
+  manager: manager   // ❌ encodeURIComponent 제거
+});
 
-  const qsMemo = new URLSearchParams({
-    action: "addMemo",
-    name: selectedStoreName,
-    memo: memoText,
-    manager: manager
-  });
+const qsMemo = new URLSearchParams({
+  action: "addMemo",
+  name: selectedStoreName,
+  memo: memoText,
+  manager: manager   // ❌ encodeURIComponent 제거
+});
 
   fetch(`${BASE_URL}?${qs.toString()}`)
     .then(() => fetch(`${BASE_URL}?${qsMemo.toString()}`))

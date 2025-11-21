@@ -1133,6 +1133,7 @@ const qs = new URLSearchParams({
   status: newStatus,
   manager: manager
 });
+  fetch(`${BASE_URL}?${qs.toString()}`);
 const qsMemo = new URLSearchParams({
   action: "addMemo",
   name: selectedStoreName,

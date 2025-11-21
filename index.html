@@ -712,7 +712,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initMap();
   initEvents();
   
-  managerType = "call"; 
+  let managerType = "call";   // 여기만 남기고
   setTypeButtonUI();
   
   loadData().then(() => {
@@ -861,8 +861,6 @@ function initEvents() {
     }
   });
 }
-  // 담당 유형 저장 변수
-let managerType = "";
 
 // CALL 버튼
 document.getElementById("btnCall").addEventListener("click", () => {

@@ -1070,9 +1070,13 @@ function focusOnStore(store) {
   showStoreDetail(store);
   setStatusDropdown(store);
   loadHistory(store.name);
-  // 🔥 담당자 select 값 유지시키기 (중요)
-  document.getElementById("managerInput").value = rawByName[store.name]?.manager || "";
-
+  
+ const mgrSelect = document.getElementById("managerInput");
+// 매장에 저장된 담당자가 있을 때만 select 값을 설정
+if (rawByName[store.name]?.manager) {
+  mgrSelect.value = rawByName[store.name].manager;
+}
+// 저장된 게 없으면 select 값을 건드리지 않음 → 사용자가 선택한 값 유지
 }
 
 /*************************************************

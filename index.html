@@ -1115,6 +1115,7 @@ function setStatusDropdown(store) {
 function saveStatus() {
   if (!selectedStoreName) return alert("매장을 먼저 선택하세요.");
 
+
   const manager = document.getElementById("managerInput").value.trim();
   if (!manager) return alert("담당자를 선택해주세요.");
 
@@ -1126,7 +1127,13 @@ function saveStatus() {
 
   insertHistoryUI(now, manager, memoText);
 
-  fetch(`${BASE_URL}?action=updateStatus&name=${encodeURIComponent(selectedStoreName)}&status=${encodeURIComponent(newStatus)}&manager=${encodeURIComponent(manager)}`);
+const qs = new URLSearchParams({
+  action: "updateStatus",
+  name: selectedStoreName,
+  status: newStatus,
+  manager: manager
+});
+fetch(`${BASE_URL}?${qs.toString()}`);
 
   fetch(`${BASE_URL}?action=addMemo&name=${encodeURIComponent(selectedStoreName)}&memo=${encodeURIComponent(memoText)}&manager=${encodeURIComponent(manager)}`);
 

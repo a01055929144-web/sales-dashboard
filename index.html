@@ -1133,14 +1133,18 @@ const qs = new URLSearchParams({
   status: newStatus,
   manager: manager
 });
-fetch(`${BASE_URL}?${qs.toString()}`);
+const qsMemo = new URLSearchParams({
+  action: "addMemo",
+  name: selectedStoreName,
+  memo: memoText,
+  manager: manager
+});
+fetch(`${BASE_URL}?${qsMemo.toString()}`);
 
-  fetch(`${BASE_URL}?action=addMemo&name=${encodeURIComponent(selectedStoreName)}&memo=${encodeURIComponent(memoText)}&manager=${encodeURIComponent(manager)}`);
-
-  if (rawByName[selectedStoreName]) {
-    rawByName[selectedStoreName].Status = newStatus;
-  }
-  applyFilters();
+if (rawByName[selectedStoreName]) {
+  rawByName[selectedStoreName].Status = newStatus;
+}
+applyFilters();
 }
 
 /*************************************************

@@ -1118,7 +1118,6 @@ function setStatusDropdown(store) {
 function saveStatus() {
   if (!selectedStoreName) return alert("매장을 먼저 선택하세요.");
 
-
   const manager = document.getElementById("managerInput").value.trim();
   if (!manager) return alert("담당자를 선택해주세요.");
 
@@ -1130,26 +1129,31 @@ function saveStatus() {
 
   insertHistoryUI(now, manager, memoText);
 
-const qs = new URLSearchParams({
-  action: "updateStatus",
-  name: selectedStoreName,
-  status: newStatus,
-  manager: manager
-});
-  fetch(`${BASE_URL}?${qs.toString()}`);
-const qsMemo = new URLSearchParams({
-  action: "addMemo",
-  name: selectedStoreName,
-  memo: memoText,
-  manager: manager
-});
-fetch(`${BASE_URL}?${qsMemo.toString()}`);
+  const qs = new URLSearchParams({
+    action: "updateStatus",
+    name: selectedStoreName,
+    status: newStatus,
+    manager: manager
+  });
 
-if (rawByName[selectedStoreName]) {
-  rawByName[selectedStoreName].Status = newStatus;
+  const qsMemo = new URLSearchParams({
+    action: "addMemo",
+    name: selectedStoreName,
+    memo: memoText,
+    manager: manager
+  });
+
+  // 🔥 상태 업데이트 먼저 → 그 후에 메모 저장
+  fetch(`${BASE_URL}?${qs.toString()}`)
+    .then(() => fetch(`${BASE_URL}?${qsMemo.toString()}`));
+
+  if (rawByName[selectedStoreName]) {
+    rawByName[selectedStoreName].Status = newStatus;
+  }
+
+  applyFilters();
 }
-applyFilters();
-}
+
 
 /*************************************************
  * 15) 히스토리 로딩

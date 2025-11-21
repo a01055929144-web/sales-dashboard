@@ -689,6 +689,8 @@
 /*************************************************
  * 🔑 Apps Script WebApp URL
  *************************************************/
+let managerType = "call";
+
 const BASE_URL =
   "https://script.google.com/macros/s/AKfycbyTEpSlrv6vFRU4jwICu5ZM9z_xRBskTl5hxyjNZs1Wp1jXd1EzMEejnWGS0hHMKzWK/exec";
 
@@ -712,7 +714,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initMap();
   initEvents();
   
-  let managerType = "call";   // 여기만 남기고
   setTypeButtonUI();
   
   loadData().then(() => {

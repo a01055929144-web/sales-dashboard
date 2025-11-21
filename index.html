@@ -1118,7 +1118,7 @@ function setStatusDropdown(store) {
 function saveStatus() {
   if (!selectedStoreName) return alert("매장을 먼저 선택하세요.");
 
-  // 🔥 여기 있는 manager는 쓰지 말고
+  // 🔥 1차 체크
   let managerUI = document.getElementById("managerInput").value.trim();
   if (!managerUI) return alert("담당자를 선택해주세요.");
 
@@ -1130,21 +1130,21 @@ function saveStatus() {
 
   insertHistoryUI(now, managerUI, memoText);
 
-  // 🔥 fetch 직전에 manager 다시 읽기 (이게 핵심)
+  // 🔥 2차 체크 — fetch 직전에 반드시 다시 읽기
   const manager = document.getElementById("managerInput").value.trim();
 
   const qs = new URLSearchParams({
     action: "updateStatus",
     name: selectedStoreName,
     status: newStatus,
-    manager: manager
+    manager: manager   // 🔥 항상 값이 들어감
   });
 
   const qsMemo = new URLSearchParams({
     action: "addMemo",
     name: selectedStoreName,
     memo: memoText,
-    manager: manager
+    manager: manager   // 🔥 항상 값이 들어감
   });
 
   // 순서 보장
@@ -1154,9 +1154,9 @@ function saveStatus() {
   if (rawByName[selectedStoreName]) {
     rawByName[selectedStoreName].Status = newStatus;
   }
-
   applyFilters();
 }
+
 
 /*************************************************
  * 15) 히스토리 로딩

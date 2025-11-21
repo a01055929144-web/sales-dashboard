@@ -1100,7 +1100,6 @@ function renderStoreList() {
 
     li.innerHTML = `
       <div class="store-header">
-        <span class="fav-icon">${store.favorite ? "⭐" : "☆"}</span>
         <div class="store-name">${store.name || "매장명 없음"}</div>
       </div>
       <div class="store-meta-line">
@@ -1112,10 +1111,6 @@ function renderStoreList() {
 
     li.addEventListener("click", () => focusOnStore(store));
 
-    li.querySelector(".fav-icon").addEventListener("click", e => {
-      e.stopPropagation();
-      toggleFavorite(store);
-    });
 
     listEl.appendChild(li);
   });

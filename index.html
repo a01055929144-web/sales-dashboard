@@ -1144,14 +1144,14 @@ function saveStatus() {
     action: "updateStatus",
     name: selectedStoreName,
     status: newStatus,
-    manager: encodeURIComponent(manager)
+    manager: manager
   });
 
   const qsMemo = new URLSearchParams({
     action: "addMemo",
     name: selectedStoreName,
     memo: memoText,
-    manager: encodeURIComponent(manager)
+    manager: manager
   });
 
   fetch(`${BASE_URL}?${qs.toString()}`)

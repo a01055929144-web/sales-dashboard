@@ -1072,10 +1072,11 @@ function focusOnStore(store) {
   loadHistory(store.name);
   
  const mgrSelect = document.getElementById("managerInput");
-// 매장에 저장된 담당자가 있을 때만 select 값을 설정
-if (rawByName[store.name]?.manager) {
+// 담당자 select 값이 비어 있을 때만 매장 담당자를 자동 세팅
+if (!mgrSelect.value && rawByName[store.name]?.manager) {
   mgrSelect.value = rawByName[store.name].manager;
 }
+
 // 저장된 게 없으면 select 값을 건드리지 않음 → 사용자가 선택한 값 유지
 }
 

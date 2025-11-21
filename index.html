@@ -1192,13 +1192,6 @@ function showStoreDetail(r) {
 /*************************************************
  * 13) 상태 드롭다운 값 세팅
  *************************************************/
-function setStatusDropdown(store) {
-  document.getElementById("statusChangeSelect").value = store?.Status || "";
-}
-
-/*************************************************
- * 14) 상태 변경 → 히스토리 자동 기록
- *************************************************/
 function saveStatus() {
   if (!selectedStoreName) return alert("매장을 먼저 선택하세요.");
 
@@ -1211,14 +1204,14 @@ function saveStatus() {
 
   const memoText = `상태를 '${newStatus}'로 변경했습니다.`;
 
-  // 🔥 UI에 먼저 반영 (지연 사라짐)
+  // 🔥 UI에 먼저 반영
   insertHistoryUI(
     new Date().toLocaleString("ko-KR"),
     manager,
     memoText
   );
 
-  // 🔥 서버 저장
+  // 🔥 서버 저장 (updateStatus만 호출)
   const qs = new URLSearchParams({
     action: "updateStatus",
     name: selectedStoreName,
@@ -1227,16 +1220,7 @@ function saveStatus() {
     managerType: managerType
   });
 
-  const qsMemo = new URLSearchParams({
-    action: "addMemo",
-    name: selectedStoreName,
-    memo: memoText,
-    manager: manager
-  });
-
-  // GET 방식으로 서버 처리
   fetch(`${BASE_URL}?${qs.toString()}`)
-    .then(() => fetch(`${BASE_URL}?${qsMemo.toString()}`))
     .then(() => applyFilters());
 }
 

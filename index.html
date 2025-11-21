@@ -1134,13 +1134,16 @@ function focusOnStore(store) {
   setStatusDropdown(store);
   loadHistory(store.name);
   
- const mgrSelect = document.getElementById("managerInput");
-// 담당자 select 값이 비어 있을 때만 매장 담당자를 자동 세팅
-if (!mgrSelect.value && rawByName[store.name]?.manager) {
-  mgrSelect.value = rawByName[store.name].manager;
-}
+  const mgrSelect = document.getElementById("managerInput");
+  if (!mgrSelect.value && rawByName[store.name]?.manager) {
+    mgrSelect.value = rawByName[store.name].manager;
+  }
 
-// 저장된 게 없으면 select 값을 건드리지 않음 → 사용자가 선택한 값 유지
+  // 🔥 [여기가 정확한 자리] managerType 초기화 금지 + 기본값 설정
+  if (!managerType) {
+    managerType = "call";   // 기본값
+    setTypeButtonUI();
+  }
 }
 
 /*************************************************
@@ -1205,24 +1208,22 @@ function saveStatus() {
     rawByName[selectedStoreName].Status = newStatus;
   }
 
-  // 🔥 서버 전송
-const qs = new URLSearchParams({
+ const qs = new URLSearchParams({
   action: "updateStatus",
-  name: selectedStoreName,
-  status: newStatus,
-  manager: manager,
-  managerType: managerType   // 🔥 추가됨
-
+  name: encodeURIComponent(selectedStoreName),
+  status: encodeURIComponent(newStatus),
+  manager: encodeURIComponent(manager),
+  managerType: encodeURIComponent(managerType)
 });
 
 const qsMemo = new URLSearchParams({
   action: "addMemo",
-  name: selectedStoreName,
-  memo: memoText,
-  manager: manager,
-  managerType: managerType   // 🔥 추가됨
-
+  name: encodeURIComponent(selectedStoreName),
+  memo: encodeURIComponent(memoText),
+  manager: encodeURIComponent(manager),
+  managerType: encodeURIComponent(managerType)
 });
+
 
   fetch(`${BASE_URL}?${qs.toString()}`)
     .then(() => fetch(`${BASE_URL}?${qsMemo.toString()}`))

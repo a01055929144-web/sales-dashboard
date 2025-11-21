@@ -711,11 +711,16 @@ let chartInstance;
 document.addEventListener("DOMContentLoaded", () => {
   initMap();
   initEvents();
+  
+  managerType = "call"; 
+  setTypeButtonUI();
+  
   loadData().then(() => {
    addMyLiveLocation(); // ✅ 데이터 로드 후 실행
+    
  // 👉 여기 아래에 추가
   const toggleBtn = document.getElementById("dashboardToggleBtn");
-const content = document.getElementById("dashboardFoldArea");
+  const content = document.getElementById("dashboardFoldArea");
 
   content.classList.add("dashboard-expanded");
 
@@ -1133,17 +1138,9 @@ function focusOnStore(store) {
   showStoreDetail(store);
   setStatusDropdown(store);
   loadHistory(store.name);
-  
-  const mgrSelect = document.getElementById("managerInput");
-  if (!mgrSelect.value && rawByName[store.name]?.manager) {
-    mgrSelect.value = rawByName[store.name].manager;
-  }
 
-  // 🔥 [여기가 정확한 자리] managerType 초기화 금지 + 기본값 설정
-  if (!managerType) {
-    managerType = "call";   // 기본값
-    setTypeButtonUI();
-  }
+  // 🔥 담당자 자동 세팅 (담당유형 기준)
+  applyManagerByType();
 }
 
 /*************************************************
@@ -1204,25 +1201,31 @@ function saveStatus() {
 
   // 🔥 여기 추가 — manager 값 local 저장
   if (rawByName[selectedStoreName]) {
-    rawByName[selectedStoreName].manager = manager;
-    rawByName[selectedStoreName].Status = newStatus;
+   if (managerType === "call") {
+  rawByName[selectedStoreName]["Manager(Call)"] = manager;
+}
+if (managerType === "sales") {
+  rawByName[selectedStoreName]["Manager(Sales)"] = manager;
+}
+rawByName[selectedStoreName].Status = newStatus;
   }
 
- const qs = new URLSearchParams({
+const qs = new URLSearchParams({
   action: "updateStatus",
-  name: encodeURIComponent(selectedStoreName),
-  status: encodeURIComponent(newStatus),
-  manager: encodeURIComponent(manager),
-  managerType: encodeURIComponent(managerType)
+  name: selectedStoreName,
+  status: newStatus,
+  manager: manager,
+  managerType: managerType
 });
+
 
 const qsMemo = new URLSearchParams({
   action: "addMemo",
-  name: encodeURIComponent(selectedStoreName),
-  memo: encodeURIComponent(memoText),
-  manager: encodeURIComponent(manager),
-  managerType: encodeURIComponent(managerType)
+  name: selectedStoreName,
+  memo: memoText,
+  manager: manager
 });
+
 
 
   fetch(`${BASE_URL}?${qs.toString()}`)

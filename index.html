@@ -605,6 +605,39 @@
     <div class="detail-title">
       담당자 <span class="required-text">*필수*</span>
     </div>
+    <!-- 담당 유형 선택 (CALL / SALES) -->
+<div style="margin-bottom:10px;">
+  <label style="font-size:13px; font-weight:700;">담당 유형 <span style="color:#dc2626;">*필수*</span></label>
+  
+  <div id="managerTypeButtons" style="display:flex; gap:8px; margin-top:6px;">
+    <button type="button" id="btnCall" class="type-btn inactive">CALL</button>
+    <button type="button" id="btnSales" class="type-btn inactive">SALES</button>
+  </div>
+</div>
+
+<style>
+.type-btn {
+  flex:1;
+  padding:10px 0;
+  border-radius:8px;
+  border:1px solid #d1d5db;
+  font-size:13px;
+  font-weight:700;
+  background:#f9fafb;
+  cursor:pointer;
+}
+.type-btn.active {
+  background:#2563eb;
+  color:white;
+  border-color:#1d4ed8;
+  box-shadow:0 2px 8px rgba(37, 99, 235, 0.35);
+}
+.type-btn.inactive {
+  background:#f3f4f6;
+  color:#374151;
+}
+</style>
+
 
     <select id="managerInput" class="select-input" style="width:100%; margin-bottom:10px;">
       <option value="">담당자 선택</option>
@@ -820,6 +853,33 @@ function initEvents() {
     }
   });
 }
+  // 담당 유형 저장 변수
+let managerType = "";
+
+// CALL 버튼
+document.getElementById("btnCall").addEventListener("click", () => {
+  managerType = "call";
+  setTypeButtonUI();
+});
+
+// SALES 버튼
+document.getElementById("btnSales").addEventListener("click", () => {
+  managerType = "sales";
+  setTypeButtonUI();
+});
+
+// 버튼 UI 적용
+function setTypeButtonUI() {
+  const btnCall = document.getElementById("btnCall");
+  const btnSales = document.getElementById("btnSales");
+
+  btnCall.classList.toggle("active", managerType === "call");
+  btnSales.classList.toggle("active", managerType === "sales");
+
+  btnCall.classList.toggle("inactive", managerType !== "call");
+  btnSales.classList.toggle("inactive", managerType !== "sales");
+}
+
 
 /*************************************************
  * 3) 데이터 불러오기
@@ -1125,6 +1185,8 @@ function saveStatus() {
 
   const manager = document.getElementById("managerInput").value.trim();
   if (!manager) return alert("담당자를 선택해주세요.");
+  if (!managerType) return alert("담당 유형(Call/Sales)을 선택해주세요.");
+
 
   const newStatus = document.getElementById("statusChangeSelect").value;
   if (!newStatus) return alert("상태를 선택해주세요.");
@@ -1145,14 +1207,18 @@ const qs = new URLSearchParams({
   action: "updateStatus",
   name: selectedStoreName,
   status: newStatus,
-  manager: manager   // ❌ encodeURIComponent 제거
+  manager: manager,
+  managerType: managerType   // 🔥 추가됨
+
 });
 
 const qsMemo = new URLSearchParams({
   action: "addMemo",
   name: selectedStoreName,
   memo: memoText,
-  manager: manager   // ❌ encodeURIComponent 제거
+  manager: manager,
+  managerType: managerType   // 🔥 추가됨
+
 });
 
   fetch(`${BASE_URL}?${qs.toString()}`)

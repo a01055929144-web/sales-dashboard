@@ -1070,6 +1070,9 @@ function focusOnStore(store) {
   showStoreDetail(store);
   setStatusDropdown(store);
   loadHistory(store.name);
+  // 🔥 담당자 select 값 유지시키기 (중요)
+  document.getElementById("managerInput").value = rawByName[store.name]?.manager || "";
+
 }
 
 /*************************************************

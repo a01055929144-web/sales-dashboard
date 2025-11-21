@@ -1118,9 +1118,8 @@ function setStatusDropdown(store) {
 function saveStatus() {
   if (!selectedStoreName) return alert("매장을 먼저 선택하세요.");
 
-  // 🔥 1차 체크
-  let managerUI = document.getElementById("managerInput").value.trim();
-  if (!managerUI) return alert("담당자를 선택해주세요.");
+  const manager = document.getElementById("managerInput").value.trim();
+  if (!manager) return alert("담당자를 선택해주세요.");
 
   const newStatus = document.getElementById("statusChangeSelect").value;
   if (!newStatus) return alert("상태를 선택해주세요.");
@@ -1128,34 +1127,36 @@ function saveStatus() {
   const memoText = `상태를 '${newStatus}'로 변경했습니다.`;
   const now = new Date().toLocaleString("ko-KR");
 
-  insertHistoryUI(now, managerUI, memoText);
+  insertHistoryUI(now, manager, memoText);
 
-  // 🔥 2차 체크 — fetch 직전에 반드시 다시 읽기
-  const manager = document.getElementById("managerInput").value.trim();
+  // 🔥 여기 추가 — manager 값 local 저장
+  if (rawByName[selectedStoreName]) {
+    rawByName[selectedStoreName].manager = manager;
+    rawByName[selectedStoreName].Status = newStatus;
+  }
 
+  // 🔥 서버 전송
   const qs = new URLSearchParams({
     action: "updateStatus",
     name: selectedStoreName,
     status: newStatus,
-    manager: manager   // 🔥 항상 값이 들어감
+    manager: manager
   });
 
   const qsMemo = new URLSearchParams({
     action: "addMemo",
     name: selectedStoreName,
     memo: memoText,
-    manager: manager   // 🔥 항상 값이 들어감
+    manager: manager
   });
 
-  // 순서 보장
   fetch(`${BASE_URL}?${qs.toString()}`)
-    .then(() => fetch(`${BASE_URL}?${qsMemo.toString()}`));
-
-  if (rawByName[selectedStoreName]) {
-    rawByName[selectedStoreName].Status = newStatus;
-  }
-  applyFilters();
+    .then(() => fetch(`${BASE_URL}?${qsMemo.toString()}`))
+    .then(() => {
+      applyFilters();
+    });
 }
+
 
 
 /*************************************************

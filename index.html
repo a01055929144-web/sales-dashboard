@@ -868,12 +868,16 @@ let managerType = "";
 document.getElementById("btnCall").addEventListener("click", () => {
   managerType = "call";
   setTypeButtonUI();
+  applyManagerByType();   // ← 🔥 NEW
+
 });
 
 // SALES 버튼
 document.getElementById("btnSales").addEventListener("click", () => {
   managerType = "sales";
   setTypeButtonUI();
+  applyManagerByType();   // ← 🔥 NEW
+
 });
 
 // 버튼 UI 적용
@@ -1142,7 +1146,25 @@ function focusOnStore(store) {
   // 🔥 담당자 자동 세팅 (담당유형 기준)
   applyManagerByType();
 }
+/*************************************************
+ * 🔥 담당자 자동 변경 함수
+ *************************************************/
+function applyManagerByType() {
+  if (!selectedStoreName) return;
 
+  const row = rawByName[selectedStoreName];
+  const mgrSelect = document.getElementById("managerInput");
+
+  // 기본값 초기화
+  mgrSelect.value = "";
+
+  if (managerType === "call" && row["Manager(Call)"]) {
+    mgrSelect.value = row["Manager(Call)"];
+  }
+  if (managerType === "sales" && row["Manager(Sales)"]) {
+    mgrSelect.value = row["Manager(Sales)"];
+  }
+}
 /*************************************************
  * 12) 상세정보 표시
  *************************************************/

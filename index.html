@@ -1219,14 +1219,8 @@ function toggleFavorite(store) {
  * 18) 담당자 자동 히스토리 기록
  *************************************************/
 function addManagerHistory(manager) {
-  if (!selectedStoreName) return;
-
-  const memoText = `담당자를 ${manager}로 설정했습니다.`;
-  const now = new Date().toLocaleString("ko-KR");
-
-  insertHistoryUI(now, manager, memoText);
-
-  fetch(`${BASE_URL}?action=addMemo&name=${encodeURIComponent(selectedStoreName)}&memo=${encodeURIComponent(memoText)}&manager=${encodeURIComponent(manager)}`);
+  // 🔥 담당자 변경 시 히스토리를 남기지 않음
+  return;
 }
 
 /*************************************************

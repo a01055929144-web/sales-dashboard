@@ -940,7 +940,6 @@ async function loadData() {
         ...r,
         lat: Number(r.lat),
         lng: Number(r.lng),
-        favorite: r.favorite === true || r.favorite === "TRUE"
       }));
 
     rawByName = {};
@@ -1090,7 +1089,7 @@ function renderAll() {
  *************************************************/
 function createMarkerIcon(store, favorite = false, selected = false) {
   const size = selected ? 26 : 18;
-  const borderColor = favorite ? "#fbbf24" : "#ffffff";
+const borderColor = "#ffffff";
 
   // ⭐ 신규 매장(오픈월 존재) → 별 모양
   if (store.open_month && store.open_month.trim() !== "") {
@@ -1379,19 +1378,6 @@ function saveMemo() {
   fetch(`${BASE_URL}?action=addMemo&name=${encodeURIComponent(selectedStoreName)}&memo=${encodeURIComponent(memo)}&manager=${encodeURIComponent(manager)}`);
 
   document.getElementById("memoInput").value = "";
-}
-
-/*************************************************
- * 17) 즐겨찾기
- *************************************************/
-function toggleFavorite(store) {
-  store.favorite = !store.favorite;
-  if (rawByName[store.name]) {
-    rawByName[store.name].favorite = store.favorite;
-  }
-  applyFilters();
-
-  fetch(`${BASE_URL}?action=favorite&name=${encodeURIComponent(store.name)}&fav=${store.favorite ? "TRUE" : "FALSE"}`);
 }
 
 /*************************************************

@@ -381,6 +381,29 @@
     height: auto !important;
   }
 
+  /* 🔥 header 필터 줄바꿈 가능하도록 */
+  header {
+    flex-wrap: wrap !important;
+    padding-bottom: 10px;
+    height: auto !important;
+  }
+
+  .header-controls {
+    flex-wrap: wrap !important;
+    width: 100%;
+    gap: 8px;
+  }
+
+  /* 🔥 필터/검색 input → 2줄 자동 배치 */
+  .search-input,
+  .select-input {
+    flex: 1 1 calc(50% - 10px);
+    min-width: 140px;
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  /* 🔥 전체 구조 */
   .layout {
     display: block;
     height: auto !important;
@@ -398,15 +421,15 @@
     margin-bottom: 0 !important;
   }
 
-  /* 🔥 지도 크기 고정값으로 변경 → 빈 공간 완전 제거 */
+  /* 🔥 지도 크기 - 빈 공간 제거 + 항상 꽉 차게 */
   #map {
     width: 100%;
-    height: 420px !important;
+    height: 420px !important;     /* 모바일에서 채우는 높이 */
     min-height: 350px !important;
     margin-top: 12px;
   }
 
-  /* 🔥 대시보드 패널 여백 제거 */
+  /* 🔥 대시보드 */
   .dashboard-panel {
     margin-top: 14px;
     padding: 12px;
@@ -416,20 +439,15 @@
     margin-bottom: 0 !important;
   }
 
-  /* 🔥 인풋/버튼 크기 */
-  .search-input,
-  .select-input {
-    width: 100%;
-    font-size: 15px;
-    padding: 10px;
-  }
-
-  .primary-btn, .secondary-btn {
+  /* 🔥 버튼 크기 */
+  .primary-btn, 
+  .secondary-btn {
     width: 100%;
     font-size: 15px;
     padding: 12px;
   }
 }
+
 
 
 

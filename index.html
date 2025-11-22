@@ -983,8 +983,9 @@ function buildFilters(rows) {
   // 🔥 여기 부분만 새로 추가 (신규 요청 기능)
   const openMonthSelect = document.getElementById("openMonthSelect");
   openMonthSelect.innerHTML = `
-    <option value="ALL_NEW">전체 신규 오픈 매장</option>
-    <option value="ALL">전체 오픈월</option>
+    <option value="ALL">전체 매장</option>
+    <option value="ALL_NEW">전체 신규 매장</option>
+    
   `;
 
   [...openMonthSet].sort().forEach(v => {

@@ -973,7 +973,12 @@ function buildFilters(rows) {
     if (r.category) catSet.add(r.category.split(">")[0].trim());
     if (r.Status) statusSet.add(r.Status);
     if (r.sigungu) regionSet.add(r.sigungu);
-    if (r.open_month) openMonthSet.add(r.open_month);
+  rows.forEach(r => {
+    const om = (r.open_month || "").trim();
+    if (om !== "") {
+    openMonthSet.add(om);
+  }
+});
   });
 
   fillSelect("categorySelect", "전체 카테고리", [...catSet]);

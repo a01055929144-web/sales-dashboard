@@ -973,19 +973,27 @@ function buildFilters(rows) {
     if (r.category) catSet.add(r.category.split(">")[0].trim());
     if (r.Status) statusSet.add(r.Status);
     if (r.sigungu) regionSet.add(r.sigungu);
-  rows.forEach(r => {
-    const om = (r.open_month || "").trim();
-    if (om !== "") {
-    openMonthSet.add(om);
-  }
-});
+    if (r.open_month && r.open_month.trim()) openMonthSet.add(r.open_month);
   });
 
   fillSelect("categorySelect", "전체 카테고리", [...catSet]);
   fillSelect("statusFilterSelect", "전체 상태", [...statusSet]);
   fillSelect("regionSelect", "전체 지역", [...regionSet]);
-  fillSelect("openMonthSelect", "전체 오픈월", [...openMonthSet]);
+
+  // 🔥 여기 부분만 새로 추가 (신규 요청 기능)
+  const openMonthSelect = document.getElementById("openMonthSelect");
+  openMonthSelect.innerHTML = `
+    <option value="ALL_NEW">전체 신규 오픈 매장</option>
+    <option value="ALL">전체 오픈월</option>
+  `;
+
+  [...openMonthSet].sort().forEach(v => {
+    openMonthSelect.insertAdjacentHTML("beforeend",
+      `<option value="${v}">${v}</option>`
+    );
+  });
 }
+
 
 
 
@@ -1017,8 +1025,9 @@ function applyFilters() {
     const matchStatus = st === "ALL" || (r.Status || "") === st;
     const matchRegion = region === "ALL" || (r.sigungu || "") === region;
     const matchOpenMonth =
-      openMonth === "ALL" ||
-      String(r.open_month || "") === openMonth;
+  (openMonth === "ALL") ||
+  (openMonth === "ALL_NEW" && (r.open_month && r.open_month !== "")) ||
+  (openMonth !== "ALL_NEW" && String(r.open_month || "") === openMonth);
 
     return (
       matchSearch &&

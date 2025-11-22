@@ -1076,7 +1076,29 @@ function renderAll() {
 /*************************************************
  * 8) 마커 아이콘
  *************************************************/
-function createMarkerIcon(status, favorite = false, selected = false) {
+function createMarkerIcon(store, favorite = false, selected = false) {
+
+  // 🔥 신규 매장 색상 우선 적용
+  const isNew = store.open_month && store.open_month !== "";
+  if (isNew) {
+    const size = selected ? 22 : 16;
+    return L.divIcon({
+      className: "custom-marker",
+      html: `
+        <div class="marker-dot"
+             style="
+                background:#8b5cf6; /* 보라색 */
+                border-color:${favorite ? "#fbbf24" : "#ffffff"};
+                width:${size}px;
+                height:${size}px;
+             ">
+        </div>`,
+      iconSize: [size + 4, size + 4],
+      iconAnchor: [(size + 4) / 2, (size + 4) / 2]
+    });
+  }
+
+  // 기존 상태 색상 로직
   const STATUS_COLOR = {
     "거래 성사": "#2ecc71",
     "미팅 완료": "#3498db",
@@ -1085,7 +1107,7 @@ function createMarkerIcon(status, favorite = false, selected = false) {
     "거절": "#e74c3c"
   };
 
-  const color = STATUS_COLOR[status] || "#7f8c8d";
+  const color = STATUS_COLOR[store.Status] || "#7f8c8d";
   const size = selected ? 22 : 16;
   const borderColor = favorite ? "#fbbf24" : "#ffffff";
 
@@ -1098,8 +1120,7 @@ function createMarkerIcon(status, favorite = false, selected = false) {
               border-color:${borderColor};
               width:${size}px;
               height:${size}px;
-           ">
-      </div>`,
+           "></div>`,
     iconSize: [size + 4, size + 4],
     iconAnchor: [(size + 4) / 2, (size + 4) / 2]
   });

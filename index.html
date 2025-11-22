@@ -527,11 +527,9 @@
   <h1>📍 Sales Store Map</h1>
 
   <div class="header-controls">
-   <select id="newOpenSelect" class="select-input">
-      <option value="ALL">전체 매장 구분</option>
-      <option value="TRUE">신규 매장</option>
-      <option value="FALSE">기존 매장</option>
-    </select>
+  <select id="openMonthSelect" class="select-input">
+  <option value="ALL">전체 오픈월</option>
+   </select>
 
     <select id="statusFilterSelect" class="select-input">
       <option value="ALL">전체 상태</option>
@@ -969,22 +967,21 @@ function buildFilters(rows) {
   const catSet = new Set();
   const statusSet = new Set();
   const regionSet = new Set();
-  const newOpenSet = new Set();   // 🔥 추가
+  const openMonthSet = new Set();
 
   rows.forEach(r => {
     if (r.category) catSet.add(r.category.split(">")[0].trim());
     if (r.Status) statusSet.add(r.Status);
     if (r.sigungu) regionSet.add(r.sigungu);
-
-    // 🔥 신규/기존 구분
-    if (r.new_open) newOpenSet.add(String(r.new_open).toUpperCase());
+    if (r.open_month) openMonthSet.add(r.open_month);
   });
 
   fillSelect("categorySelect", "전체 카테고리", [...catSet]);
   fillSelect("statusFilterSelect", "전체 상태", [...statusSet]);
   fillSelect("regionSelect", "전체 지역", [...regionSet]);
-  fillSelect("newOpenSelect", "전체 매장 구분", [...newOpenSet]);   // 🔥 추가
+  fillSelect("openMonthSelect", "전체 오픈월", [...openMonthSet]);
 }
+
 
 
 function fillSelect(id, label, arr) {
@@ -1004,22 +1001,32 @@ function applyFilters() {
   const st = document.getElementById("statusFilterSelect").value;
   const region = document.getElementById("regionSelect").value;
   const sortMode = document.getElementById("sortSelect").value;
-  const newOpen = document.getElementById("newOpenSelect").value;
+  const openMonth = document.getElementById("openMonthSelect").value;
+  const isNew = r.open_month && r.open_month !== "";
+
 
 
   filteredRows = rawRows.filter(r => {
     const text = `${r.name} ${r.sigungu} ${r.roadAddress} ${r.keyword}`.toLowerCase();
     const major = (r.category || "").split(">")[0].trim();
-    const matchNewOpen =  newOpen === "ALL" ||  (String(r.new_open || "").toUpperCase() === newOpen);
-
     const matchSearch = !q || text.includes(q);
     const matchCat = cat === "ALL" || major === cat;
     const matchStatus = st === "ALL" || (r.Status || "") === st;
     const matchRegion = region === "ALL" || (r.sigungu || "") === region;
+    const matchOpenMonth =
+  openMonth === "ALL" ||
+  (String(r.open_month || "") === openMonth);
+
    
 
-return matchSearch && matchCat && matchStatus && matchRegion && matchNewOpen;
-  });
+return (
+  matchSearch &&
+  matchCat &&
+  matchStatus &&
+  matchRegion &&
+  matchOpenMonth
+);
+
 
   filteredRows = sortStores(filteredRows, sortMode);
 
@@ -1139,6 +1146,8 @@ function renderStoreList() {
   listEl.innerHTML = "";
 
   filteredRows.slice(0, 500).forEach(store => {
+    const isNew = store.open_month && store.open_month !== "";  // ← 여기!
+
     const li = document.createElement("li");
     li.className = "store-item";
 

@@ -527,10 +527,10 @@
   <h1>📍 Sales Store Map</h1>
 
   <div class="header-controls">
-    <select id="newOpenSelect" class="select-input">
-      <option value="ALL">신규/기존</option>
-      <option value="Y">신규 오픈</option>
-      <option value="N">기존 매장</option>
+   <select id="newOpenSelect" class="select-input">
+      <option value="ALL">전체 매장 구분</option>
+      <option value="TRUE">신규 매장</option>
+      <option value="FALSE">기존 매장</option>
     </select>
 
     <select id="statusFilterSelect" class="select-input">
@@ -999,6 +999,8 @@ function applyFilters() {
   const region = document.getElementById("regionSelect").value;
   const sortMode = document.getElementById("sortSelect").value;
   const newOpen = document.getElementById("newOpenSelect").value;
+  const matchNewOpen = newOpen === "ALL" || String(r.new_open).toUpperCase() === newOpen;
+
 
   filteredRows = rawRows.filter(r => {
     const text = `${r.name} ${r.sigungu} ${r.roadAddress} ${r.keyword}`.toLowerCase();
@@ -1008,11 +1010,7 @@ function applyFilters() {
     const matchCat = cat === "ALL" || major === cat;
     const matchStatus = st === "ALL" || (r.Status || "") === st;
     const matchRegion = region === "ALL" || (r.sigungu || "") === region;
-    const matchNewOpen =
-  newOpen === "ALL" ||
-  (newOpen === "Y" && (r.new_open === "TRUE" || r.new_open === true)) ||
-  (newOpen === "N" && (!r.new_open || r.new_open === "" || r.new_open === "FALSE"));
-
+   
 
 return matchSearch && matchCat && matchStatus && matchRegion && matchNewOpen;
   });

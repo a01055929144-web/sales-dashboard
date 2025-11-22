@@ -373,38 +373,50 @@
   </style>
 <!-- ✅ 모바일 최적화 미디어 쿼리 + 매장 리스트 고정 스크롤 -->
 <style>
+  
 @media screen and (max-width: 768px) {
+
+  /* 🔥 모바일에서는 body 높이를 고정하지 않음 */
+  body {
+    height: auto !important;
+  }
 
   .layout {
     display: block;
     height: auto !important;
     overflow-y: auto;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
   }
 
-  /* 매장 리스트는 3개만 보이고 스크롤 */
+  /* 🔥 매장 리스트 */
   .store-panel {
     max-height: 180px;
     overflow-y: auto;
     border-bottom: 1px solid #ddd;
     padding-bottom: 6px;
+    margin-bottom: 0 !important;
   }
 
-  /* 지도는 모바일화면에서 더 크게 */
+  /* 🔥 지도 크기 고정값으로 변경 → 빈 공간 완전 제거 */
   #map {
     width: 100%;
-    height: 55vh !important;   /* 🔥 모바일 화면 절반 이상 */
-    min-height: 400px;         /* 화면이 작아도 최소 400px은 확보 */
+    height: 420px !important;
+    min-height: 350px !important;
     margin-top: 12px;
   }
 
+  /* 🔥 대시보드 패널 여백 제거 */
   .dashboard-panel {
     margin-top: 14px;
     padding: 12px;
     border: none;
     width: 100%;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
   }
 
-  /* 필터/검색 input 크기 증가 */
+  /* 🔥 인풋/버튼 크기 */
   .search-input,
   .select-input {
     width: 100%;
@@ -418,6 +430,7 @@
     padding: 12px;
   }
 }
+
 
 
  /* ⭐ 카카오맵/네이버 지도 스타일 Floating 버튼 */

@@ -1089,7 +1089,36 @@ function renderAll() {
  * 8) 마커 아이콘
  *************************************************/
 function createMarkerIcon(store, favorite = false, selected = false) {
+  const size = selected ? 26 : 18;
+  const borderColor = favorite ? "#fbbf24" : "#ffffff";
 
+  // ⭐ 신규 매장(오픈월 존재) → 별 모양
+  if (store.open_month && store.open_month.trim() !== "") {
+    return L.divIcon({
+      className: "custom-marker",
+      html: `
+        <div style="
+          width:${size}px;
+          height:${size}px;
+          color:#8b5cf6;
+          font-size:${size}px;
+          text-shadow: -1px -1px 0 white, 
+                        1px -1px 0 white, 
+                       -1px  1px 0 white, 
+                        1px  1px 0 white;
+          display:flex;
+          justify-content:center;
+          align-items:center;
+        ">
+          ★
+        </div>
+      `,
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2]
+    });
+  }
+
+  // 기존 상태 색상 로직
   const STATUS_COLOR = {
     "거래 성사": "#2ecc71",
     "미팅 완료": "#3498db",
@@ -1099,29 +1128,7 @@ function createMarkerIcon(store, favorite = false, selected = false) {
   };
 
   const color = STATUS_COLOR[store.Status] || "#7f8c8d";
-  const size = selected ? 26 : 20;
-  const borderColor = favorite ? "#fbbf24" : "#ffffff";
-  
-  // 🔥 신규 매장(open_month 있음) → ⭐ 별 아이콘
-  const isNew = store.open_month && store.open_month !== "";
-  if (isNew) {
-    return L.divIcon({
-      className: "custom-marker",
-      html: `
-        <div style="
-          color:${color};
-          font-size:${selected ? 30 : 24}px;
-          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-          ">
-          ⭐
-        </div>
-      `,
-      iconSize: [size + 10, size + 10],
-      iconAnchor: [(size + 10) / 2, (size + 10) / 2]
-    });
-  }
 
-  // 🔵 일반 매장: 상태색 원형
   return L.divIcon({
     className: "custom-marker",
     html: `
@@ -1131,13 +1138,15 @@ function createMarkerIcon(store, favorite = false, selected = false) {
               border-color:${borderColor};
               width:${size}px;
               height:${size}px;
-              border-radius:50%;
-           "></div>
-    `,
+              border-radius:999px;
+              border:2px solid ${borderColor};
+           ">
+      </div>`,
     iconSize: [size + 4, size + 4],
     iconAnchor: [(size + 4) / 2, (size + 4) / 2]
   });
 }
+
 
 
 /*************************************************

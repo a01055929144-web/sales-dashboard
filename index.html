@@ -969,17 +969,23 @@ function buildFilters(rows) {
   const catSet = new Set();
   const statusSet = new Set();
   const regionSet = new Set();
+  const newOpenSet = new Set();   // 🔥 추가
 
   rows.forEach(r => {
     if (r.category) catSet.add(r.category.split(">")[0].trim());
     if (r.Status) statusSet.add(r.Status);
     if (r.sigungu) regionSet.add(r.sigungu);
+
+    // 🔥 신규/기존 구분
+    if (r.new_open) newOpenSet.add(String(r.new_open).toUpperCase());
   });
 
   fillSelect("categorySelect", "전체 카테고리", [...catSet]);
   fillSelect("statusFilterSelect", "전체 상태", [...statusSet]);
   fillSelect("regionSelect", "전체 지역", [...regionSet]);
+  fillSelect("newOpenSelect", "전체 매장 구분", [...newOpenSet]);   // 🔥 추가
 }
+
 
 function fillSelect(id, label, arr) {
   const el = document.getElementById(id);
@@ -1004,7 +1010,7 @@ function applyFilters() {
   filteredRows = rawRows.filter(r => {
     const text = `${r.name} ${r.sigungu} ${r.roadAddress} ${r.keyword}`.toLowerCase();
     const major = (r.category || "").split(">")[0].trim();
-    const matchNewOpen =  newOpen === "ALL" ||  String(r.new_open).toUpperCase() === newOpen;
+    const matchNewOpen =  newOpen === "ALL" ||  (String(r.new_open || "").toUpperCase() === newOpen);
 
     const matchSearch = !q || text.includes(q);
     const matchCat = cat === "ALL" || major === cat;

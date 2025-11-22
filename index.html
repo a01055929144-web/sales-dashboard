@@ -878,7 +878,7 @@ function initEvents() {
   document.getElementById("statusFilterSelect").addEventListener("change", applyFilters);
   document.getElementById("regionSelect").addEventListener("change", applyFilters);
   document.getElementById("sortSelect").addEventListener("change", applyFilters);
-  document.getElementById("newOpenSelect").addEventListener("change", applyFilters);
+  document.getElementById("openMonthSelect").addEventListener("change", applyFilters);
   document.getElementById("statusSaveBtn").addEventListener("click", saveStatus);
   document.getElementById("memoSaveBtn").addEventListener("click", saveMemo);
 
@@ -1002,36 +1002,33 @@ function applyFilters() {
   const region = document.getElementById("regionSelect").value;
   const sortMode = document.getElementById("sortSelect").value;
   const openMonth = document.getElementById("openMonthSelect").value;
-  const isNew = r.open_month && r.open_month !== "";
-
-
 
   filteredRows = rawRows.filter(r => {
     const text = `${r.name} ${r.sigungu} ${r.roadAddress} ${r.keyword}`.toLowerCase();
     const major = (r.category || "").split(">")[0].trim();
+
     const matchSearch = !q || text.includes(q);
     const matchCat = cat === "ALL" || major === cat;
     const matchStatus = st === "ALL" || (r.Status || "") === st;
     const matchRegion = region === "ALL" || (r.sigungu || "") === region;
+
     const matchOpenMonth =
-  openMonth === "ALL" ||
-  (String(r.open_month || "") === openMonth);
+      openMonth === "ALL" ||
+      String(r.open_month || "") === openMonth;
 
-   
-
-return (
-  matchSearch &&
-  matchCat &&
-  matchStatus &&
-  matchRegion &&
-  matchOpenMonth
-);
-
+    return (
+      matchSearch &&
+      matchCat &&
+      matchStatus &&
+      matchRegion &&
+      matchOpenMonth
+    );
+  });
 
   filteredRows = sortStores(filteredRows, sortMode);
-
   renderAll();
 }
+
 
 /*************************************************
  * 6) 정렬

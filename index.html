@@ -527,6 +527,12 @@
   <h1>📍 Sales Store Map</h1>
 
   <div class="header-controls">
+    <select id="newOpenSelect" class="select-input">
+      <option value="ALL">신규/기존</option>
+      <option value="Y">신규 오픈</option>
+      <option value="N">기존 매장</option>
+    </select>
+
     <select id="statusFilterSelect" class="select-input">
       <option value="ALL">전체 상태</option>
     </select>
@@ -874,7 +880,7 @@ function initEvents() {
   document.getElementById("statusFilterSelect").addEventListener("change", applyFilters);
   document.getElementById("regionSelect").addEventListener("change", applyFilters);
   document.getElementById("sortSelect").addEventListener("change", applyFilters);
-
+  document.getElementById("newOpenSelect").addEventListener("change", applyFilters);
   document.getElementById("statusSaveBtn").addEventListener("click", saveStatus);
   document.getElementById("memoSaveBtn").addEventListener("click", saveMemo);
 
@@ -992,6 +998,7 @@ function applyFilters() {
   const st = document.getElementById("statusFilterSelect").value;
   const region = document.getElementById("regionSelect").value;
   const sortMode = document.getElementById("sortSelect").value;
+  const newOpen = document.getElementById("newOpenSelect").value;
 
   filteredRows = rawRows.filter(r => {
     const text = `${r.name} ${r.sigungu} ${r.roadAddress} ${r.keyword}`.toLowerCase();
@@ -1001,8 +1008,13 @@ function applyFilters() {
     const matchCat = cat === "ALL" || major === cat;
     const matchStatus = st === "ALL" || (r.Status || "") === st;
     const matchRegion = region === "ALL" || (r.sigungu || "") === region;
+    const matchNewOpen =
+  newOpen === "ALL" ||
+  (newOpen === "Y" && (r.new_open === "TRUE" || r.new_open === true)) ||
+  (newOpen === "N" && (!r.new_open || r.new_open === "" || r.new_open === "FALSE"));
 
-    return matchSearch && matchCat && matchStatus && matchRegion;
+
+return matchSearch && matchCat && matchStatus && matchRegion && matchNewOpen;
   });
 
   filteredRows = sortStores(filteredRows, sortMode);

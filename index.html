@@ -1090,27 +1090,6 @@ function renderAll() {
  *************************************************/
 function createMarkerIcon(store, favorite = false, selected = false) {
 
-  // 🔥 신규 매장 색상 우선 적용
-  const isNew = store.open_month && store.open_month !== "";
-  if (isNew) {
-    const size = selected ? 22 : 16;
-    return L.divIcon({
-      className: "custom-marker",
-      html: `
-        <div class="marker-dot"
-             style="
-                background:#8b5cf6; /* 보라색 */
-                border-color:${favorite ? "#fbbf24" : "#ffffff"};
-                width:${size}px;
-                height:${size}px;
-             ">
-        </div>`,
-      iconSize: [size + 4, size + 4],
-      iconAnchor: [(size + 4) / 2, (size + 4) / 2]
-    });
-  }
-
-  // 기존 상태 색상 로직
   const STATUS_COLOR = {
     "거래 성사": "#2ecc71",
     "미팅 완료": "#3498db",
@@ -1120,9 +1099,29 @@ function createMarkerIcon(store, favorite = false, selected = false) {
   };
 
   const color = STATUS_COLOR[store.Status] || "#7f8c8d";
-  const size = selected ? 22 : 16;
+  const size = selected ? 26 : 20;
   const borderColor = favorite ? "#fbbf24" : "#ffffff";
+  
+  // 🔥 신규 매장(open_month 있음) → ⭐ 별 아이콘
+  const isNew = store.open_month && store.open_month !== "";
+  if (isNew) {
+    return L.divIcon({
+      className: "custom-marker",
+      html: `
+        <div style="
+          color:${color};
+          font-size:${selected ? 30 : 24}px;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+          ">
+          ⭐
+        </div>
+      `,
+      iconSize: [size + 10, size + 10],
+      iconAnchor: [(size + 10) / 2, (size + 10) / 2]
+    });
+  }
 
+  // 🔵 일반 매장: 상태색 원형
   return L.divIcon({
     className: "custom-marker",
     html: `
@@ -1132,11 +1131,14 @@ function createMarkerIcon(store, favorite = false, selected = false) {
               border-color:${borderColor};
               width:${size}px;
               height:${size}px;
-           "></div>`,
+              border-radius:50%;
+           "></div>
+    `,
     iconSize: [size + 4, size + 4],
     iconAnchor: [(size + 4) / 2, (size + 4) / 2]
   });
 }
+
 
 /*************************************************
  * 9) 마커 렌더링

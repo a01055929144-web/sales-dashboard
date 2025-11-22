@@ -1011,7 +1011,6 @@ function applyFilters() {
     const matchCat = cat === "ALL" || major === cat;
     const matchStatus = st === "ALL" || (r.Status || "") === st;
     const matchRegion = region === "ALL" || (r.sigungu || "") === region;
-
     const matchOpenMonth =
       openMonth === "ALL" ||
       String(r.open_month || "") === openMonth;
@@ -1028,6 +1027,7 @@ function applyFilters() {
   filteredRows = sortStores(filteredRows, sortMode);
   renderAll();
 }
+
 
 
 /*************************************************

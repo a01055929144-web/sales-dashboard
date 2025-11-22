@@ -1135,7 +1135,7 @@ function renderMarkers() {
 
   filteredRows.forEach(store => {
     const marker = L.marker([store.lat, store.lng], {
-      icon: createMarkerIcon(store.Status, store.favorite, store.name === selectedStoreName)
+    icon: createMarkerIcon(store, store.favorite, store.name === selectedStoreName)
     });
 
     marker.bindTooltip(store.name || "", {
@@ -1203,11 +1203,12 @@ function focusOnStore(store) {
   }
 
   Object.keys(markersByName).forEach(name => {
-    const row = rawByName[name];
-    markersByName[name].setIcon(
-      createMarkerIcon(row.Status, row.favorite, name === selectedStoreName)
-    );
-  });
+   const row = rawByName[name];
+   markersByName[name].setIcon(
+    createMarkerIcon(row, row.favorite, name === selectedStoreName)
+  );
+});
+
 
   showStoreDetail(store);
   setStatusDropdown(store);

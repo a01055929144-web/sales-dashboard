@@ -999,12 +999,12 @@ function applyFilters() {
   const region = document.getElementById("regionSelect").value;
   const sortMode = document.getElementById("sortSelect").value;
   const newOpen = document.getElementById("newOpenSelect").value;
-  const matchNewOpen = newOpen === "ALL" || String(r.new_open).toUpperCase() === newOpen;
 
 
   filteredRows = rawRows.filter(r => {
     const text = `${r.name} ${r.sigungu} ${r.roadAddress} ${r.keyword}`.toLowerCase();
     const major = (r.category || "").split(">")[0].trim();
+    const matchNewOpen =  newOpen === "ALL" ||  String(r.new_open).toUpperCase() === newOpen;
 
     const matchSearch = !q || text.includes(q);
     const matchCat = cat === "ALL" || major === cat;

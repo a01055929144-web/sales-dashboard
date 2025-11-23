@@ -1469,7 +1469,7 @@ function saveStatus() {
     memoText
   );
 
-  // 🔥 서버 저장 (updateStatus만 호출)
+  // 🔥 서버 저장
   const qs = new URLSearchParams({
     action: "updateStatus",
     name: selectedStoreName,
@@ -1478,12 +1478,16 @@ function saveStatus() {
     managerType: managerType
   });
 
-fetch(`${BASE_URL}?${qs.toString()}`)
-  .then(() => {
-    applyFilters();                 // UI 즉시 갱신
-    loadHistory(selectedStoreName); // 🔥 히스토리도 즉시 다시 로딩
-  });
-
+  fetch(`${BASE_URL}?${qs.toString()}`)
+    .then(() => {
+      applyFilters();
+      loadHistory(selectedStoreName);
+    })
+    .catch(e => {
+      console.error("상태 저장 실패", e);
+      alert("상태 저장 중 오류가 발생했습니다.");
+    });
+}
 
 
 

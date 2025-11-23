@@ -880,11 +880,20 @@ let chartInstance;
 document.addEventListener("DOMContentLoaded", () => {
   initMap();
   initEvents();
+  // 🔥 범례 토글 이벤트는 DOMContentLoaded 안에서 등록해야 정상 작동함
+document.getElementById("legendToggle").addEventListener("click", () => {
+  document.getElementById("legendPanel").style.display = "block";
+});
+
+document.getElementById("legendCloseBtn").addEventListener("click", () => {
+  document.getElementById("legendPanel").style.display = "none";
+});
   
   setTypeButtonUI();
   
   loadData().then(() => {
    addMyLiveLocation(); // ✅ 데이터 로드 후 실행
+    
     
  // 👉 여기 아래에 추가
   const toggleBtn = document.getElementById("dashboardToggleBtn");
@@ -1469,9 +1478,12 @@ function saveStatus() {
     managerType: managerType
   });
 
-  fetch(`${BASE_URL}?${qs.toString()}`)
-    .then(() => applyFilters());
-}
+fetch(`${BASE_URL}?${qs.toString()}`)
+  .then(() => {
+    applyFilters();                 // UI 즉시 갱신
+    loadHistory(selectedStoreName); // 🔥 히스토리도 즉시 다시 로딩
+  });
+
 
 
 

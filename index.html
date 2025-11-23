@@ -411,6 +411,11 @@
   margin-right: 8px;
   color: #8b5cf6; /* 보라색 */
 }
+
+    .custom-marker {
+  overflow: visible !important;
+}
+
     
 
   </style>
@@ -937,43 +942,6 @@ function initMap() {
   });
   map.addLayer(markerCluster);
   
-// ⭐ 범례 추가
-const legend = L.control({ position: "topleft" });
-
-legend.onAdd = function () {
-  const div = L.DomUtil.create("div", "legend-box");
-
-  div.innerHTML = `
-    <div class="legend-item">
-      <span class="legend-star">★</span> 신규 매장
-    </div>
-
-    <div class="legend-item">
-      <span class="legend-marker" style="background:#2ecc71;"></span> 거래 성사
-    </div>
-
-    <div class="legend-item">
-      <span class="legend-marker" style="background:#3498db;"></span> 미팅 완료
-    </div>
-
-    <div class="legend-item">
-      <span class="legend-marker" style="background:#f1c40f;"></span> 미팅 요청
-    </div>
-
-    <div class="legend-item">
-      <span class="legend-marker" style="background:#95a5a6;"></span> 부재중/미응답
-    </div>
-
-    <div class="legend-item">
-      <span class="legend-marker" style="background:#e74c3c;"></span> 거절
-    </div>
-  `;
-
-  return div;
-};
-
-legend.addTo(map);
-
  
 
   // 🔥 지도 내부에 내 위치 버튼 추가

@@ -369,6 +369,49 @@
       border-radius: 999px;
       border: 2px solid #ffffff;
     }
+/* ⭐ 범례 스타일 */
+.legend-box {
+  background: rgba(255, 255, 255, 0.92);
+  padding: 10px 14px;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  font-size: 12px;
+  color: #111827;
+  line-height: 1.5;
+  width: 158px;
+  backdrop-filter: blur(6px);
+}
+
+/* 타이틀 */
+.legend-title {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+/* 범례 아이템 한 줄 */
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+/* 마커 썸네일(이미지/도형) */
+.legend-marker {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border:2px solid #fff;
+  margin-right: 8px;
+}
+
+/* ⭐ 신규 매장: 별모양 (원 대신) */
+.legend-star {
+  font-size: 14px;
+  margin-right: 8px;
+  color: #8b5cf6; /* 보라색 */
+}
+    
 
   </style>
 <!-- ✅ 모바일 최적화 미디어 쿼리 + 매장 리스트 고정 스크롤 -->
@@ -794,6 +837,26 @@ function initMap() {
     maxClusterRadius: 35
   });
   map.addLayer(markerCluster);
+  
+  // 🔥 🔥 범례(legend) 추가
+  const legend = L.control({ position: "topleft" });
+
+  legend.onAdd = function () {
+    const div = L.DomUtil.create("div", "legend-box");
+    div.innerHTML = `
+      <div><b>🗂 상태 범례</b></div>
+      <div><span class="legend-dot" style="background:#8b5cf6;"></span> 신규 오픈</div>
+      <div><span class="legend-dot" style="background:#2ecc71;"></span> 거래 성사</div>
+      <div><span class="legend-dot" style="background:#3498db;"></span> 미팅 완료</div>
+      <div><span class="legend-dot" style="background:#f1c40f;"></span> 미팅 요청</div>
+      <div><span class="legend-dot" style="background:#95a5a6;"></span> 부재중/미응답</div>
+      <div><span class="legend-dot" style="background:#e74c3c;"></span> 거절</div>
+    `;
+    return div;
+  };
+
+  legend.addTo(map);  
+ 
 
   // 🔥 지도 내부에 내 위치 버튼 추가
   const locateControl = L.control({ position: 'bottomright' });

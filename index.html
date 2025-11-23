@@ -702,12 +702,34 @@
   <!-- 가운데: 지도 -->
 <main>
   <div id="map">
-    <!-- ⭐ 반드시 map 내부에 넣어야 지도 기준 absolute 작동함 -->
-    <div id="legendToggle">범례 ▼</div>
-    <div id="legendPanel">
-      ... (범례 내용)
+
+  <div class="legend-header">
+    <span>📍 상태 범례</span>
+    <button id="legendCloseBtn">닫기</button>
+  </div>
+
+  <div class="legend-body">
+    <div class="legend-item">
+      <span class="legend-dot" style="background:#8b5cf6"></span> 신규 오픈 매장
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot" style="background:#2ecc71"></span> 거래 성사
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot" style="background:#3498db"></span> 미팅 완료
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot" style="background:#f1c40f"></span> 미팅 요청
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot" style="background:#95a5a6"></span> 부재중·미응답
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot" style="background:#e74c3c"></span> 거절
     </div>
   </div>
+</div>
+
 </main>
 
 

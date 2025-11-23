@@ -706,13 +706,12 @@
 
 <div id="legendPanel">
   <div class="legend-header">
-    <span>📍 상태 범례</span>
     <button id="legendCloseBtn">닫기</button>
   </div>
 
   <div class="legend-body">
     <div class="legend-item">
-      <span class="legend-dot" style="background:#8b5cf6"></span> 신규 오픈 매장
+      <span class="legend-star">★</span> 신규 오픈 매장
     </div>
     <div class="legend-item">
       <span class="legend-dot" style="background:#2ecc71"></span> 거래 성사
@@ -968,8 +967,12 @@ function initMap() {
   map = L.map("map", {
     center: [37.5665, 126.9780],
     zoom: 11,
-    zoomControl: true
+    zoomControl: false // 기본 zoom 버튼 제거
   });
+
+  L.control.zoom({
+    position: "topright"   // <-- 원하는 위치
+  }).addTo(map);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
@@ -981,6 +984,8 @@ function initMap() {
     maxClusterRadius: 35
   });
   map.addLayer(markerCluster);
+}
+
   
  
 

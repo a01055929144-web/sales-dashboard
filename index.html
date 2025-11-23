@@ -559,6 +559,91 @@
   pointer-events: auto !important;
 }
 
+  /* 🔥 범례 토글 버튼 */
+#legendToggle {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  background: rgba(0,0,0,0.55);
+  color: white;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  z-index: 9999;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+/* 🔥 범례 패널 */
+#legendPanel {
+  position: fixed;
+  top: 60px;
+  left: 14px;
+  width: 220px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  padding: 12px;
+  z-index: 9999;
+  display: none;
+}
+
+.legend-header {
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+#legendCloseBtn {
+  border:none;
+  background:#efefef;
+  padding:3px 8px;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.legend-body .legend-item {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.legend-dot {
+  width:12px;
+  height:12px;
+  border-radius:50%;
+}
+
+/* 🔥 모바일 전용 스타일 */
+@media (max-width: 768px) {
+
+  #legendToggle {
+    bottom: 80px;
+    top: auto;
+    left: 16px;
+    background: rgba(0,0,0,0.7);
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 12px;
+  }
+
+  #legendPanel {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    width: 100%;
+    padding: 16px;
+    border-radius: 16px 16px 0 0;
+    display: none;
+  }
+}
+
 
   
 </style>
@@ -817,6 +902,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
  });
 });
+// 🔥 범례 토글
+const legendToggle = document.getElementById("legendToggle");
+const legendPanel = document.getElementById("legendPanel");
+const legendCloseBtn = document.getElementById("legendCloseBtn");
+
+legendToggle.addEventListener("click", () => {
+  legendPanel.style.display = "block";
+});
+
+legendCloseBtn.addEventListener("click", () => {
+  legendPanel.style.display = "none";
+});
+
+  
 /*************************************************
  * 1) 지도 초기화
  *************************************************/
@@ -1564,6 +1663,25 @@ function renderStats() {
 }
 </script>
 
+<!-- 🔥 범례 토글 버튼 (PC/모바일 자동 적용) -->
+<div id="legendToggle">범례 ▼</div>
+
+<!-- 🔥 펼쳐지는 범례 패널 -->
+<div id="legendPanel">
+  <div class="legend-header">
+    <span>📍 상태 범례</span>
+    <button id="legendCloseBtn">닫기</button>
+  </div>
+
+  <div class="legend-body">
+    <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span> 신규 오픈 매장</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#2ecc71"></span> 거래 성사</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#3498db"></span> 미팅 완료</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#f1c40f"></span> 미팅 요청</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#95a5a6"></span> 부재중·미응답</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#e74c3c"></span> 거절</div>
+  </div>
+</div>
 
 
 </body>

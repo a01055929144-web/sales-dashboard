@@ -649,6 +649,9 @@
     display: none;
   }
 }
+.leaflet-marker-icon.custom-marker {
+  overflow: visible !important;
+}
 
   
 </style>
@@ -967,32 +970,29 @@ function initMap() {
   map = L.map("map", {
     center: [37.5665, 126.9780],
     zoom: 11,
-    zoomControl: false // 기본 zoom 버튼 제거
+    zoomControl: false
   });
 
-  L.control.zoom({
-    position: "topright"   // <-- 원하는 위치
-  }).addTo(map);
+  // 확대/축소 버튼 (오른쪽 상단)
+  L.control.zoom({ position: "topright" }).addTo(map);
 
+  // 타일 레이어
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: "&copy; OpenStreetMap"
   }).addTo(map);
 
+  // 마커 클러스터 그룹
   markerCluster = L.markerClusterGroup({
     showCoverageOnHover: false,
     maxClusterRadius: 35
   });
   map.addLayer(markerCluster);
-}
 
-  
- 
+  // 🔥 내 위치 버튼 추가 (여기 내부로 들어와야 함)
+  const locateControl = L.control({ position: "bottomright" });
 
-  // 🔥 지도 내부에 내 위치 버튼 추가
-  const locateControl = L.control({ position: 'bottomright' });
-
-  locateControl.onAdd = function(map) {
+  locateControl.onAdd = function () {
     const btn = L.DomUtil.create('div', 'leaflet-control-locate');
     btn.innerHTML = '📍';
     btn.onclick = () => moveToMyLocation();
@@ -1001,6 +1001,7 @@ function initMap() {
 
   locateControl.addTo(map);
 }
+
   
 // ✅ 여기 추가
 function addMyLiveLocation() {

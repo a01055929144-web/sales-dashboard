@@ -1576,14 +1576,17 @@ function saveMemo() {
   const memo = document.getElementById("memoInput").value.trim();
   if (!memo) return alert("메모 내용을 입력하세요.");
 
-  const now = new Date().toLocaleString("ko-KR");
+  document.getElementById("historyList").innerHTML = "저장 중...";
 
-  insertHistoryUI(now, manager, memo);
-
-  fetch(`${BASE_URL}?action=addMemo&name=${encodeURIComponent(selectedStoreName)}&memo=${encodeURIComponent(memo)}&manager=${encodeURIComponent(manager)}`);
- .then(() => loadHistory(selectedStoreName));  // ← NEW
-
-  document.getElementById("memoInput").value = "";
+  fetch(`${BASE_URL}?action=addMemo&name=${encodeURIComponent(selectedStoreName)}&memo=${encodeURIComponent(memo)}&manager=${encodeURIComponent(manager)}`)
+    .then(() => {
+      loadHistory(selectedStoreName);   // 🔥 서버 기준 최신 데이터 불러오기
+      document.getElementById("memoInput").value = "";
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("메모 저장 실패");
+    });
 }
 
 /*************************************************

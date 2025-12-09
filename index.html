@@ -1453,12 +1453,11 @@ function focusOnStore(store) {
 });
 
 
-  showStoreDetail(store);
-  setStatusDropdown(store);
-  loadHistory(store.name);
+showStoreDetail(store);
+setStatusDropdown(store);
+applyManagerByType();   // 담당자 셋업 먼저
+loadHistory(store.name);   // 히스토리 최종 호출 (덮어쓰기 방지)
 
-  // 🔥 담당자 자동 세팅 (담당유형 기준)
-  applyManagerByType();
 }
 /*************************************************
  * 🔥 담당자 자동 변경 함수
@@ -1568,7 +1567,8 @@ function saveStatus() {
  *************************************************/
 function loadHistory(name) {
   const listEl = document.getElementById("historyList");
-  listEl.innerHTML = "불러오는 중...";
+  listEl.innerHTML = "<div class='history-empty'>불러오는 중...</div>";
+
 
   fetch(`${BASE_URL}?action=history&name=${encodeURIComponent(name)}`)
     .then(res => res.json())

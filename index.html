@@ -1509,7 +1509,14 @@ function showStoreDetail(r) {
     <div class="info-item"><span>🔗 링크</span>${urlHtml}</div>
   `;
 }
-
+  
+/*************************************************
+ * ⭐ 상태 드롭다운 값 세팅 함수 추가 위치
+ *************************************************/
+function setStatusDropdown(store) {
+  const select = document.getElementById("statusChangeSelect");
+  select.value = store.Status || "";
+}
 /*************************************************
  * 13) 상태 드롭다운 값 세팅
  *************************************************/

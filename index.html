@@ -929,6 +929,9 @@ let selectedStoreName = null;
 let map;
 let chartInstance;
 
+let liveWatchId = null;   // ★ 여기에 추가
+let liveMarker = null;    // ★ 여기에 추가
+
 /*************************************************
  * DOM Ready
  *************************************************/
@@ -1014,53 +1017,133 @@ function initMap() {
   // 🔥 내 위치 버튼 추가 (여기 내부로 들어와야 함)
   const locateControl = L.control({ position: "bottomright" });
 
-  locateControl.onAdd = function () {
-    const btn = L.DomUtil.create('div', 'leaflet-control-locate');
-    btn.innerHTML = '📍';
-    btn.onclick = () => moveToMyLocation();
-    return btn;
+ locateControl.onAdd = function () {
+  const btn = L.DomUtil.create('div', 'leaflet-control-locate');
+  btn.innerHTML = '📍';
+
+  btn.onclick = () => {
+    if (liveWatchId === null) {
+      startLiveTracking();  // 🔥 실시간 시작
+    } else {
+      stopLiveTracking();   // 🔥 종료
+    }
   };
+
+  return btn;
+};
+
 
   locateControl.addTo(map);
 }
 
-  
-// ✅ 여기 추가
-function addMyLiveLocation() {
+  function startLiveTracking() {
   if (!navigator.geolocation) {
-    console.warn("Geolocation is not supported.");
+    alert("위치 정보를 지원하지 않습니다.");
     return;
   }
+
+  if (liveWatchId !== null) {
+    console.log("이미 실시간 추적 실행 중");
+    return;
+  }
+
+  liveWatchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      const { latitude, longitude, accuracy } = pos.coords;
+
+      const zoomLevel =
+        accuracy < 30 ? 17 :
+        accuracy < 80 ? 15 : 13;
+
+      if (!liveMarker) {
+        liveMarker = L.circleMarker([latitude, longitude], {
+          radius: 9,
+          fillColor: "#3b82f6",
+          color: "#ffffff",
+          weight: 2,
+          fillOpacity: 0.9
+        }).addTo(map);
+
+        liveMarker.bindTooltip("📍 실시간 내 위치", { permanent: false });
+
+        map.setView([latitude, longitude], zoomLevel);
+      } else {
+        liveMarker.setLatLng([latitude, longitude]);
+      }
+    },
+    (err) => {
+      console.error(err);
+      alert("GPS 신호가 약합니다.");
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 2000,
+      timeout: 15000
+    }
+  );
+}
+
+function stopLiveTracking() {
+  if (liveWatchId !== null) {
+    navigator.geolocation.clearWatch(liveWatchId);
+    liveWatchId = null;
+
+    if (liveMarker) {
+      map.removeLayer(liveMarker);
+      liveMarker = null;
+    }
+    console.log("🛑 실시간 추적 종료");
+  }
+}
+
+
   
+function addMyLiveLocation() {
   navigator.geolocation.getCurrentPosition(
     (pos) => {
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
+      const { latitude, longitude, accuracy } = pos.coords;
 
-      const myMarker = L.circleMarker([lat, lng], {
-        radius: 8,
-        fillColor: "#3b82f6",
-        color: "#ffffff",
-        weight: 2,
-        opacity: 1,
-        fillOpacity: 0.8
-      }).addTo(map);
+      console.log("📍 GPS Accuracy:", accuracy, "meters");
 
-      myMarker.bindTooltip("📍내 위치", { permanent: false });
+      const zoomLevel =
+        accuracy < 30 ? 17 :
+        accuracy < 80 ? 15 : 13;
 
-      map.setView([lat, lng], 14); // 지도 중심 이동
+      // 🟦 liveMarker 재사용 (중복 생성 방지)
+      if (!liveMarker) {
+        liveMarker = L.circleMarker([latitude, longitude], {
+          radius: 8,
+          fillColor: "#3b82f6",
+          color: "#ffffff",
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.85
+        }).addTo(map);
+
+        liveMarker.bindTooltip(`📍내 위치 (±${Math.round(accuracy)}m)`);
+
+      } else {
+        liveMarker.setLatLng([latitude, longitude]);
+      }
+
+      map.setView([latitude, longitude], zoomLevel);
+
+      if (accuracy > 100) {
+        console.warn("GPS 신호 약함");
+      }
     },
     (err) => {
       console.warn("위치 정보를 가져올 수 없습니다.", err);
     },
     {
       enableHighAccuracy: true,
-      timeout: 10000,
+      timeout: 15000,
       maximumAge: 0
     }
   );
 }
-// "내 위치" 버튼 눌렀을 때 지도만 이동시키는 함수
+
+      // "내 위치" 버튼 눌렀을 때 지도만 이동시키는 함수
 function moveToMyLocation() {
   if (!navigator.geolocation) {
     alert("위치 정보를 지원하지 않습니다.");
@@ -1069,9 +1152,13 @@ function moveToMyLocation() {
 
   navigator.geolocation.getCurrentPosition(
     (pos) => {
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-      map.setView([lat, lng], 14); // 🔥 현재 위치로 재이동
+      const { latitude, longitude, accuracy } = pos.coords;
+
+      const zoomLevel =
+        accuracy < 30 ? 17 :
+        accuracy < 80 ? 15 : 13;
+
+      map.setView([latitude, longitude], zoomLevel);
     },
     (err) => {
       console.error("위치 불러오기 실패", err);
@@ -1079,11 +1166,13 @@ function moveToMyLocation() {
     },
     {
       enableHighAccuracy: true,
-      timeout: 10000,
+      timeout: 15000,
       maximumAge: 0
     }
   );
 }
+
+
   
 
 /*************************************************

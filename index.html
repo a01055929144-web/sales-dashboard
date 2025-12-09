@@ -766,49 +766,51 @@
     </div>
 
     <!-- 숫자 카드 -->
-    <div class="stat-grid">
-      <div class="stat-card">
-        <div class="stat-label">총 매장 수</div>
-        <div class="stat-value" id="statTotal">0</div>
-      </div>
-      
-      <div class="stat-card">
-        <div class="stat-label">컨텍</div>
-        <div class="stat-value" id="statContact">0</div>
-        <div class="stat-sub" id="statContactPct"></div>
-      </div>
+  <div class="stat-grid">
 
+  <div class="stat-card">
+    <div class="stat-label">총 매장 수</div>
+    <div class="stat-value" id="statTotal">0</div>
+  </div>
 
-      <div class="stat-card">
-        <div class="stat-label">거래 성사</div>
-        <div class="stat-value" id="statDeal">0</div>
-        <div class="stat-sub" id="statDealPct"></div>
-      </div>
+  <div class="stat-card">
+    <div class="stat-label">컨텍</div>
+    <div class="stat-value" id="statContact">0</div>
+    <div class="stat-sub" id="statContactPct"></div>
+  </div>
 
-      <div class="stat-card">
-        <div class="stat-label">미팅 완료</div>
-        <div class="stat-value" id="statMeetingDone">0</div>
-        <div class="stat-sub" id="statMeetingDonePct"></div>
-      </div>
+  <div class="stat-card">
+    <div class="stat-label">미팅 요청</div>
+    <div class="stat-value" id="statRequest">0</div>
+    <div class="stat-sub" id="statRequestPct"></div>
+  </div>
 
-      <div class="stat-card">
-        <div class="stat-label">미팅 요청</div>
-        <div class="stat-value" id="statRequest">0</div>
-        <div class="stat-sub" id="statRequestPct"></div>
-      </div>
+  <div class="stat-card">
+    <div class="stat-label">미팅 완료</div>
+    <div class="stat-value" id="statMeetingDone">0</div>
+    <div class="stat-sub" id="statMeetingDonePct"></div>
+  </div>
 
-      <div class="stat-card">
-        <div class="stat-label">부재중/미응답</div>
-        <div class="stat-value" id="statNoAnswer">0</div>
-        <div class="stat-sub" id="statNoAnswerPct"></div>
-      </div>
+  <div class="stat-card">
+    <div class="stat-label">거래 성사</div>
+    <div class="stat-value" id="statDeal">0</div>
+    <div class="stat-sub" id="statDealPct"></div>
+  </div>
 
-      <div class="stat-card">
-        <div class="stat-label">거절</div>
-        <div class="stat-value" id="statReject">0</div>
-        <div class="stat-sub" id="statRejectPct"></div>
-      </div>
-    </div>
+  <div class="stat-card">
+    <div class="stat-label">부재중/미응답</div>
+    <div class="stat-value" id="statNoAnswer">0</div>
+    <div class="stat-sub" id="statNoAnswerPct"></div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">거절</div>
+    <div class="stat-value" id="statReject">0</div>
+    <div class="stat-sub" id="statRejectPct"></div>
+  </div>
+
+</div>
+
   </div> <!-- dashboardFoldArea --> 
 </div> <!-- dashboardContent -->
 
@@ -1702,14 +1704,15 @@ filteredRows.forEach(r => {
     }
   });
 
-  document.getElementById("chartStats").innerHTML = `
-    <div><b>컨텍:</b> ${stats.contact}개 (${pct(stats.contact)}%)</div>
-    <div><b>거래 성사:</b> ${stats.deal}개 (${pct(stats.deal)}%)</div>
-    <div><b>미팅 완료:</b> ${stats.meetingDone}개 (${pct(stats.meetingDone)}%)</div>
-    <div><b>미팅 요청:</b> ${stats.request}개 (${pct(stats.request)}%)</div>
-    <div><b>부재중/미응답:</b> ${stats.noAnswer}개 (${pct(stats.noAnswer)}%)</div>
-    <div><b>거절:</b> ${stats.reject}개 (${pct(stats.reject)}%)</div>
-  `;
+document.getElementById("chartStats").innerHTML = `
+  <div><b>컨텍:</b> ${stats.contact}개 (${pct(stats.contact)}%)</div>
+  <div><b>미팅 요청:</b> ${stats.request}개 (${pct(stats.request)}%)</div>
+  <div><b>미팅 완료:</b> ${stats.meetingDone}개 (${pct(stats.meetingDone)}%)</div>
+  <div><b>거래 성사:</b> ${stats.deal}개 (${pct(stats.deal)}%)</div>
+  <div><b>부재중/미응답:</b> ${stats.noAnswer}개 (${pct(stats.noAnswer)}%)</div>
+  <div><b>거절:</b> ${stats.reject}개 (${pct(stats.reject)}%)</div>
+`;
+
 }
 </script>
 

@@ -1503,7 +1503,7 @@ function showStoreDetail(r) {
     <div class="info-item"><span>📍 지역</span>${r.sigungu || "-"}</div>
     <div class="info-item"><span>🍽 업종</span>${major}</div>
     <div class="info-item"><span>⭐ 상태</span>${r.Status || "-"}</div>
-    <div class="info-item"><span>📝 키워드</span>${r.keyword || "-"}</div>
+    <div class="info-item"><span>📝키워드</span>${r.keyword || "-"}</div>
     <div class="info-item"><span>🔗 링크</span>${urlHtml}</div>
   `;
 }
@@ -1703,6 +1703,7 @@ filteredRows.forEach(r => {
   });
 
   document.getElementById("chartStats").innerHTML = `
+    <div><b>컨텍:</b> ${stats.contact}개 (${pct(stats.contact)}%)</div>
     <div><b>거래 성사:</b> ${stats.deal}개 (${pct(stats.deal)}%)</div>
     <div><b>미팅 완료:</b> ${stats.meetingDone}개 (${pct(stats.meetingDone)}%)</div>
     <div><b>미팅 요청:</b> ${stats.request}개 (${pct(stats.request)}%)</div>

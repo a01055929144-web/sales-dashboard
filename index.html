@@ -772,6 +772,12 @@
         <div class="stat-value" id="statTotal">0</div>
       </div>
       
+      <div class="stat-card">
+        <div class="stat-label">컨텍</div>
+        <div class="stat-value" id="statContact">0</div>
+        <div class="stat-sub" id="statContactPct"></div>
+      </div>
+
 
       <div class="stat-card">
         <div class="stat-label">거래 성사</div>
@@ -1667,6 +1673,10 @@ filteredRows.forEach(r => {
   document.getElementById("statRequestPct").textContent = `${pct(stats.request)}%`;
   document.getElementById("statNoAnswerPct").textContent = `${pct(stats.noAnswer)}%`;
   document.getElementById("statRejectPct").textContent = `${pct(stats.reject)}%`;
+
+  document.getElementById("statContact").textContent = stats.contact.toLocaleString();
+  document.getElementById("statContactPct").textContent = `${pct(stats.contact)}%`;
+
 
   if (chartInstance) chartInstance.destroy();
 

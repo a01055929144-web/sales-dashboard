@@ -712,29 +712,38 @@
     <button id="legendCloseBtn">닫기</button>
   </div>
 
-  <div class="legend-body">
-    <div class="legend-item">
-      <span class="legend-star">★</span>신규 오픈 매장
-    </div>
-    <div class="legend-item">
-        <span class="legend-dot" style="background:#5DADE2"></span> 컨텍
-    </div>
-    <div class="legend-item">
-      <span class="legend-dot" style="background:#2ecc71"></span> 거래 성사
-    </div>
-    <div class="legend-item">
-      <span class="legend-dot" style="background:#3498db"></span> 미팅 완료
-    </div>
-    <div class="legend-item">
-      <span class="legend-dot" style="background:#f1c40f"></span> 미팅 요청
-    </div>
-    <div class="legend-item">
-      <span class="legend-dot" style="background:#95a5a6"></span> 부재중·미응답
-    </div>
-    <div class="legend-item">
-      <span class="legend-dot" style="background:#e74c3c"></span> 거절
-    </div>
+ <div class="legend-body">
+
+  <div class="legend-item">
+    <span class="legend-dot" style="background:#5DADE2"></span> 컨텍
   </div>
+
+  <div class="legend-item">
+    <span class="legend-dot" style="background:#f1c40f"></span> 미팅 요청
+  </div>
+
+  <div class="legend-item">
+    <span class="legend-dot" style="background:#3498db"></span> 미팅 완료
+  </div>
+
+  <div class="legend-item">
+    <span class="legend-dot" style="background:#2ecc71"></span> 거래 성사
+  </div>
+
+  <div class="legend-item">
+    <span class="legend-dot" style="background:#95a5a6"></span> 부재중·미응답
+  </div>
+
+  <div class="legend-item">
+    <span class="legend-dot" style="background:#e74c3c"></span> 거절
+  </div>
+
+  <div class="legend-item">
+    <span class="legend-star">★</span> 신규 오픈 매장
+  </div>
+
+</div>
+
 </div>
 
 </main>
@@ -860,11 +869,13 @@
 
       <select id="statusChangeSelect" class="select-input" style="width:100%;">
         <option value="">상태 선택</option>
-        <option value="거래 성사">거래 성사</option>
-        <option value="미팅 완료">미팅 완료</option>
-        <option value="미팅 요청">미팅 요청</option>
+        <option value="컨텍">컨텍</option>
         <option value="부재중/미응답">부재중/미응답</option>
         <option value="거절">거절</option>
+        <option value="미팅 요청">미팅 요청</option>
+        <option value="미팅 완료">미팅 완료</option>
+        <option value="거래 성사">거래 성사</option>
+        
       </select>
 
       <button id="statusSaveBtn" class="primary-btn" disabled>상태 변경 저장</button>
@@ -1317,6 +1328,7 @@ const borderColor = "#ffffff";
 
   // 기존 상태 색상 로직
   const STATUS_COLOR = {
+    "컨텍": "#5DADE2",
     "거래 성사": "#2ecc71",
     "미팅 완료": "#3498db",
     "미팅 요청": "#f1c40f",
@@ -1620,22 +1632,25 @@ function insertHistoryUI(date, manager, memo) {
  * 19) 통계/차트
  *************************************************/
 function renderStats() {
-  const stats = {
-    total: filteredRows.length,
-    deal: 0,
-    meetingDone: 0,
-    request: 0,
-    noAnswer: 0,
-    reject: 0
-  };
+const stats = {
+  total: filteredRows.length,
+  contact: 0,
+  deal: 0,
+  meetingDone: 0,
+  request: 0,
+  noAnswer: 0,
+  reject: 0
+};
 
-  filteredRows.forEach(r => {
-    if (r.Status === "거래 성사") stats.deal++;
-    else if (r.Status === "미팅 완료") stats.meetingDone++;
-    else if (r.Status === "미팅 요청") stats.request++;
-    else if (r.Status === "부재중/미응답") stats.noAnswer++;
-    else if (r.Status === "거절") stats.reject++;
-  });
+filteredRows.forEach(r => {
+  if (r.Status === "컨텍") stats.contact++;
+  else if (r.Status === "거래 성사") stats.deal++;
+  else if (r.Status === "미팅 완료") stats.meetingDone++;
+  else if (r.Status === "미팅 요청") stats.request++;
+  else if (r.Status === "부재중/미응답") stats.noAnswer++;
+  else if (r.Status === "거절") stats.reject++;
+});
+
 
   const total = stats.total || 1;
   const pct = v => ((v / total) * 100).toFixed(1);
@@ -1659,17 +1674,15 @@ function renderStats() {
   chartInstance = new Chart(ctx, {
     type: "doughnut",
     data: {
-      labels: ["거래 성사", "미팅 완료", "미팅 요청", "부재중/미응답", "거절"],
-      datasets: [{
-        data: [
-          stats.deal,
-          stats.meetingDone,
-          stats.request,
-          stats.noAnswer,
-          stats.reject
-        ],
-        backgroundColor: ["#2ecc71", "#3498db", "#f1c40f", "#95a5a6", "#e74c3c"]
-      }]
+   labels: ["컨텍","미팅 요청","미팅 완료","거래 성사","부재중/미응답","거절"],
+   datasets: [{
+       data: [
+    stats.contact, stats.request, stats.meetingDone,
+    stats.deal, stats.noAnswer, stats.reject
+  ],
+  backgroundColor: ["#5DADE2","#f1c40f","#3498db","#2ecc71","#95a5a6","#e74c3c"]
+}]
+
     },
     options: {
       cutout: "65%",

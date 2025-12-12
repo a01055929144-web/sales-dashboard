@@ -1302,18 +1302,19 @@ function buildVenderRegionMap() {
   venderRegionMap = {};
 
   venderRegionRows.forEach(r => {
-    if (!r.sigungu || !r.category || !r.vender) return;
+    const sigungu = (r.sigungu || "").trim();
+    const category = (r.category || "").trim();
+    const vender = r.vender || r.vender_name;
 
-    const key = `${r.sigungu}|${r.category}`;
+    if (!sigungu || !category || !vender) return;
 
-    // 우선순위가 있다면 높은 것만 유지
-    if (
-      !venderRegionMap[key] ||
-      Number(r.priority || 0) < Number(venderRegionMap[key].priority || 999)
-    ) {
-      venderRegionMap[key] = r;
-    }
+    const key = `${sigungu}|${category}`;
+
+    venderRegionMap[key] = venderRegionMap[key] || [];
+    venderRegionMap[key].push(r);
   });
+
+  console.log("✅ venderRegionMap built:", venderRegionMap);
 }
 
 

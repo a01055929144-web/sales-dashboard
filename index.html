@@ -954,23 +954,28 @@ let venderRegionMap = {};    // STEP 6에서 쓸 Map
 /*************************************************
  * DOM Ready
  *************************************************/
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   initMap();
   initEvents();
-  // 🔥 범례 토글 이벤트는 DOMContentLoaded 안에서 등록해야 정상 작동함
-document.getElementById("legendToggle").addEventListener("click", () => {
-  document.getElementById("legendPanel").style.display = "block";
+
+  // 범례 이벤트
+  document.getElementById("legendToggle").addEventListener("click", () => {
+    document.getElementById("legendPanel").style.display = "block";
+  });
+
+  document.getElementById("legendCloseBtn").addEventListener("click", () => {
+    document.getElementById("legendPanel").style.display = "none";
+  });
+
+  setTypeButtonUI();
+
+  // ✅ 반드시 순서 + await
+  await loadData();          // 1️⃣ 매장 데이터
+  await loadVenderRegion();  // 2️⃣ 유통사 지역 데이터 (중요)
+
+  addMyLiveLocation();       // 3️⃣ 그 다음 실행
 });
 
-document.getElementById("legendCloseBtn").addEventListener("click", () => {
-  document.getElementById("legendPanel").style.display = "none";
-});
-  
-  setTypeButtonUI();
-  
-  loadData().then(() => {
-   loadVenderRegion();   // ✅ 추가
-   addMyLiveLocation(); // ✅ 데이터 로드 후 실행
     
     
  // 👉 여기 아래에 추가

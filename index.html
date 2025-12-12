@@ -821,6 +821,23 @@
         매장을 선택하면 상세정보가 표시됩니다.
       </div>
     </div>
+
+<!-- 📦 추천 유통사 -->
+<div class="detail-card" id="venderSection" style="display:none;">
+  <div class="detail-title">⭐ 추천 유통사</div>
+
+  <div id="venderCard" style="
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    padding:10px;
+    margin-bottom:8px;
+  ">
+    <!-- JS로 채워질 영역 -->
+  </div>
+</div>
+
+    
     
     <!-- 담당 유형 선택 (CALL / SALES) -->
   <div style="margin-bottom:10px;">
@@ -1553,6 +1570,7 @@ function focusOnStore(store) {
 
 
 showStoreDetail(store);
+renderRecommendedVender(store);
 setStatusDropdown(store);
 applyManagerByType();   // 담당자 셋업 먼저
 loadHistory(store.name);   // 히스토리 최종 호출 (덮어쓰기 방지)
@@ -1607,6 +1625,60 @@ function showStoreDetail(r) {
     <div class="info-item"><span>🔗 링크</span>${urlHtml}</div>
   `;
 }
+  
+/*************************************************
+ * 📦 추천 유통사 렌더링
+ *************************************************/
+function renderRecommendedVender(store) {
+  const section = document.getElementById("venderSection");
+  const card = document.getElementById("venderCard");
+
+  if (!store || !store.sigungu || !store.category) {
+    section.style.display = "none";
+    return;
+  }
+
+  const sigungu = store.sigungu;
+  const majorCategory = (store.category || "").split(">")[0].trim();
+
+  let recommended = null;
+
+  // ⚠️ 지금은 예시 → 다음 단계에서 시트 연동
+  if (sigungu === "동대문구" && majorCategory === "한식") {
+    recommended = {
+      vender: "beadong",
+      name: "배동바지(봉동)",
+      desc: "한식 전문 · 새벽배송",
+      qr_url: "https://kitchenboard.app/beadong"
+    };
+  }
+
+  if (!recommended) {
+    section.style.display = "none";
+    return;
+  }
+
+  card.innerHTML = `
+    <div style="font-size:14px; font-weight:700;">
+      ${recommended.name}
+    </div>
+    <div style="font-size:12px; color:#6b7280; margin:4px 0 8px;">
+      ${recommended.desc}
+    </div>
+    <button class="primary-btn"
+      onclick="openVenderQR('${recommended.qr_url}')">
+      📲 QR 코드 보여주기
+    </button>
+    <div style="font-size:11px; color:#9ca3af; margin-top:6px;">
+      ※ 설치는 선택사항입니다
+    </div>
+  `;
+
+  section.style.display = "block";
+}
+
+
+
   
 /*************************************************
  * ⭐ 상태 드롭다운 값 세팅 함수 추가 위치

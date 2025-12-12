@@ -1317,6 +1317,27 @@ function buildVenderRegionMap() {
   console.log("✅ venderRegionMap built:", venderRegionMap);
 }
 
+/*************************************************
+ * 📦 추천 유통사 찾기
+ *************************************************/
+function findRecommendedVender(store) {
+  if (!store || !store.sigungu || !store.category) return null;
+
+  const sigungu = (store.sigungu || "").trim();
+  const majorCategory = (store.category || "").split(">")[0].trim();
+
+  const key = `${sigungu}|${majorCategory}`;
+
+  const venders = venderRegionMap[key];
+
+  console.log("🔍 추천 유통사 lookup key:", key);
+  console.log("🔍 매칭된 유통사:", venders);
+
+  if (!venders || venders.length === 0) return null;
+
+  // 👉 지금은 첫 번째 추천만 사용
+  return venders[0];
+}
 
   
   /*************************************************

@@ -948,7 +948,9 @@ let chartInstance;
 
 let liveWatchId = null;   // ★ 여기에 추가
 let liveMarker = null;    // ★ 여기에 추가
-
+  
+let venderRegionRows = [];   // 원본 배열
+let venderRegionMap = {};    // STEP 6에서 쓸 Map
 /*************************************************
  * DOM Ready
  *************************************************/
@@ -967,6 +969,7 @@ document.getElementById("legendCloseBtn").addEventListener("click", () => {
   setTypeButtonUI();
   
   loadData().then(() => {
+   loadVenderRegion();   // ✅ 추가
    addMyLiveLocation(); // ✅ 데이터 로드 후 실행
     
     
@@ -1288,6 +1291,47 @@ async function loadData() {
     alert("데이터 불러오기 실패!");
     console.error(e);
     return false;
+  }
+}
+
+/*************************************************
+ * 📦 vender_region → JS Map 변환
+ * key: sigungu|category
+ *************************************************/
+function buildVenderRegionMap() {
+  venderRegionMap = {};
+
+  venderRegionRows.forEach(r => {
+    if (!r.sigungu || !r.category || !r.vender) return;
+
+    const key = `${r.sigungu}|${r.category}`;
+
+    // 우선순위가 있다면 높은 것만 유지
+    if (
+      !venderRegionMap[key] ||
+      Number(r.priority || 0) < Number(venderRegionMap[key].priority || 999)
+    ) {
+      venderRegionMap[key] = r;
+    }
+  });
+}
+
+
+  
+  /*************************************************
+ * 📦 유통사 지역 매핑 로드
+ *************************************************/
+async function loadVenderRegion() {
+  try {
+    const res = await fetch(`${BASE_URL}?action=vender_region`);
+    const rows = await res.json();
+
+    venderRegionRows = rows || [];
+    buildVenderRegionMap(); // STEP 6
+
+    console.log("✅ vender_region loaded", venderRegionMap);
+  } catch (e) {
+    console.error("❌ vender_region 로딩 실패", e);
   }
 }
 
@@ -1633,42 +1677,27 @@ function renderRecommendedVender(store) {
   const section = document.getElementById("venderSection");
   const card = document.getElementById("venderCard");
 
-  if (!store || !store.sigungu || !store.category) {
-    section.style.display = "none";
-    return;
-  }
+  const vender = findRecommendedVender(store);
 
-  const sigungu = store.sigungu;
-  const majorCategory = (store.category || "").split(">")[0].trim();
-
-  let recommended = null;
-
-  // ⚠️ 지금은 예시 → 다음 단계에서 시트 연동
-  if (sigungu === "광진구" && majorCategory === "한식") {
-    recommended = {
-      vender: "beadong",
-      name: "배동바지(봉동)",
-      desc: "한식 전문 · 새벽배송",
-      qr_url: "https://kitchenboard.app/beadong"
-    };
-  }
-
-  if (!recommended) {
+  if (!vender) {
     section.style.display = "none";
     return;
   }
 
   card.innerHTML = `
     <div style="font-size:14px; font-weight:700;">
-      ${recommended.name}
+      ${vender.vender_name || vender.vender}
     </div>
+
     <div style="font-size:12px; color:#6b7280; margin:4px 0 8px;">
-      ${recommended.desc}
+      ${vender.desc || ""}
     </div>
+
     <button class="primary-btn"
-      onclick="openVenderQR('${recommended.qr_url}')">
+      onclick="openVenderQR('${vender.qr_url}')">
       📲 QR 코드 보여주기
     </button>
+
     <div style="font-size:11px; color:#9ca3af; margin-top:6px;">
       ※ 설치는 선택사항입니다
     </div>

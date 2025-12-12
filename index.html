@@ -1298,43 +1298,49 @@ function buildVenderRegionMap() {
   venderRegionMap = {};
 
   venderRegionRows.forEach(r => {
-    const sigungu = (r.sigungu || "").trim();
-    const category = (r.category || "").trim();
-    const vender = r.vender || r.vender_name;
+    const sigungu  = normalizeSigungu(r.sigungu);
+    const category = normalizeCategory(r.category);
+    const vender   = r.vender || r.vender_name;
 
     if (!sigungu || !category || !vender) return;
 
     const key = `${sigungu}|${category}`;
 
-    venderRegionMap[key] = venderRegionMap[key] || [];
+    if (!venderRegionMap[key]) {
+      venderRegionMap[key] = [];
+    }
+
     venderRegionMap[key].push(r);
   });
 
-  console.log("✅ venderRegionMap built:", venderRegionMap);
+  console.log("✅ venderRegionMap:", venderRegionMap);
 }
+
 
 /*************************************************
  * 📦 추천 유통사 찾기
  *************************************************/
 function findRecommendedVender(store) {
-  if (!store || !store.sigungu || !store.category) {
-    console.warn("❌ store 정보 부족", store);
-    return null;
-  }
+  if (!store) return null;
 
-  const sigungu = (store.sigungu || "").trim();
-  const majorCategory = (store.category || "").split(">")[0].trim();
+  const sigungu = normalizeSigungu(store.sigungu);
+  const majorCategory = normalizeCategory(store.category);
+
   const key = `${sigungu}|${majorCategory}`;
 
   console.log("🔑 추천 key:", key);
   console.log("🗂 venderRegionMap keys:", Object.keys(venderRegionMap));
 
-  const venders = venderRegionMap[key];
+  const list = venderRegionMap[key];
+  if (!list || list.length === 0) return null;
 
-  console.log("📦 매칭 결과:", venders);
-
-  if (!venders || venders.length === 0) return null;
-  return venders[0];
+  // 우선순위 기준 정렬 (importance → priority)
+  return list.sort((a, b) => {
+    if (a.importance !== b.importance) {
+      return (b.importance || 0) - (a.importance || 0);
+    }
+    return (b.priority || 0) - (a.priority || 0);
+  })[0];
 }
 
 
@@ -1355,6 +1361,20 @@ async function loadVenderRegion() {
   } catch (e) {
     console.error("❌ vender_region 로딩 실패", e);
   }
+}
+
+  /*************************************************
+ * 🔧 문자열 정규화 유틸 (중요)
+ *************************************************/
+function normalizeSigungu(v) {
+  return (v || "")
+    .replace("서울특별시", "")
+    .replace("서울", "")
+    .trim();
+}
+
+function normalizeCategory(v) {
+  return (v || "").split(/[>/]/)[0].trim();
 }
 
 

@@ -1317,21 +1317,26 @@ function buildVenderRegionMap() {
  * 📦 추천 유통사 찾기
  *************************************************/
 function findRecommendedVender(store) {
-  if (!store || !store.sigungu || !store.category) return null;
+  if (!store || !store.sigungu || !store.category) {
+    console.warn("❌ store 정보 부족", store);
+    return null;
+  }
 
-  const sigungu = store.sigungu.replace("서울", "").trim();
-  const majorCategory = store.category.split(">")[0].trim();
-
+  const sigungu = (store.sigungu || "").trim();
+  const majorCategory = (store.category || "").split(">")[0].trim();
   const key = `${sigungu}|${majorCategory}`;
 
-  console.log("🔍 추천 key:", key);
-  console.log("📦 venderRegionMap keys:", Object.keys(venderRegionMap));
+  console.log("🔑 추천 key:", key);
+  console.log("🗂 venderRegionMap keys:", Object.keys(venderRegionMap));
 
   const venders = venderRegionMap[key];
-  if (!venders || venders.length === 0) return null;
 
+  console.log("📦 매칭 결과:", venders);
+
+  if (!venders || venders.length === 0) return null;
   return venders[0];
 }
+
 
 
   
@@ -1686,11 +1691,15 @@ function showStoreDetail(r) {
     <div class="info-item"><span>🔗 링크</span>${urlHtml}</div>
   `;
 }
+
+
   
 /*************************************************
  * 📦 추천 유통사 렌더링
  *************************************************/
 function renderRecommendedVender(store) {
+  console.log("🧪 renderRecommendedVender 호출됨:", store);
+
   const section = document.getElementById("venderSection");
   const card = document.getElementById("venderCard");
 

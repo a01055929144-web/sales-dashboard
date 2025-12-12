@@ -1677,6 +1677,26 @@ function renderRecommendedVender(store) {
   const section = document.getElementById("venderSection");
   const card = document.getElementById("venderCard");
 
+  // ✅ 이미 설치된 경우 (가장 먼저 체크)
+  if (store.Vender_name && store.App_Installed_Date) {
+    card.innerHTML = `
+      <div style="font-size:14px; font-weight:700;">
+        ${store.Vender_name}
+      </div>
+
+      <div style="font-size:12px; color:#16a34a; margin-top:6px;">
+        ✅ 설치 완료 (${store.App_Installed_Date.split(" ")[0]})
+      </div>
+
+      <div style="font-size:11px; color:#9ca3af; margin-top:6px;">
+        ※ 이미 설치 완료된 유통사입니다
+      </div>
+    `;
+    section.style.display = "block";
+    return;
+  }
+
+  // 🔽 여기부터는 기존 추천 로직 그대로
   const vender = findRecommendedVender(store);
 
   if (!vender) {
@@ -1684,29 +1704,29 @@ function renderRecommendedVender(store) {
     return;
   }
 
-card.innerHTML = `
-  <div style="font-size:14px; font-weight:700;">
-    ${vender.vender_name || vender.vender}
-  </div>
+  card.innerHTML = `
+    <div style="font-size:14px; font-weight:700;">
+      ${vender.vender_name || vender.vender}
+    </div>
 
-  <div style="font-size:12px; color:#6b7280; margin:4px 0 8px;">
-    ${vender.desc || ""}
-  </div>
+    <div style="font-size:12px; color:#6b7280; margin:4px 0 8px;">
+      ${vender.desc || ""}
+    </div>
 
-  <button class="primary-btn"
-    onclick="openVenderQR('${vender.qr_url}')">
-    📲 QR 코드 보여주기
-  </button>
+    <button class="primary-btn"
+      onclick="openVenderQR('${vender.qr_url}')">
+      📲 QR 코드 보여주기
+    </button>
 
-  <button class="secondary-btn"
-    onclick="confirmVenderInstalled('${vender.vender}')">
-    ✅ 설치 완료
-  </button>
-`;
-
+    <button class="secondary-btn"
+      onclick="confirmVenderInstalled('${vender.vender}')">
+      ✅ 설치 완료
+    </button>
+  `;
 
   section.style.display = "block";
 }
+
 
 
 
@@ -1833,8 +1853,30 @@ function confirmVenderInstalled(venderName) {
 
   fetch(`${BASE_URL}?${qs.toString()}`)
     .then(() => {
+
+      // ✅ 1) 로컬 모델 즉시 반영
+      const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+      rawByName[selectedStoreName].Vender_name = venderName;
+      rawByName[selectedStoreName].App_Installed_Date = now;
+
+      // ✅ 2) 추천 카드 즉시 설치 완료 상태로 변경
+      renderRecommendedVender(rawByName[selectedStoreName]);
+
+      // ✅ 3) 상태값 자동 "제안"
+      const statusSelect = document.getElementById("statusChangeSelect");
+
+      // 기본 추천 상태
+      if (!statusSelect.value) {
+        statusSelect.value = "미팅 완료";
+      }
+
+      // 버튼 활성화
+      document.getElementById("statusSaveBtn").disabled = false;
+
+      // 히스토리 갱신
       loadHistory(selectedStoreName);
-      showToast("✔ 설치 완료 기록됨");
+
+      showToast("✔ 설치 완료 기록됨 · 상태 변경을 추천합니다");
     });
 }
 

@@ -931,7 +931,7 @@
 let managerType = "call";
 
 const BASE_URL =
-  "https://script.google.com/macros/s/AKfycbzV5_8xMsIMu_qFEhmSFnZyx9iRBrxbokzQAh-IGfOMhHWFIx7-P4tsv2qnT-m0nTDa/exec";
+  "https://script.google.com/macros/s/AKfycbzqLQQ6XEp5Bc_DLOvfvnkP-3CV5BieCrJajQ7vNHliLmOrEYinqRFhpOxdLwT9tauO/exec";
 
 /*************************************************
  * 전역 변수
@@ -1684,24 +1684,26 @@ function renderRecommendedVender(store) {
     return;
   }
 
-  card.innerHTML = `
-    <div style="font-size:14px; font-weight:700;">
-      ${vender.vender_name || vender.vender}
-    </div>
+card.innerHTML = `
+  <div style="font-size:14px; font-weight:700;">
+    ${vender.vender_name || vender.vender}
+  </div>
 
-    <div style="font-size:12px; color:#6b7280; margin:4px 0 8px;">
-      ${vender.desc || ""}
-    </div>
+  <div style="font-size:12px; color:#6b7280; margin:4px 0 8px;">
+    ${vender.desc || ""}
+  </div>
 
-    <button class="primary-btn"
-      onclick="openVenderQR('${vender.qr_url}')">
-      📲 QR 코드 보여주기
-    </button>
+  <button class="primary-btn"
+    onclick="openVenderQR('${vender.qr_url}')">
+    📲 QR 코드 보여주기
+  </button>
 
-    <div style="font-size:11px; color:#9ca3af; margin-top:6px;">
-      ※ 설치는 선택사항입니다
-    </div>
-  `;
+  <button class="secondary-btn"
+    onclick="confirmVenderInstalled('${vender.vender}')">
+    ✅ 설치 완료
+  </button>
+`;
+
 
   section.style.display = "block";
 }
@@ -1818,6 +1820,26 @@ function saveMemo() {
     });
 }
 
+function confirmVenderInstalled(venderName) {
+  if (!selectedStoreName) return alert("매장을 선택하세요.");
+
+  if (!confirm("설치 완료로 기록할까요?")) return;
+
+  const qs = new URLSearchParams({
+    action: "installVender",
+    name: selectedStoreName,
+    vender_name: venderName
+  });
+
+  fetch(`${BASE_URL}?${qs.toString()}`)
+    .then(() => {
+      loadHistory(selectedStoreName);
+      showToast("✔ 설치 완료 기록됨");
+    });
+}
+
+
+  
 /*************************************************
  * 18) 담당자 자동 히스토리 기록
  *************************************************/

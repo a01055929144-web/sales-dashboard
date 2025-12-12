@@ -957,58 +957,50 @@ let venderRegionMap = {};    // STEP 6에서 쓸 Map
 document.addEventListener("DOMContentLoaded", async () => {
   initMap();
   initEvents();
-
-  // 범례 이벤트
-  document.getElementById("legendToggle").addEventListener("click", () => {
-    document.getElementById("legendPanel").style.display = "block";
-  });
-
-  document.getElementById("legendCloseBtn").addEventListener("click", () => {
-    document.getElementById("legendPanel").style.display = "none";
-  });
-
   setTypeButtonUI();
 
-  // ✅ 반드시 순서 + await
-  await loadData();          // 1️⃣ 매장 데이터
-  await loadVenderRegion();  // 2️⃣ 유통사 지역 데이터 (중요)
+  // 🔥 범례 이벤트
+  const legendToggle = document.getElementById("legendToggle");
+  const legendPanel = document.getElementById("legendPanel");
+  const legendCloseBtn = document.getElementById("legendCloseBtn");
 
-  addMyLiveLocation();       // 3️⃣ 그 다음 실행
-});
+  if (legendToggle && legendPanel && legendCloseBtn) {
+    legendToggle.addEventListener("click", () => {
+      legendPanel.style.display = "block";
+    });
 
-    
-    
- // 👉 여기 아래에 추가
+    legendCloseBtn.addEventListener("click", () => {
+      legendPanel.style.display = "none";
+    });
+  }
+
+  // 🔥 대시보드 접기/펼치기
   const toggleBtn = document.getElementById("dashboardToggleBtn");
   const content = document.getElementById("dashboardFoldArea");
 
-  content.classList.add("dashboard-expanded");
+  if (toggleBtn && content) {
+    content.classList.add("dashboard-expanded");
 
-  toggleBtn.addEventListener("click", () => {
-    const collapsed = content.classList.contains("dashboard-collapsed");
+    toggleBtn.addEventListener("click", () => {
+      const collapsed = content.classList.contains("dashboard-collapsed");
 
-    if (collapsed) {
-      content.classList.remove("dashboard-collapsed");
-      content.classList.add("dashboard-expanded");
-      toggleBtn.textContent = "▼";
-    } else {
-      content.classList.remove("dashboard-expanded");
-      content.classList.add("dashboard-collapsed");
-      toggleBtn.textContent = "▲";
-    }    
- });
-});
-// 🔥 범례 토글
-const legendToggle = document.getElementById("legendToggle");
-const legendPanel = document.getElementById("legendPanel");
-const legendCloseBtn = document.getElementById("legendCloseBtn");
+      if (collapsed) {
+        content.classList.remove("dashboard-collapsed");
+        content.classList.add("dashboard-expanded");
+        toggleBtn.textContent = "▼";
+      } else {
+        content.classList.remove("dashboard-expanded");
+        content.classList.add("dashboard-collapsed");
+        toggleBtn.textContent = "▲";
+      }
+    });
+  }
 
-legendToggle.addEventListener("click", () => {
-  legendPanel.style.display = "block";
-});
+  // ✅ 데이터 로딩 순서 (이게 핵심)
+  await loadData();          // 1️⃣ 매장
+  await loadVenderRegion();  // 2️⃣ 유통사 매핑
 
-legendCloseBtn.addEventListener("click", () => {
-  legendPanel.style.display = "none";
+  addMyLiveLocation();       // 3️⃣ 위치
 });
 
   

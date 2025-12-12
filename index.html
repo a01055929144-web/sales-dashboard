@@ -1328,21 +1328,20 @@ function buildVenderRegionMap() {
 function findRecommendedVender(store) {
   if (!store || !store.sigungu || !store.category) return null;
 
-  const sigungu = (store.sigungu || "").trim();
-  const majorCategory = (store.category || "").split(">")[0].trim();
+  const sigungu = store.sigungu.replace("서울", "").trim();
+  const majorCategory = store.category.split(">")[0].trim();
 
   const key = `${sigungu}|${majorCategory}`;
 
+  console.log("🔍 추천 key:", key);
+  console.log("📦 venderRegionMap keys:", Object.keys(venderRegionMap));
+
   const venders = venderRegionMap[key];
-
-  console.log("🔍 추천 유통사 lookup key:", key);
-  console.log("🔍 매칭된 유통사:", venders);
-
   if (!venders || venders.length === 0) return null;
 
-  // 👉 지금은 첫 번째 추천만 사용
   return venders[0];
 }
+
 
   
   /*************************************************

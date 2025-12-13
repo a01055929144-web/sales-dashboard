@@ -1380,7 +1380,7 @@ function findRecommendedVenders(store, limit = 3) {
 
       return {
         ...v,
-        importance: Number(r.importance || 0),
+        importance: (r.importance || "").trim(),   // ✅ 문자열 유지
         priority: Number(r.priority || 0),
         matchedCategory: categories.join(", ")
       };
@@ -1807,12 +1807,19 @@ function renderRecommendedVender(store) {
   // ⭐ 1) 대표 추천
   const main = venders[0];
 
-  const importanceClass =
-    main.importance === 1 ? "badge-important" : "badge-priority";
+const importanceRaw = String(main.importance ?? "").trim();
 
-  const importanceLabel =
-    main.importance === 1 ? "매우필요" :
-    main.importance === 2 ? "필요" : "보통";
+let importanceLabel = "보통";
+let importanceClass = "badge-priority";
+
+if (importanceRaw === "매우필요") {
+  importanceLabel = "매우필요";
+  importanceClass = "badge-important";
+} else if (importanceRaw === "확장필요") {
+  importanceLabel = "확장필요";
+  importanceClass = "badge-priority";
+}
+
 
   card.innerHTML += `
     <div style="margin-bottom:14px;">
@@ -1862,9 +1869,14 @@ function renderRecommendedVender(store) {
             </div>
             ${v.strengths ? `<div style="font-size:12px;">${v.strengths}</div>` : ""}
             <div style="margin-top:4px;">
-              <span class="vender-badge badge-priority">
-                우선순위 ${v.priority ?? "-"}
-              </span>
+             ${v.importance ? `
+  <span class="vender-badge ${
+    v.importance === "매우필요" ? "badge-important" : "badge-priority"
+  }">
+    ${v.importance}
+  </span>
+` : ""}
+
             </div>
           </div>
         `).join("")}

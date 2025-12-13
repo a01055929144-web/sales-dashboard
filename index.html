@@ -1766,25 +1766,18 @@ function renderRecommendedVender(store) {
   const section = document.getElementById("venderSection");
   const card = document.getElementById("venderCard");
 
-  if (!store) {
-    section.style.display = "none";
-    return;
-  }
-
-  // ✅ 이미 만들어둔 추천 함수 사용
   const v = findRecommendedVender(store);
-
   if (!v) {
     section.style.display = "none";
     return;
   }
 
   card.innerHTML = `
-    <div style="font-weight:700;">${v.vendor_name}</div>
+    <div style="font-weight:700;">${v.name || v.vendor}</div>
     <div style="font-size:12px;color:#6b7280;">${v.desc || ""}</div>
 
     <button class="primary-btn"
-      onclick="openVenderQR('${v.qr_url}', '${v.vendor_name}')">
+      onclick="openVenderQR('${v.qr_url}', '${v.vendor}')">
       📲 QR 코드 보여주기
     </button>
 
@@ -1795,8 +1788,6 @@ function renderRecommendedVender(store) {
 
   section.style.display = "block";
 }
-
-
 
 
 

@@ -1356,7 +1356,6 @@ function findRecommendedVenders(store, limit = 3) {
   const sigungu = normalizeSigungu(store.sigungu);
   const storeCategory = normalizeCategory(store.category);
 
-  // 중요도 랭크 (정렬용)
   const importanceRank = {
     "매우필요": 3,
     "확장필요": 2,
@@ -1364,45 +1363,46 @@ function findRecommendedVenders(store, limit = 3) {
   };
 
   const regionVenders = venderRegionRows.filter(r =>
-    normalizeSigungu(r.sigungu) === sigungu &&
-    r.status === "active"
+    normalizeSigungu(r.sigungu) === sigungu
   );
 
   const matched = regionVenders
     .map(r => {
+      if (r.status !== "active") return null;
+
       const v = venderMasterMap[r.vender];
       if (!v) return null;
+      if (v.status !== "active") return null;
 
-      // 🔥 유통사 다중 업종 허용
       const categories = (v.category || "")
         .split(/[,/]/)
         .map(c => c.trim());
 
       const isMatch =
         categories.includes(storeCategory) ||
-        categories.includes("고깃집") ||
-        categories.includes("한식");
+        categories.includes("한식") ||
+        categories.includes("고깃집");
 
       if (!isMatch) return null;
 
       return {
         ...v,
         importance: (r.importance || "").trim(),
-        priority: Number(r.priority || 0),
-        matchedCategory: categories.join(", ")
+        priority: Number(r.priority || 999)
       };
     })
     .filter(Boolean)
     .sort((a, b) => {
-      const ia = importanceRank[a.importance || ""] || 0;
-      const ib = importanceRank[b.importance || ""] || 0;
-
+      const ia = importanceRank[a.importance || ""] || 1;
+      const ib = importanceRank[b.importance || ""] || 1;
       if (ia !== ib) return ib - ia;
-      return (b.priority || 0) - (a.priority || 0);
+
+      return (a.priority || 999) - (b.priority || 999);
     });
 
   return matched.slice(0, limit);
 }
+
 
 
 

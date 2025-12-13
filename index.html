@@ -1858,20 +1858,22 @@ if (importanceRaw === "매우필요") {
       
       <!-- QR 버튼 -->
       ${main.qr_url ? `
-        <a href="${main.qr_url}" target="_blank"
-           style="
-             flex:1;
-             text-align:center;
-             padding:8px 10px;
-             border-radius:8px;
-             background:#111827;
-             color:white;
-             font-size:12px;
-             font-weight:700;
-             text-decoration:none;
-           ">
-          📱 QR 열기
-        </a>
+<button
+  onclick="openQr('${main.qr_url}')"
+  style="
+    flex:1;
+    padding:8px 10px;
+    border-radius:8px;
+    border:none;
+    background:#111827;
+    color:white;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+  "
+>
+  📱 QR 열기
+</button>
       ` : ""}
 
       <!-- 설치 완료 버튼 -->
@@ -1942,49 +1944,65 @@ if (importanceRaw === "매우필요") {
       </span>
     </div>
 
-    <!-- 🔥 QR + 설치 버튼 (여기가 핵심) -->
-    <div style="display:flex; gap:6px; margin-top:8px;">
+<!-- 🔥 QR + 설치 버튼 (수정본) -->
+<div style="display:flex; gap:6px; margin-top:8px;">
 
-      ${v.qr_url ? `
-        <a href="${v.qr_url}" target="_blank"
-           style="
-             flex:1;
-             text-align:center;
-             padding:6px 8px;
-             border-radius:6px;
-             background:#374151;
-             color:white;
-             font-size:12px;
-             font-weight:700;
-             text-decoration:none;
-           ">
-          📱 QR 열기
-        </a>
-      ` : ""}
+  ${v.qr_url ? `
+    <button
+      onclick="openQr('${v.qr_url}')"
+      style="
+        flex:1;
+        padding:6px 8px;
+        border-radius:6px;
+        border:none;
+        background:#374151;
+        color:white;
+        font-size:12px;
+        font-weight:700;
+        cursor:pointer;
+      ">
+      📱 QR 열기
+    </button>
+  ` : ""}
 
-      <button
-        onclick="confirmVenderInstalled('${v.vender_name}')"
-        style="
-          flex:1;
-          padding:6px 8px;
-          border-radius:6px;
-          border:none;
-          background:#2563eb;
-          color:white;
-          font-size:12px;
-          font-weight:700;
-          cursor:pointer;
-        ">
-        ✔ 설치 완료
-      </button>
-    </div>
+  <button
+    onclick="confirmVenderInstalled('${v.vender_name}')"
+    style="
+      flex:1;
+      padding:6px 8px;
+      border-radius:6px;
+      border:none;
+      background:#2563eb;
+      color:white;
+      font-size:12px;
+      font-weight:700;
+      cursor:pointer;
+    ">
+    ✔ 설치 완료
+  </button>
+
+</div>
+
 
   </div>
 `).join("")}
   </div>
   </div>
 `;
+}
+function openQr(url) {
+  if (!url) {
+    alert("QR 주소가 없습니다.");
+    return;
+  }
 
+  // http 없는 경우 자동 보정
+  const finalUrl = url.startsWith("http")
+    ? url
+    : "https://" + url;
+
+  window.open(finalUrl, "_blank");
+}
 
 
 

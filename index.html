@@ -1356,6 +1356,13 @@ function findRecommendedVenders(store, limit = 3) {
   const sigungu = normalizeSigungu(store.sigungu);
   const storeCategory = normalizeCategory(store.category);
 
+  // 중요도 랭크 (정렬용)
+  const importanceRank = {
+    "매우필요": 3,
+    "확장필요": 2,
+    "": 1
+  };
+
   const regionVenders = venderRegionRows.filter(r =>
     normalizeSigungu(r.sigungu) === sigungu &&
     r.status === "active"
@@ -1373,28 +1380,30 @@ function findRecommendedVenders(store, limit = 3) {
 
       const isMatch =
         categories.includes(storeCategory) ||
-        categories.includes("고깃집") ||   // ← 추가 추천 허용
+        categories.includes("고깃집") ||
         categories.includes("한식");
 
       if (!isMatch) return null;
 
       return {
         ...v,
-        importance: (r.importance || "").trim(),   // ✅ 문자열 유지
+        importance: (r.importance || "").trim(),
         priority: Number(r.priority || 0),
         matchedCategory: categories.join(", ")
       };
     })
     .filter(Boolean)
     .sort((a, b) => {
-      if (a.importance !== b.importance) {
-        return b.importance - a.importance;
-      }
-      return b.priority - a.priority;
+      const ia = importanceRank[a.importance || ""] || 0;
+      const ib = importanceRank[b.importance || ""] || 0;
+
+      if (ia !== ib) return ib - ia;
+      return (b.priority || 0) - (a.priority || 0);
     });
 
   return matched.slice(0, limit);
 }
+
 
 
 
@@ -1821,30 +1830,70 @@ if (importanceRaw === "매우필요") {
 }
 
 
-  card.innerHTML += `
-    <div style="margin-bottom:14px;">
-      <div style="font-size:13px; font-weight:700; margin-bottom:6px;">
-        ⭐ 대표 추천
-      </div>
-
-      <div style="font-size:15px; font-weight:800;">
-        ${main.vender_name}${main.link_number ? ` · ${main.link_number}` : ""}
-      </div>
-
-      ${main.phone ? `<div style="font-size:12px;">${main.phone}</div>` : ""}
-      ${main.strengths ? `<div style="font-size:12px; margin-top:4px;">${main.strengths}</div>` : ""}
-      ${main.desc ? `<div style="font-size:12px; color:#6b7280;">${main.desc}</div>` : ""}
-
-      <div style="margin-top:6px;">
-        <span class="vender-badge ${importanceClass}">
-          ${importanceLabel}
-        </span>
-        <span class="vender-badge badge-priority">
-          우선순위 ${main.priority ?? "-"}
-        </span>
-      </div>
+ card.innerHTML += `
+  <div style="margin-bottom:14px;">
+    <div style="font-size:13px; font-weight:700; margin-bottom:6px;">
+      ⭐ 대표 추천
     </div>
-  `;
+
+    <div style="font-size:15px; font-weight:800;">
+      ${main.vender_name}${main.link_number ? ` · ${main.link_number}` : ""}
+    </div>
+
+    ${main.phone ? `<div style="font-size:12px;">${main.phone}</div>` : ""}
+    ${main.strengths ? `<div style="font-size:12px; margin-top:4px;">${main.strengths}</div>` : ""}
+    ${main.desc ? `<div style="font-size:12px; color:#6b7280;">${main.desc}</div>` : ""}
+
+    <div style="margin-top:6px;">
+      <span class="vender-badge ${importanceClass}">
+        ${importanceLabel}
+      </span>
+      <span class="vender-badge badge-priority">
+        우선순위 ${main.priority ?? "-"}
+      </span>
+    </div>
+
+    <!-- ✅ QR + 설치 완료 버튼 -->
+    <div style="margin-top:10px; display:flex; gap:8px;">
+      
+      <!-- QR 버튼 -->
+      ${main.qr_url ? `
+        <a href="${main.qr_url}" target="_blank"
+           style="
+             flex:1;
+             text-align:center;
+             padding:8px 10px;
+             border-radius:8px;
+             background:#111827;
+             color:white;
+             font-size:12px;
+             font-weight:700;
+             text-decoration:none;
+           ">
+          📱 QR 열기
+        </a>
+      ` : ""}
+
+      <!-- 설치 완료 버튼 -->
+      <button
+        onclick="confirmVenderInstalled('${main.vender_name}')"
+        style="
+          flex:1;
+          padding:8px 10px;
+          border-radius:8px;
+          border:none;
+          background:#2563eb;
+          color:white;
+          font-size:12px;
+          font-weight:700;
+          cursor:pointer;
+        ">
+        ✔ 설치 완료
+      </button>
+    </div>
+  </div>
+`;
+
 
   // 👍 2) 대안 추천 (더보기)
   const alternatives = venders.slice(1);
@@ -1862,28 +1911,80 @@ if (importanceRaw === "매우필요") {
       </div>
 
       <div id="${altId}" class="hidden" style="margin-top:8px;">
-        ${alternatives.map(v => `
-          <div style="padding:8px; border-top:1px dashed #e5e7eb;">
-            <div style="font-weight:700;">
-              ${v.vender_name}${v.link_number ? ` · ${v.link_number}` : ""}
-            </div>
-            ${v.strengths ? `<div style="font-size:12px;">${v.strengths}</div>` : ""}
-            <div style="margin-top:4px;">
-             ${v.importance ? `
-  <span class="vender-badge ${
-    v.importance === "매우필요" ? "badge-important" : "badge-priority"
-  }">
-    ${v.importance}
-  </span>
-` : ""}
+       ${alternatives.map(v => `
+  <div style="padding:10px; border-top:1px dashed #e5e7eb;">
 
-            </div>
-          </div>
-        `).join("")}
-      </div>
+    <!-- 유통사 이름 -->
+    <div style="font-weight:700; font-size:14px;">
+      ${v.vender_name}${v.link_number ? ` · ${v.link_number}` : ""}
     </div>
-  `;
-}
+
+    <!-- 강점 -->
+    ${v.strengths ? `
+      <div style="font-size:12px; margin-top:2px;">
+        ${v.strengths}
+      </div>
+    ` : ""}
+
+    <!-- 중요도 / 우선순위 -->
+    <div style="margin-top:6px;">
+      ${v.importance ? `
+        <span class="vender-badge ${
+          v.importance === "매우필요"
+            ? "badge-important"
+            : "badge-priority"
+        }">
+          ${v.importance}
+        </span>
+      ` : ""}
+      <span class="vender-badge badge-priority">
+        우선순위 ${v.priority ?? "-"}
+      </span>
+    </div>
+
+    <!-- 🔥 QR + 설치 버튼 (여기가 핵심) -->
+    <div style="display:flex; gap:6px; margin-top:8px;">
+
+      ${v.qr_url ? `
+        <a href="${v.qr_url}" target="_blank"
+           style="
+             flex:1;
+             text-align:center;
+             padding:6px 8px;
+             border-radius:6px;
+             background:#374151;
+             color:white;
+             font-size:12px;
+             font-weight:700;
+             text-decoration:none;
+           ">
+          📱 QR 열기
+        </a>
+      ` : ""}
+
+      <button
+        onclick="confirmVenderInstalled('${v.vender_name}')"
+        style="
+          flex:1;
+          padding:6px 8px;
+          border-radius:6px;
+          border:none;
+          background:#2563eb;
+          color:white;
+          font-size:12px;
+          font-weight:700;
+          cursor:pointer;
+        ">
+        ✔ 설치 완료
+      </button>
+    </div>
+
+  </div>
+`).join("")}
+  </div>
+  </div>
+`;
+
 
 
 

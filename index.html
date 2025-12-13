@@ -1785,7 +1785,7 @@ function renderRecommendedVender(store) {
       background:${idx === 0 ? "#eef2ff" : "#ffffff"};
     ">
       <div style="font-weight:700;">
-        ${idx === 0 ? "⭐ 대표 추천" : "👉 대안 추천"} · ${v.vendor_name}
+        ${idx === 0 ? "⭐ 대표 추천" : "👉 대안 추천"} · ${v.vender_name}
       </div>
 
       <div style="font-size:12px;color:#6b7280;margin-top:4px;">
@@ -1800,7 +1800,7 @@ function renderRecommendedVender(store) {
       </div>
 
       <button class="primary-btn" style="margin-top:6px;"
-        onclick="openVenderQR('${v.qr_url}', '${v.vendor_name}')">
+        onclick="openVenderQR('${v.qr_url}', '${v.vender_name}')">
         📲 QR 코드 보여주기
       </button>
     </div>

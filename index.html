@@ -931,7 +931,7 @@
 let managerType = "call";
 
 const BASE_URL =
-  "https://script.google.com/macros/s/AKfycbxDBzEKJkt3MqTEWPKPQnCy5_obKEG2M38KtZO38c_TSSJdi4RwV3YNlBPBgN0uj-k_/exec";
+  "https://script.google.com/macros/s/AKfycbxRy_4UswBbwffNt96tcikoC7ck1XZUTjdTHFE-uA0zi_hbD-bnReCPaDzsaaEYFOFe/exec";
 
 /*************************************************
  * 전역 변수
@@ -951,6 +951,10 @@ let liveMarker = null;    // ★ 여기에 추가
   
 let venderRegionRows = [];   // 원본 배열
 let venderRegionMap = {};    // STEP 6에서 쓸 Map
+
+let venderMasterRows = [];
+let venderMasterMap = {};
+
 /*************************************************
  * DOM Ready
  *************************************************/
@@ -999,6 +1003,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // ✅ 데이터 로딩 순서 (이게 핵심)
   await loadData();          // 1️⃣ 매장
   await loadVenderRegion();  // 2️⃣ 유통사 매핑
+  await loadVenderMaster();  // ⭐ 유통사 (이게 없어서 안 떴던 것)
 
   addMyLiveLocation();       // 3️⃣ 위치
 });
@@ -1384,6 +1389,30 @@ async function loadVenderRegion() {
   }
 }
 
+/*************************************************
+ * 📦 vender (유통사 마스터) 로드
+ *************************************************/
+async function loadVenderMaster() {
+  try {
+    const res = await fetch(`${BASE_URL}?action=vender`);
+    const rows = await res.json();
+
+    venderMasterRows = rows || [];
+    venderMasterMap = {};
+
+    venderMasterRows.forEach(v => {
+      if (v.vender) {
+        venderMasterMap[v.vender] = v;
+      }
+    });
+
+    console.log("✅ vender master loaded", venderMasterMap);
+  } catch (e) {
+    console.error("❌ vender master 로딩 실패", e);
+  }
+}
+
+  
   /*************************************************
  * 🔧 문자열 정규화 유틸 (중요)
  *************************************************/

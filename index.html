@@ -1324,24 +1324,45 @@ function findRecommendedVender(store) {
   if (!store) return null;
 
   const sigungu = normalizeSigungu(store.sigungu);
-  const majorCategory = normalizeCategory(store.category);
+  const storeCategory = normalizeCategory(store.category);
 
-  const key = `${sigungu}|${majorCategory}`;
+  // 1️⃣ 해당 지역에서 active 인 유통사 찾기
+  const regionVenders = venderRegionRows.filter(r =>
+    normalizeSigungu(r.sigungu) === sigungu &&
+    r.status === "active"
+  );
 
-  console.log("🔑 추천 key:", key);
-  console.log("🗂 venderRegionMap keys:", Object.keys(venderRegionMap));
+  if (regionVenders.length === 0) return null;
 
-  const list = venderRegionMap[key];
-  if (!list || list.length === 0) return null;
+  // 2️⃣ vender 시트와 JOIN (vendor 기준)
+  const matched = regionVenders
+    .map(r => {
+      const v = venderMasterMap[r.vender]; // ← vender 시트 Map
+      if (!v) return null;
 
-  // 우선순위 기준 정렬 (importance → priority)
-  return list.sort((a, b) => {
+      // 3️⃣ 업종 매칭 (복수 카테고리 대응)
+      const categories = (v.category || "").split(/[,/]/).map(c => c.trim());
+      if (!categories.includes(storeCategory)) return null;
+
+      return {
+        ...v,
+        importance: r.importance,
+        priority: r.priority
+      };
+    })
+    .filter(Boolean);
+
+  if (matched.length === 0) return null;
+
+  // 4️⃣ 중요도 / 우선순위 정렬
+  return matched.sort((a, b) => {
     if (a.importance !== b.importance) {
       return (b.importance || 0) - (a.importance || 0);
     }
     return (b.priority || 0) - (a.priority || 0);
   })[0];
 }
+
 
 
 

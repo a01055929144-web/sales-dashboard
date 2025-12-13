@@ -1001,11 +1001,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // ✅ 데이터 로딩 순서 (이게 핵심)
-  await loadData();          // 1️⃣ 매장
-  await loadVenderRegion();  // 2️⃣ 유통사 매핑
-  await loadVenderMaster();  // ⭐ 유통사 (이게 없어서 안 떴던 것)
+await loadData();          // 매장
+await loadVenderRegion();  // 지역
+await loadVenderMaster();  // 🔥 이거 필수
 
-  addMyLiveLocation();       // 3️⃣ 위치
+addMyLiveLocation();
+
 });
 
   
@@ -1393,23 +1394,17 @@ async function loadVenderRegion() {
  * 📦 vender (유통사 마스터) 로드
  *************************************************/
 async function loadVenderMaster() {
-  try {
-    const res = await fetch(`${BASE_URL}?action=vender`);
-    const rows = await res.json();
+  const res = await fetch(`${BASE_URL}?action=vender`);
+  const rows = await res.json();
 
-    venderMasterRows = rows || [];
-    venderMasterMap = {};
+  venderMasterMap = {};
+  rows.forEach(v => {
+    if (v.vendor) {
+      venderMasterMap[v.vendor] = v;
+    }
+  });
 
-    venderMasterRows.forEach(v => {
-      if (v.vender) {
-        venderMasterMap[v.vender] = v;
-      }
-    });
-
-    console.log("✅ vender master loaded", venderMasterMap);
-  } catch (e) {
-    console.error("❌ vender master 로딩 실패", e);
-  }
+  console.log("✅ venderMasterMap", venderMasterMap);
 }
 
   

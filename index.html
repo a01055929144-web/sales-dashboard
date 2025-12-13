@@ -436,6 +436,9 @@
   color: #3730a3;
 }
 
+.hidden {
+  display: none;
+}
 
     
 
@@ -1790,70 +1793,86 @@ function renderRecommendedVender(store) {
   const section = document.getElementById("venderSection");
   const card = document.getElementById("venderCard");
 
-  // 1) 추천 유통사 3개 추출
   const venders = findRecommendedVenders(store, 3);
 
-  // 2) 없으면 섹션 숨김
   if (!store || !venders.length) {
     section.style.display = "none";
     card.innerHTML = "";
     return;
   }
 
-  // 3) 있으면 섹션 표시 + 내용 초기화(누적 방지)
   section.style.display = "block";
   card.innerHTML = "";
 
-  // 4) 대표/대안 렌더링
-  venders.forEach((v, idx) => {
-    const title = idx === 0 ? "⭐ 대표 추천" : "👍 대안 추천";
+  // ⭐ 1) 대표 추천
+  const main = venders[0];
 
-    const importanceClass =
-      v.importance === 1 ? "badge-important" : "badge-priority";
+  const importanceClass =
+    main.importance === 1 ? "badge-important" : "badge-priority";
 
-    const importanceLabel =
-      v.importance === 1 ? "매우필요" :
-      v.importance === 2 ? "필요" : "보통";
+  const importanceLabel =
+    main.importance === 1 ? "매우필요" :
+    main.importance === 2 ? "필요" : "보통";
 
-    card.innerHTML += `
-      <div style="margin-bottom:14px;">
-        <div style="font-size:13px; font-weight:700; margin-bottom:4px;">
-          ${title}
-        </div>
-
-        <div style="font-size:15px; font-weight:800;">
-        ${v.vender_name}
-        ${v.link_number ? ` · ${v.link_number}` : ""}
-
-        </div>
-
-        ${v.phone ? `<div style="font-size:12px; color:#374151;">${v.phone}</div>` : ""}
-
-        ${v.strengths ? `<div style="font-size:12px; margin-top:4px;">${v.strengths}</div>` : ""}
-
-        ${v.desc ? `<div style="font-size:12px; color:#6b7280;">${v.desc}</div>` : ""}
-
-        <div style="margin-top:6px;">
-          <span class="vender-badge ${importanceClass}">
-            ${importanceLabel}
-          </span>
-          <span class="vender-badge badge-priority">
-            우선순위 ${v.priority ?? "-"}
-          </span>
-        </div>
-
-        ${v.qr_url ? `
-          <button class="primary-btn"
-            style="margin-top:6px;"
-            onclick="openVenderQR('${v.qr_url}', '${v.vender_name}')">
-            📲 QR 코드
-          </button>
-        ` : ""}
-
+  card.innerHTML += `
+    <div style="margin-bottom:14px;">
+      <div style="font-size:13px; font-weight:700; margin-bottom:6px;">
+        ⭐ 대표 추천
       </div>
-    `;
-  });
+
+      <div style="font-size:15px; font-weight:800;">
+        ${main.vender_name}${main.link_number ? ` · ${main.link_number}` : ""}
+      </div>
+
+      ${main.phone ? `<div style="font-size:12px;">${main.phone}</div>` : ""}
+      ${main.strengths ? `<div style="font-size:12px; margin-top:4px;">${main.strengths}</div>` : ""}
+      ${main.desc ? `<div style="font-size:12px; color:#6b7280;">${main.desc}</div>` : ""}
+
+      <div style="margin-top:6px;">
+        <span class="vender-badge ${importanceClass}">
+          ${importanceLabel}
+        </span>
+        <span class="vender-badge badge-priority">
+          우선순위 ${main.priority ?? "-"}
+        </span>
+      </div>
+    </div>
+  `;
+
+  // 👍 2) 대안 추천 (더보기)
+  const alternatives = venders.slice(1);
+  if (!alternatives.length) return;
+
+  const altId = "altVenderBox";
+
+  card.innerHTML += `
+    <div>
+      <div
+        style="cursor:pointer; font-size:13px; font-weight:700; color:#2563eb;"
+        onclick="document.getElementById('${altId}').classList.toggle('hidden')"
+      >
+        🔽 대안 추천 더보기 (${alternatives.length})
+      </div>
+
+      <div id="${altId}" class="hidden" style="margin-top:8px;">
+        ${alternatives.map(v => `
+          <div style="padding:8px; border-top:1px dashed #e5e7eb;">
+            <div style="font-weight:700;">
+              ${v.vender_name}${v.link_number ? ` · ${v.link_number}` : ""}
+            </div>
+            ${v.strengths ? `<div style="font-size:12px;">${v.strengths}</div>` : ""}
+            <div style="margin-top:4px;">
+              <span class="vender-badge badge-priority">
+                우선순위 ${v.priority ?? "-"}
+              </span>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
 }
+
 
 
 

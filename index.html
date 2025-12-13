@@ -1786,70 +1786,74 @@ function showStoreDetail(r) {
 /*************************************************
  * 📦 추천 유통사 렌더링
  *************************************************/
-  function renderRecommendedVender(store) {
+function renderRecommendedVender(store) {
   const section = document.getElementById("venderSection");
   const card = document.getElementById("venderCard");
 
-  if (!store) {
+  // 1) 추천 유통사 3개 추출
+  const venders = findRecommendedVenders(store, 3);
+
+  // 2) 없으면 섹션 숨김
+  if (!store || !venders.length) {
     section.style.display = "none";
+    card.innerHTML = "";
     return;
   }
 
-  const v = findRecommendedVender(store);
-  if (!v) {
-    section.style.display = "none";
-    return;
-  }
+  // 3) 있으면 섹션 표시 + 내용 초기화(누적 방지)
+  section.style.display = "block";
+  card.innerHTML = "";
 
-  // ✅ 1️⃣ 여기!
-  const importanceClass =
-    v.importance === "매우필요"
-      ? "badge-important"
-      : "badge-priority";
+  // 4) 대표/대안 렌더링
+  venders.forEach((v, idx) => {
+    const title = idx === 0 ? "⭐ 대표 추천" : "👍 대안 추천";
 
-card.innerHTML += `
-  <div style="font-size:13px; font-weight:700; margin-bottom:4px;">
-    ⭐ 대표 추천
-  </div>
+    const importanceClass =
+      v.importance === 1 ? "badge-important" : "badge-priority";
 
-  <div style="font-size:15px; font-weight:800;">
-    ${v.vender_name}
-    ${v.link_number ? `· ${v.link_number}` : ""}
-  </div>
+    const importanceLabel =
+      v.importance === 1 ? "매우필요" :
+      v.importance === 2 ? "필요" : "보통";
 
-  ${v.phone ? `
-    <div style="font-size:12px; color:#374151; margin-bottom:6px;">
-      ${v.phone}
-    </div>
-  ` : ""}
+    card.innerHTML += `
+      <div style="margin-bottom:14px;">
+        <div style="font-size:13px; font-weight:700; margin-bottom:4px;">
+          ${title}
+        </div>
 
-  ${v.strengths ? `
-    <div style="font-size:12px; margin-top:4px;">
-      ${v.strengths}
-    </div>
-  ` : ""}
+        <div style="font-size:15px; font-weight:800;">
+          ${v.vender_name || v.vender}
+          ${v.link_number ? `· ${v.link_number}` : ""}
+        </div>
 
-  ${v.desc ? `
-    <div style="font-size:12px; color:#6b7280;">
-      ${v.desc}
-    </div>
-  ` : ""}
+        ${v.phone ? `<div style="font-size:12px; color:#374151;">${v.phone}</div>` : ""}
 
-  <div style="margin-top:6px;">
-    <span class="vender-badge badge-important">
-      ${v.importance || "중요"}
-    </span>
-    <span class="vender-badge badge-priority">
-      우선순위 ${v.priority ?? "-"}
-    </span>
-  </div>
+        ${v.strengths ? `<div style="font-size:12px; margin-top:4px;">${v.strengths}</div>` : ""}
 
-  <button class="primary-btn"
-    style="margin-top:8px;"
-    onclick="openVenderQR('${v.qr_url}', '${v.vender_name}')">
-    📲 QR 코드
-  </button>
-`;
+        ${v.desc ? `<div style="font-size:12px; color:#6b7280;">${v.desc}</div>` : ""}
+
+        <div style="margin-top:6px;">
+          <span class="vender-badge ${importanceClass}">
+            ${importanceLabel}
+          </span>
+          <span class="vender-badge badge-priority">
+            우선순위 ${v.priority ?? "-"}
+          </span>
+        </div>
+
+        ${v.qr_url ? `
+          <button class="primary-btn"
+            style="margin-top:6px;"
+            onclick="openVenderQR('${v.qr_url}', '${v.vender_name || v.vender}')">
+            📲 QR 코드
+          </button>
+        ` : ""}
+
+      </div>
+    `;
+  });
+}
+
 
 
 

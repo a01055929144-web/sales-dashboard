@@ -1363,8 +1363,10 @@ function findRecommendedVenders(store, limit = 3) {
   };
 
   const regionVenders = venderRegionRows.filter(r =>
-    normalizeSigungu(r.sigungu) === sigungu
-  );
+  normalizeSigungu(r.sigungu) === sigungu &&
+  r.status === "active"
+);
+
 
   const matched = regionVenders
     .map(r => {
@@ -1815,6 +1817,36 @@ function renderRecommendedVender(store) {
 
   // ⭐ 1) 대표 추천
   const main = venders[0];
+ const priceSummaryHtml =
+  main.price_summary && Array.isArray(main.price_summary.items)
+    ? `
+      <div style="
+        margin-top:8px;
+        background:#f9fafb;
+        border:1px solid #e5e7eb;
+        border-radius:8px;
+        padding:8px;
+        font-size:12px;
+      ">
+        <div style="font-weight:700; margin-bottom:4px;">
+          📦 대표 단가 (최근)
+        </div>
+
+        ${main.price_summary.items.map(i => `
+          <div style="display:flex; justify-content:space-between;">
+            <span>${i.item}</span>
+            <b>${Number(i.price).toLocaleString()}원</b>
+          </div>
+        `).join("")}
+
+        <div style="margin-top:6px; font-size:11px; color:#6b7280;">
+          🕒 단가 업데이트: ${main.price_summary.updated_at || "-"}
+        </div>
+      </div>
+    `
+    : "";
+
+
 
 const importanceRaw = String(main.importance ?? "").trim();
 
@@ -1830,22 +1862,11 @@ if (importanceRaw === "매우필요") {
 }
 
 
- card.innerHTML += `
+card.innerHTML += `
   <div style="margin-bottom:14px;">
 
-    <div style="font-size:15px; font-weight:800;">
-      ${main.vender_name}${main.link_number ? ` · ${main.link_number}` : ""}
-    </div>
-
-    ${main.phone ? `<div style="font-size:12px;">${main.phone}</div>` : ""}
-
-    ${main.strengths || main.desc ? `
-  <div style="font-size:12px; color:#6b7280; margin-top:2px;">
-    ${[main.strengths, main.desc].filter(Boolean).join(" · ")}
-  </div>
-` : ""}
-
-    <div style="margin-top:6px;">
+    <!-- 뱃지 -->
+    <div style="margin-bottom:4px;">
       <span class="vender-badge ${importanceClass}">
         ${importanceLabel}
       </span>
@@ -1854,48 +1875,50 @@ if (importanceRaw === "매우필요") {
       </span>
     </div>
 
-    <!-- ✅ QR + 설치 완료 버튼 -->
-    <div style="margin-top:10px; display:flex; gap:8px;">
-      
-      <!-- QR 버튼 -->
+    <!-- 유통사명 -->
+    <div style="font-size:15px; font-weight:800;">
+      ${main.vender_name}${main.link_number ? ` · ${main.link_number}` : ""}
+    </div>
+
+    ${main.phone ? `<div style="font-size:12px;">${main.phone}</div>` : ""}
+
+    ${main.strengths || main.desc ? `
+      <div style="font-size:12px; color:#6b7280; margin-top:2px;">
+        ${[main.strengths, main.desc].filter(Boolean).join(" · ")}
+      </div>
+    ` : ""}
+
+    ${priceSummaryHtml}
+
+    <!-- 버튼 영역 -->
+    <div style="margin-top:10px; display:flex; gap:6px;">
+
+      <button
+        onclick="openPriceTable('${main.vender}')"
+        style="flex:1; padding:8px; border-radius:8px; border:1px solid #e5e7eb;
+               background:white; font-size:12px; font-weight:700; cursor:pointer;">
+        📊 단가표
+      </button>
+
       ${main.qr_url ? `
-<button
-  onclick="openQr('${main.qr_url}')"
-  style="
-    flex:1;
-    padding:8px 10px;
-    border-radius:8px;
-    border:none;
-    background:#111827;
-    color:white;
-    font-size:12px;
-    font-weight:700;
-    cursor:pointer;
-  "
->
-  📱 QR 열기
-</button>
+        <button
+          onclick="openQr('${main.qr_url}')"
+          style="flex:1; padding:8px; border-radius:8px;
+                 background:#111827; color:white; font-size:12px; font-weight:700;">
+          📱 QR
+        </button>
       ` : ""}
 
-      <!-- 설치 완료 버튼 -->
       <button
         onclick="confirmVenderInstalled('${main.vender_name}')"
-        style="
-          flex:1;
-          padding:8px 10px;
-          border-radius:8px;
-          border:none;
-          background:#2563eb;
-          color:white;
-          font-size:12px;
-          font-weight:700;
-          cursor:pointer;
-        ">
+        style="flex:1; padding:8px; border-radius:8px;
+               background:#2563eb; color:white; font-size:12px; font-weight:700;">
         ✔ 설치 완료
       </button>
     </div>
   </div>
 `;
+
 
 
   // 👍 2) 대안 추천 (더보기)
@@ -1913,6 +1936,7 @@ if (importanceRaw === "매우필요") {
         🔽 대안 추천 더보기 (${alternatives.length})
       </div>
 
+        
       <div id="${altId}" class="hidden" style="margin-top:8px;">
        ${alternatives.map(v => `
         <!-- 중요도 / 우선순위 -->
@@ -2005,8 +2029,22 @@ function openQr(url) {
 
   window.open(finalUrl, "_blank");
 }
+function openPriceTable(vender) {
+  if (!vender) {
+    alert("유통사 정보가 없습니다.");
+    return;
+  }
+
+  const url =
+    `${BASE_URL}?action=vender_price&vender=${encodeURIComponent(vender)}`;
+
+  window.open(url, "_blank");
+}
 
 
+function showToast(msg) {
+  alert(msg);
+}
 
 
 

@@ -1800,6 +1800,101 @@ function showStoreDetail(r) {
 /*************************************************
  * 📦 추천 유통사 렌더링 (수정본)
  *************************************************/
+/*************************************************
+ * ✅ 추천 유통사 카드 공통 렌더 함수 (메인/대안 공용)
+ *************************************************/
+function renderVenderCard(v, { isMain = false } = {}) {
+  if (!v) return "";
+
+  const importanceRaw = String(v.importance ?? "").trim();
+
+  let importanceBadgeHtml = "";
+  if (importanceRaw === "매우필요") {
+    importanceBadgeHtml = `<span class="vender-badge badge-important">매우필요</span>`;
+  } else if (importanceRaw === "확장필요") {
+    importanceBadgeHtml = `<span class="vender-badge badge-priority">확장필요</span>`;
+  }
+
+  // ✅ 메인에서만 단가 요약 보여주고 싶으면 isMain 조건 유지
+  const priceSummaryHtml =
+    isMain && v.price_summary && Array.isArray(v.price_summary.items)
+      ? `
+        <div style="
+          margin-top:8px;
+          background:#f9fafb;
+          border:1px solid #e5e7eb;
+          border-radius:8px;
+          padding:8px;
+          font-size:12px;
+        ">
+          <div style="font-weight:700; margin-bottom:4px;">📦 대표 단가 (최근)</div>
+
+          ${v.price_summary.items.map(i => `
+            <div style="display:flex; justify-content:space-between;">
+              <span>${i.item}</span>
+              <b>${Number(i.price).toLocaleString()}원</b>
+            </div>
+          `).join("")}
+
+          <div style="margin-top:6px; font-size:11px; color:#6b7280;">
+            🕒 단가 업데이트: ${v.price_summary.updated_at || "-"}
+          </div>
+        </div>
+      `
+      : "";
+
+  return `
+    <div style="padding:10px; border:1px solid #e5e7eb; border-radius:10px; background:#fff; margin-bottom:10px;">
+      <!-- 뱃지 -->
+      <div style="margin-bottom:6px; display:flex; gap:6px; align-items:center;">
+        ${importanceBadgeHtml}
+        <span class="vender-badge badge-priority">우선순위 ${v.priority ?? "-"}</span>
+      </div>
+
+      <!-- 이름 -->
+      <div style="font-size:15px; font-weight:800;">
+        ${v.vender_name || "-"}${v.link_number ? ` · ${v.link_number}` : ""}
+      </div>
+
+      <!-- 전화 -->
+      ${v.phone ? `<div style="font-size:12px; margin-top:2px;">${v.phone}</div>` : ""}
+
+      <!-- 강점/설명 -->
+      ${v.strengths || v.desc ? `
+        <div style="font-size:12px; color:#6b7280; margin-top:4px;">
+          ${[v.strengths, v.desc].filter(Boolean).join(" · ")}
+        </div>
+      ` : ""}
+
+      ${priceSummaryHtml}
+
+      <!-- 버튼 -->
+      <div style="margin-top:10px; display:flex; gap:6px;">
+        <button
+          onclick="openPriceTable('${v.vender}')"
+          style="flex:1; padding:8px; border-radius:8px; border:1px solid #e5e7eb; background:white; font-size:12px; font-weight:700;">
+          📊 단가표
+        </button>
+
+        ${v.qr_url ? `
+          <button
+            onclick="openQr('${v.qr_url}')"
+            style="flex:1; padding:8px; border-radius:8px; border:none; background:#111827; color:white; font-size:12px; font-weight:700;">
+            📱 QR
+          </button>
+        ` : ""}
+
+        <button
+          onclick="confirmVenderInstalled('${v.vender_name || ""}')"
+          style="flex:1; padding:8px; border-radius:8px; border:none; background:#2563eb; color:white; font-size:12px; font-weight:700;">
+          ✔ 앱설치
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+  
 function renderRecommendedVender(store) {
   const section = document.getElementById("venderSection");
   const card = document.getElementById("venderCard");
@@ -1815,112 +1910,10 @@ function renderRecommendedVender(store) {
   section.style.display = "block";
   card.innerHTML = "";
 
-  // ⭐ 1) 대표 추천
-  const main = venders[0];
+  // ✅ 1) 대표 추천 (공통 카드 그대로)
+  card.innerHTML += renderVenderCard(venders[0], { isMain: true });
 
-  /* ---------- 단가 요약 ---------- */
-  const priceSummaryHtml =
-    main.price_summary && Array.isArray(main.price_summary.items)
-      ? `
-        <div style="
-          margin-top:8px;
-          background:#f9fafb;
-          border:1px solid #e5e7eb;
-          border-radius:8px;
-          padding:8px;
-          font-size:12px;
-        ">
-          <div style="font-weight:700; margin-bottom:4px;">
-            📦 대표 단가 (최근)
-          </div>
-
-          ${main.price_summary.items.map(i => `
-            <div style="display:flex; justify-content:space-between;">
-              <span>${i.item}</span>
-              <b>${Number(i.price).toLocaleString()}원</b>
-            </div>
-          `).join("")}
-
-          <div style="margin-top:6px; font-size:11px; color:#6b7280;">
-            🕒 단가 업데이트: ${main.price_summary.updated_at || "-"}
-          </div>
-        </div>
-      `
-      : "";
-
-  /* ---------- 중요도 뱃지 처리 (핵심 수정) ---------- */
-  const importanceRaw = String(main.importance ?? "").trim();
-
-  let importanceBadgeHtml = "";
-
-  if (importanceRaw === "매우필요") {
-    importanceBadgeHtml = `
-      <span class="vender-badge badge-important">매우필요</span>
-    `;
-  } else if (importanceRaw === "확장필요") {
-    importanceBadgeHtml = `
-      <span class="vender-badge badge-priority">확장필요</span>
-    `;
-  }
-  // ❗ 보통(빈값) → 아무것도 렌더링 안 함
-
-  /* ---------- 카드 렌더 ---------- */
-  card.innerHTML += `
-    <div style="margin-bottom:14px;">
-
-      <!-- 🔥 뱃지 영역 (유통사명 위) -->
-      <div style="margin-bottom:6px; display:flex; gap:6px; align-items:center;">
-        ${importanceBadgeHtml}
-        <span class="vender-badge badge-priority">
-          우선순위 ${main.priority ?? "-"}
-        </span>
-      </div>
-
-      <!-- 유통사명 -->
-      <div style="font-size:15px; font-weight:800;">
-        ${main.vender_name}${main.link_number ? ` · ${main.link_number}` : ""}
-      </div>
-
-      ${main.phone ? `<div style="font-size:12px;">${main.phone}</div>` : ""}
-
-      ${main.strengths || main.desc ? `
-        <div style="font-size:12px; color:#6b7280; margin-top:2px;">
-          ${[main.strengths, main.desc].filter(Boolean).join(" · ")}
-        </div>
-      ` : ""}
-
-      ${priceSummaryHtml}
-
-      <!-- 버튼 영역 -->
-      <div style="margin-top:10px; display:flex; gap:6px;">
-        <button
-          onclick="openPriceTable('${main.vender}')"
-          style="flex:1; padding:8px; border-radius:8px; border:1px solid #e5e7eb;
-                 background:white; font-size:12px; font-weight:700;">
-          📊 단가표
-        </button>
-
-        ${main.qr_url ? `
-          <button
-            onclick="openQr('${main.qr_url}')"
-            style="flex:1; padding:8px; border-radius:8px;
-                   background:#111827; color:white; font-size:12px; font-weight:700;">
-            📱 QR
-          </button>
-        ` : ""}
-
-        <button
-          onclick="confirmVenderInstalled('${main.vender_name}')"
-          style="flex:1; padding:8px; border-radius:8px;
-                 background:#2563eb; color:white; font-size:12px; font-weight:700;">
-          ✔ 앱설치
-        </button>
-      </div>
-    </div>
-  `;
-
-
-  // 👍 2) 대안 추천 (더보기)
+  // ✅ 2) 대안 추천
   const alternatives = venders.slice(1);
   if (!alternatives.length) return;
 
@@ -1935,86 +1928,13 @@ function renderRecommendedVender(store) {
         🔽 대안 추천 더보기 (${alternatives.length})
       </div>
 
-        
       <div id="${altId}" class="hidden" style="margin-top:8px;">
-       ${alternatives.map(v => `
-        <!-- 중요도 / 우선순위 -->
-    <div style="margin-top:6px;">
-      ${v.importance ? `
-        <span class="vender-badge ${
-          v.importance === "매우필요"
-            ? "badge-important"
-            : "badge-priority"
-        }">
-          ${v.importance}
-        </span>
-      ` : ""}
-      <span class="vender-badge badge-priority">
-        우선순위 ${v.priority ?? "-"}
-      </span>
-      
-  <div style="padding:10px; border-top:1px dashed #e5e7eb;">
-    <!-- 유통사 이름 -->
-    <div style="font-weight:700; font-size:14px;">
-      ${v.vender_name}${v.link_number ? ` · ${v.link_number}` : ""}
-    </div>
-
-    <!-- 강점 -->
-    ${v.strengths ? `
-      <div style="font-size:12px; margin-top:2px;">
-        ${v.strengths}
+        ${alternatives.map(v => renderVenderCard(v)).join("")}
       </div>
-    ` : ""}
-
-   
     </div>
-
-<!-- 🔥 QR + 설치 버튼 (수정본) -->
-<div style="display:flex; gap:6px; margin-top:8px;">
-
-  ${v.qr_url ? `
-    <button
-      onclick="openQr('${v.qr_url}')"
-      style="
-        flex:1;
-        padding:6px 8px;
-        border-radius:6px;
-        border:none;
-        background:#374151;
-        color:white;
-        font-size:12px;
-        font-weight:700;
-        cursor:pointer;
-      ">
-      📱 QR 열기
-    </button>
-  ` : ""}
-
-  <button
-    onclick="confirmVenderInstalled('${v.vender_name}')"
-    style="
-      flex:1;
-      padding:6px 8px;
-      border-radius:6px;
-      border:none;
-      background:#2563eb;
-      color:white;
-      font-size:12px;
-      font-weight:700;
-      cursor:pointer;
-    ">
-    ✔ 설치 완료
-  </button>
-
-</div>
-
-
-  </div>
-`).join("")}
-  </div>
-  </div>
-`;
+  `;
 }
+
 
 
   

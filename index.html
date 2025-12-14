@@ -1380,10 +1380,8 @@ function findRecommendedVenders(store, limit = 3) {
         .split(/[,/]/)
         .map(c => c.trim());
 
-      const isMatch =
-        categories.includes(storeCategory) ||
-        categories.includes("한식") ||
-        categories.includes("고깃집");
+      const isMatch = categories.includes(storeCategory);
+
 
       if (!isMatch) return null;
 
